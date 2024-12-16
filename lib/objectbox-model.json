@@ -1,0 +1,169 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:3309203886988884770",
+      "lastPropertyId": "21:6302222563772266739",
+      "name": "EpisodeEntity",
+      "properties": [
+        {
+          "id": "1:668424013223521821",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6141596027453652814",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "3:767892463554070742",
+          "name": "subtitle",
+          "type": 9
+        },
+        {
+          "id": "4:2894804369429132928",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "5:3455955862748461904",
+          "name": "pubDate",
+          "type": 9
+        },
+        {
+          "id": "6:7505172247141206455",
+          "name": "duration",
+          "type": 9
+        },
+        {
+          "id": "7:1741935446466659292",
+          "name": "enclosureUrlToAudioFile",
+          "type": 9
+        },
+        {
+          "id": "8:8252002439903660138",
+          "name": "imgSrc",
+          "type": 9
+        },
+        {
+          "id": "9:467021800030601710",
+          "name": "siteUrl",
+          "type": 9
+        },
+        {
+          "id": "10:8319883336630448423",
+          "name": "author",
+          "type": 9
+        },
+        {
+          "id": "11:8032882114758395693",
+          "name": "episodeType",
+          "type": 9
+        },
+        {
+          "id": "12:6875430055124487265",
+          "name": "episodeNr",
+          "type": 9
+        },
+        {
+          "id": "13:2015876515127752125",
+          "name": "keywords",
+          "type": 9
+        },
+        {
+          "id": "14:7574047575443263318",
+          "name": "explicit",
+          "type": 9
+        },
+        {
+          "id": "15:6483140894059304113",
+          "name": "category",
+          "type": 9
+        },
+        {
+          "id": "16:6958454228345394273",
+          "name": "language",
+          "type": 9
+        },
+        {
+          "id": "17:8135968068062849025",
+          "name": "favorite",
+          "type": 1
+        },
+        {
+          "id": "18:7409952201026245034",
+          "name": "read",
+          "type": 1
+        },
+        {
+          "id": "19:1971452761106932243",
+          "name": "completed",
+          "type": 1
+        },
+        {
+          "id": "20:3063358670821914948",
+          "name": "position",
+          "type": 6
+        },
+        {
+          "id": "21:6302222563772266739",
+          "name": "podcastId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "1:7279534521704955711",
+          "relationTarget": "PodcastEntity"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:7816089807555791931",
+      "lastPropertyId": "5:3667417151176843567",
+      "name": "PodcastEntity",
+      "properties": [
+        {
+          "id": "1:8763866746127038548",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2574668561834224178",
+          "name": "image",
+          "type": 9
+        },
+        {
+          "id": "3:8367497652790873153",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "4:5665529740232816284",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "5:3667417151176843567",
+          "name": "rssUrl",
+          "type": 9
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "2:7816089807555791931",
+  "lastIndexId": "1:7279534521704955711",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}
