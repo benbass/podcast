@@ -5,9 +5,12 @@ Search, follow and listen to Podcasts
 ## Getting Started
 
 This App uses the Podcastindex API under https://api.podcastindex.org/
+
 API key:
-You'll need an account to get your own API keys that must be inserted in the variables apikey and apiSecret in authorization.dart file.
+You need an account to obtain your own API keys, which must be inserted in the apikey and apiSecret variables in the authorisation.dart file.
+
 I use an .env file (included in gitignore) for hardcoded values and envied + envied_generator packages for obfuscation: https://pub.dev/packages/envied
+
 My gitignore:
 
 *.env
