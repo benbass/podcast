@@ -14,6 +14,7 @@ I use an .env file (included in gitignore) for hardcoded values and envied + env
 My gitignore:
 
 *.env
+
 /lib/env/env.g.dart
 
 ## Current state
