@@ -28,3 +28,4 @@ Done: Search for podcasts and view description and episodes, view episode descri
     - Playlists and favourites
     - Player (skip to previous and skip to next episode: playlists must be implemented first)
     - Share on social media or as link
+    - Unit tests
