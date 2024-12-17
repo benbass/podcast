@@ -27,8 +27,6 @@ class PodcastSearchPageState extends State<PodcastSearchPage> {
 // while Web Scraping awaits
   bool isLoading = false;
 
-
-
   @override
   void initState() {
     getAndroidVersion();

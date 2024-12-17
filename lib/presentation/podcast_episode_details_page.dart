@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -9,9 +9,11 @@ import 'package:podcast/domain/entities/episode_entity.dart';
 import '../application/podcast_episode_url/current_url_cubit.dart';
 import '../helpers/core/format_duration.dart';
 import '../helpers/core/format_pubdate_string.dart';
+import '../helpers/core/get_android_version.dart';
 import '../helpers/player/audiohandler.dart';
 import '../injection.dart';
 import 'audioplayer_overlay.dart';
+import 'flexible_space.dart';
 
 class PodcastEpisodeDetailsPage extends StatelessWidget {
   final EpisodeEntity episode;
@@ -33,7 +35,9 @@ class PodcastEpisodeDetailsPage extends StatelessWidget {
         if (didPop) {
           return;
         }
-        if (sl<MyAudioHandler>().player.playing && overlayEntry == null) {
+        if (sl<MyAudioHandler>().player.processingState ==
+                ProcessingState.ready &&
+            overlayEntry == null) {
           showOverlayPlayerMin(context, episode, title);
         }
         // We don't pop immediately (it causes an exception): we use a scheduler
@@ -42,70 +46,21 @@ class PodcastEpisodeDetailsPage extends StatelessWidget {
         });
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text("$title: ${episode.title}"),
-          leading: IconButton(
-            onPressed: () {
-              if (sl<MyAudioHandler>().player.playing && overlayEntry == null) {
-                showOverlayPlayerMin(context, episode, title);
-              }
-
-              Navigator.of(context).pop();
-            },
-            icon: const BackButtonIcon(),
-          ),
-        ),
         body: Stack(
           children: [
-            Column(
-              children: [
-                Container(
-                  height: MediaQuery.of(context).size.height / 4,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: episode.image != ""
-                          ? NetworkImage(episode.image)
-                          : const AssetImage("assets/placeholder.png"),
-                      fit: BoxFit.fitWidth,
-                    ),
+            SafeArea(
+              child: CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  FlexibleSpace(
+                    podcast: null,
+                    episode: episode,
+                    title: title,
                   ),
-                  child: ClipRect(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-                      child: Center(
-                        child: FadeInImage(
-                          fadeOutDuration: const Duration(milliseconds: 100),
-                          fadeInDuration: const Duration(milliseconds: 200),
-                          imageErrorBuilder: (context, error, stackTrace) {
-                            return Image.asset(
-                              "assets/placeholder.png",
-                              fit: BoxFit.cover,
-                              //height: 300,
-                              //width: 300,
-                            );
-                          },
-                          //height: 300,
-                          //width: 300,
-                          fit: BoxFit.cover,
-                          placeholder:
-                              const AssetImage('assets/placeholder.png'),
-                          image: NetworkImage(episode.image),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 12.0, horizontal: 20.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(episode.title),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+                    sliver: SliverToBoxAdapter(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(formatTimestamp(episode.datePublished)),
@@ -114,30 +69,24 @@ class PodcastEpisodeDetailsPage extends StatelessWidget {
                               : formatIntDuration(episode.duration!)),
                         ],
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height / 3,
-                        child: SingleChildScrollView(
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 50.0),
-                            child: Text(
-                              episode.description,
-                              style: const TextStyle(
-                                fontSize: 15.0,
-                              ),
-                            ),
-                          ),
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 170.0),
+                    sliver: SliverToBoxAdapter(
+                      child: Text(
+                        episode.description,
+                        style: const TextStyle(
+                          fontSize: 16.0,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                  )
+                ],
+              ),
             ),
             Positioned(
-                bottom: MediaQuery.of(context).padding.bottom,
+                bottom: 0,
                 left: 0,
                 right: 0,
                 child: Container(
@@ -281,6 +230,12 @@ class PodcastEpisodeDetailsPage extends StatelessWidget {
                 ))
           ],
         ),
+        bottomNavigationBar: Platform.isAndroid && androidVersion > 14
+            ? Container(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                height: MediaQuery.of(context).padding.bottom,
+              )
+            : null,
       ),
     );
   }

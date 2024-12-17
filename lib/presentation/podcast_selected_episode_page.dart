@@ -27,7 +27,10 @@ class PodcastSelectedEpisodePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("${podcast.title}: ${episode.title}"),
+        title: Text(
+          podcast.title,
+          maxLines: 3,
+        ),
       ),
       body: Stack(
         children: [
@@ -51,7 +54,9 @@ class PodcastSelectedEpisodePage extends StatelessWidget {
                         width: 56,
                         fit: BoxFit.scaleDown,
                         placeholder: const AssetImage('assets/placeholder.png'),
-                        image: Image.network(episode.image).image,
+                        image: Image.network(
+                          episode.image,
+                        ).image,
                       ).image
                     : const AssetImage("assets/placeholder.png"),
                 fit: BoxFit.fitWidth,
@@ -60,58 +65,57 @@ class PodcastSelectedEpisodePage extends StatelessWidget {
             child: ClipRect(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                //blendMode: BlendMode.lighten,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        if (sl<MyAudioHandler>().player.playing &&
-                            overlayEntry == null) {
-                          showOverlayPlayerMin(context, episode, podcast.title);
-                        }
-                      },
-                      behavior: HitTestBehavior.opaque,
-                      child: Row(
-                        children: [
-                          FadeInImage(
-                            fadeOutDuration: const Duration(milliseconds: 100),
-                            fadeInDuration: const Duration(milliseconds: 200),
-                            imageErrorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                "assets/placeholder.png",
-                                fit: BoxFit.cover,
-                                height: 120,
-                              );
-                            },
-                            height: 120,
-                            fit: BoxFit.cover,
-                            placeholder:
-                                const AssetImage('assets/placeholder.png'),
-                            image: Image.network(
-                              episode.image,
-                            ).image,
+                    Row(
+                      children: [
+                        FadeInImage(
+                          fadeOutDuration: const Duration(milliseconds: 100),
+                          fadeInDuration: const Duration(milliseconds: 200),
+                          imageErrorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              "assets/placeholder.png",
+                              fit: BoxFit.cover,
+                              height: 120,
+                            );
+                          },
+                          height: 120,
+                          fit: BoxFit.cover,
+                          placeholder:
+                              const AssetImage('assets/placeholder.png'),
+                          image: Image.network(
+                            episode.image,
+                          ).image,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                formatTimestamp(episode.datePublished),
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                              Text(
+                                episode.duration! == 0
+                                    ? ""
+                                    : formatIntDuration(episode.duration!),
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                              const Spacer(),
+                              Icon(
+                                episode.read == true
+                                    ? Icons.check_circle_outline_rounded
+                                    : Icons.remove_circle_outline_rounded,
+                                color: Colors.black,
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  formatTimestamp(episode.datePublished),
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                                Text(
-                                  episode.duration! == 0
-                                      ? ""
-                                      : formatIntDuration(episode.duration!),
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     BlocBuilder<CurrentUrlCubit, String>(
                       builder: (context, state) {
@@ -121,10 +125,11 @@ class PodcastSelectedEpisodePage extends StatelessWidget {
                                   sl<MyAudioHandler>().player.playerStateStream,
                               builder: (context, stream) {
                                 final isPlaying = stream.data?.playing;
+
                                 return IconButton(
                                   onPressed: () async {
                                     if (isPlaying == true) {
-                                      // Only if player is playing we have an overlay that we can remove
+                                      // Only if player is playing we have an overlay (from current playback) that we can remove
                                       removeOverlay();
                                     }
 
@@ -157,7 +162,6 @@ class PodcastSelectedEpisodePage extends StatelessWidget {
                                   constraints: const BoxConstraints(),
                                   icon: const Icon(
                                     Icons.play_arrow_rounded,
-                                    color: Colors.white,
                                     size: 80,
                                   ),
                                 );
@@ -165,7 +169,7 @@ class PodcastSelectedEpisodePage extends StatelessWidget {
                         } else {
                           return const Icon(
                             Icons.play_arrow_rounded,
-                            color: Colors.white54,
+                            color: Colors.white24,
                             size: 80,
                           );
                         }
@@ -220,7 +224,6 @@ class PodcastSelectedEpisodePage extends StatelessWidget {
                   const SizedBox(
                     height: 8,
                   ),
-                  Text(episode.read.toString()),
                 ],
               ),
             ),

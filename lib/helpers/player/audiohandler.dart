@@ -3,6 +3,14 @@ import 'package:podcast/helpers/notifications/create_notification.dart';
 
 import '../../presentation/audioplayer_overlay.dart';
 
+/*
+ProcessingState.idle: player is idle and didn't load any audio file.
+ProcessingState.loading: player is loading audio file.
+ProcessingState.buffering: player buffers audio file.
+ProcessingState.ready: player ready for playback. >>> Use this for pause state
+player.playing: player ia playing audio file.
+ProcessingState.completed: playback is completed
+ */
 
 class MyAudioHandler {
   final player = AudioPlayer(); // Instance of the JustAudio player.
