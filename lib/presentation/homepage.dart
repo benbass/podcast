@@ -106,6 +106,7 @@ class HomePageState extends State<HomePage> {
                                     ),
                                   );
                                 }
+                                hintText = keyword;
                               }
                             },
                           ),
