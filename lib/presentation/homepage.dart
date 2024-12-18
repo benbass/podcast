@@ -43,7 +43,7 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: const Text("Podcasts"),
       ),
       body: SafeArea(
         child: CustomScrollView(
