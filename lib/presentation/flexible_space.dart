@@ -43,39 +43,49 @@ class FlexibleSpace extends StatelessWidget {
           padding: const EdgeInsets.only(
             bottom: 70,
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: image != ""
-                    ? NetworkImage(image)
-                    : const AssetImage("assets/placeholder.png"),
-                fit: BoxFit.fitWidth,
-              ),
-            ),
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-                child: Center(
-                  child: FadeInImage(
-                    fadeOutDuration: const Duration(milliseconds: 100),
-                    fadeInDuration: const Duration(milliseconds: 200),
-                    imageErrorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        "assets/placeholder.png",
-                        fit: BoxFit.cover,
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: image != ""
+                        ? NetworkImage(image)
+                        : const AssetImage("assets/placeholder.png"),
+                    fit: BoxFit.fitWidth,
+                  ),
+                ),
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                    child: Center(
+                      child: FadeInImage(
+                        fadeOutDuration: const Duration(milliseconds: 100),
+                        fadeInDuration: const Duration(milliseconds: 200),
+                        imageErrorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            "assets/placeholder.png",
+                            fit: BoxFit.cover,
+                            //height: 300,
+                            //width: 300,
+                          );
+                        },
                         //height: 300,
                         //width: 300,
-                      );
-                    },
-                    //height: 300,
-                    //width: 300,
-                    fit: BoxFit.cover,
-                    placeholder: const AssetImage('assets/placeholder.png'),
-                    image: NetworkImage(image),
+                        fit: BoxFit.cover,
+                        placeholder: const AssetImage('assets/placeholder.png'),
+                        image: NetworkImage(image),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              Container(
+                padding: const EdgeInsets.all(4.0),
+                decoration: const BoxDecoration(
+                  color: Colors.black26,
+                ),
+              ),
+            ],
           ),
         ),
         titlePadding: const EdgeInsets.all(4.0),

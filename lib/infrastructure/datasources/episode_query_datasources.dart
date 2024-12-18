@@ -17,7 +17,7 @@ class EpisodeQueryDataSourcesImpl implements EpisodeQueryDataSources {
 
     final response = await http.get(
         Uri.parse(
-            'https://api.podcastindex.org/api/1.0/episodes/byfeedid?id=$id&pretty'),
+            'https://api.podcastindex.org/api/1.0/episodes/byfeedid?id=$id&pretty&max=1000'),
         headers: headers);
 
     if (response.statusCode == 200) {

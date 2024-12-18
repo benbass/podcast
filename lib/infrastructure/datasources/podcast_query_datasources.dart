@@ -20,7 +20,7 @@ class PodcastQueryDataSourceImpl implements PodcastQueryDataSources {
 
     final response = await http.get(
         Uri.parse(
-            'https://api.podcastindex.org/api/1.0/search/byterm?q=$searchKeyword&pretty'),
+            'https://api.podcastindex.org/api/1.0/search/byterm?q=$searchKeyword&pretty&max=1000'),
         headers: headers);
 
     if (response.statusCode == 200) {

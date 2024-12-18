@@ -26,22 +26,37 @@ class PodcastDetailsPage extends StatelessWidget {
               title: podcast.title,
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
-              sliver: SliverToBoxAdapter(
-                child: Text(
-                  podcast.description,
-                  style: const TextStyle(
-                    fontSize: 16,
+                padding: const EdgeInsets.fromLTRB(10.0, 0.0, 20.0, 10.0),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ...podcast.categories.values.map((value) => Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: Text(
+                              value,
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                          )),
+                    ],
                   ),
-                ),
-              ),
-            ),
+                )),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
+              padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
               sliver: SliverToBoxAdapter(
-                child: Column(
+                child: Row(
                   children: [
-                    TextButton(
+                    Text(
+                      podcast.episodeCount.toString(),
+                      style: const TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                    IconButton(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -52,13 +67,58 @@ class PodcastDetailsPage extends StatelessWidget {
                           ),
                         );
                       },
-                      child: const Text('Episodes'),
+                      icon: const Icon(
+                        Icons.view_list_rounded,
+                        size: 40,
+                      ),
                     ),
-                    TextButton(
+                    const SizedBox(
+                      width: 20.0,
+                    ),
+                    IconButton(
                       onPressed: () {
                         // save podcast to db
                       },
-                      child: const Text('Follow'),
+                      icon: const Icon(
+                        Icons.subscriptions_rounded,
+                        size: 30,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
+              sliver: SliverToBoxAdapter(
+                child: Text(
+                  podcast.description,
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 100.0),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      podcast.author,
+                      style: const TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: Text(
+                        podcast.language.toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
                   ],
                 ),

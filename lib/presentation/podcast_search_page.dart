@@ -17,20 +17,17 @@ class PodcastSearchPage extends StatefulWidget {
 }
 
 class PodcastSearchPageState extends State<PodcastSearchPage> {
-  String title = "";
+  String title = "Podcasts";
 // Map to store the extracted values
   List<PodcastEntity> results = [];
 
   final TextEditingController _textEditingController = TextEditingController();
 
-// boolean to show CircularProgressIndication
-// while Web Scraping awaits
   bool isLoading = false;
 
   @override
   void initState() {
     getAndroidVersion();
-    title = "Search a podcast";
     super.initState();
   }
 
@@ -52,6 +49,7 @@ class PodcastSearchPageState extends State<PodcastSearchPage> {
       ),
       body: SafeArea(
         child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
               child: Container(
@@ -84,8 +82,6 @@ class PodcastSearchPageState extends State<PodcastSearchPage> {
                           //Setting isLoading true to show the loader
                           setState(() {
                             isLoading = true;
-                            title =
-                                'Results for "${_textEditingController.text}"';
                           });
 
                           //Awaiting for web scraping function to return list of strings
@@ -96,6 +92,7 @@ class PodcastSearchPageState extends State<PodcastSearchPage> {
                           setState(() {
                             results = response;
                             isLoading = false;
+                            title = "${results.length} podcasts";
                           });
                         },
                         child: const Text(
@@ -122,41 +119,78 @@ class PodcastSearchPageState extends State<PodcastSearchPage> {
                       final entry = results.elementAt(index);
                       final title = entry.title;
                       final imgSrc = entry.artwork;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: ListTile(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              ScaleRoute(
-                                page: PodcastDetailsPage(
-                                  podcast: entry,
+                      return Card(
+                        key: ValueKey(entry.id),
+                        color: Theme.of(context).colorScheme.secondary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        elevation: 5.0,
+                        shadowColor: Colors.black,
+                        margin: const EdgeInsets.all(8.0),
+                        clipBehavior: Clip.antiAlias,
+                        child: SizedBox(
+                          height: 90.0,
+                          child: InkWell(
+                            splashColor: Colors.black87,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                ScaleRoute(
+                                  page: PodcastDetailsPage(
+                                    podcast: entry,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                          leading: FadeInImage(
-                            fadeOutDuration: const Duration(milliseconds: 100),
-                            fadeInDuration: const Duration(milliseconds: 200),
-                            imageErrorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                "assets/placeholder.png",
-                                fit: BoxFit.contain,
-                                height: 56,
                               );
                             },
-                            height: 56,
-                            width: 56,
-                            fit: BoxFit.scaleDown,
-                            placeholder:
-                                const AssetImage('assets/placeholder.png'),
-                            image: Image.network(
-                              imgSrc,
-                            ).image,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: FadeInImage(
+                                    fadeOutDuration:
+                                        const Duration(milliseconds: 100),
+                                    fadeInDuration:
+                                        const Duration(milliseconds: 200),
+                                    imageErrorBuilder:
+                                        (context, error, stackTrace) {
+                                      return Image.asset(
+                                        "assets/placeholder.png",
+                                        fit: BoxFit.cover,
+                                        height: 90,
+                                      );
+                                    },
+                                    height: 90,
+                                    width: 90,
+                                    fit: BoxFit.cover,
+                                    placeholder: const AssetImage(
+                                        'assets/placeholder.png'),
+                                    image: Image.network(
+                                      imgSrc,
+                                    ).image,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                      6.0,
+                                      10.0,
+                                      8.0,
+                                      10.0,
+                                    ),
+                                    child: Text(
+                                      title,
+                                      style: const TextStyle(
+                                        fontSize: 16.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          title: Text(title),
-                          tileColor: Theme.of(context).colorScheme.secondary,
-                          contentPadding: const EdgeInsets.all(6.0),
                         ),
                       );
                     },

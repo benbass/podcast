@@ -35,7 +35,6 @@ class PodcastSelectedEpisodePage extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-            //color: Colors.black54,
             height: 120,
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -62,122 +61,141 @@ class PodcastSelectedEpisodePage extends StatelessWidget {
                 fit: BoxFit.fitWidth,
               ),
             ),
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-                //blendMode: BlendMode.lighten,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
+            child: Stack(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4.0),
+                  decoration: const BoxDecoration(
+                    color: Colors.black38,
+                  ),
+                ),
+                ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                    //blendMode: BlendMode.lighten,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        FadeInImage(
-                          fadeOutDuration: const Duration(milliseconds: 100),
-                          fadeInDuration: const Duration(milliseconds: 200),
-                          imageErrorBuilder: (context, error, stackTrace) {
-                            return Image.asset(
-                              "assets/placeholder.png",
-                              fit: BoxFit.cover,
+                        Row(
+                          children: [
+                            FadeInImage(
+                              fadeOutDuration:
+                                  const Duration(milliseconds: 100),
+                              fadeInDuration: const Duration(milliseconds: 200),
+                              imageErrorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  "assets/placeholder.png",
+                                  fit: BoxFit.cover,
+                                  height: 120,
+                                );
+                              },
                               height: 120,
-                            );
-                          },
-                          height: 120,
-                          fit: BoxFit.cover,
-                          placeholder:
-                              const AssetImage('assets/placeholder.png'),
-                          image: Image.network(
-                            episode.image,
-                          ).image,
+                              fit: BoxFit.cover,
+                              placeholder:
+                                  const AssetImage('assets/placeholder.png'),
+                              image: Image.network(
+                                episode.image,
+                              ).image,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    formatTimestamp(episode.datePublished),
+                                    style: const TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    episode.duration! == 0
+                                        ? ""
+                                        : formatIntDuration(episode.duration!),
+                                    style: const TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Icon(
+                                    episode.read == true
+                                        ? Icons.check_circle_outline_rounded
+                                        : Icons.remove_circle_outline_rounded,
+                                    //color: Colors.black,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                formatTimestamp(episode.datePublished),
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                              Text(
-                                episode.duration! == 0
-                                    ? ""
-                                    : formatIntDuration(episode.duration!),
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                              const Spacer(),
-                              Icon(
-                                episode.read == true
-                                    ? Icons.check_circle_outline_rounded
-                                    : Icons.remove_circle_outline_rounded,
-                                color: Colors.black,
-                              ),
-                            ],
-                          ),
+                        BlocBuilder<CurrentUrlCubit, String>(
+                          builder: (context, state) {
+                            if (state != episode.enclosureUrl) {
+                              return StreamBuilder<PlayerState>(
+                                  stream: sl<MyAudioHandler>()
+                                      .player
+                                      .playerStateStream,
+                                  builder: (context, stream) {
+                                    final isPlaying = stream.data?.playing;
+
+                                    return IconButton(
+                                      onPressed: () async {
+                                        if (isPlaying == true) {
+                                          // Only if player is playing we have an overlay (from current playback) that we can remove
+                                          removeOverlay();
+                                        }
+
+                                        // source error?
+                                        try {
+                                          await sl<MyAudioHandler>()
+                                              .player
+                                              .setUrl(episode.enclosureUrl);
+                                          sl<MyAudioHandler>().play();
+
+                                          // We need to wait for the previous overlayEntry, if any, to be removed before we can insert the new one
+                                          Future.delayed(
+                                              const Duration(seconds: 2));
+                                          if (context.mounted) {
+                                            BlocProvider.of<CurrentUrlCubit>(
+                                                    context)
+                                                .setCurrentEpisodeUrl(
+                                                    episode.enclosureUrl);
+                                            showOverlayPlayerMin(context,
+                                                episode, podcast.title);
+                                          }
+                                        } on PlayerException {
+                                          if (context.mounted) {
+                                            showOverlayError(context,
+                                                "Error: No valid file exists under the requested url.");
+                                          }
+                                        }
+                                      },
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      icon: const Icon(
+                                        Icons.play_arrow_rounded,
+                                        size: 80,
+                                      ),
+                                    );
+                                  });
+                            } else {
+                              return const Icon(
+                                Icons.play_arrow_rounded,
+                                color: Colors.white24,
+                                size: 80,
+                              );
+                            }
+                          },
                         ),
                       ],
                     ),
-                    BlocBuilder<CurrentUrlCubit, String>(
-                      builder: (context, state) {
-                        if (state != episode.enclosureUrl) {
-                          return StreamBuilder<PlayerState>(
-                              stream:
-                                  sl<MyAudioHandler>().player.playerStateStream,
-                              builder: (context, stream) {
-                                final isPlaying = stream.data?.playing;
-
-                                return IconButton(
-                                  onPressed: () async {
-                                    if (isPlaying == true) {
-                                      // Only if player is playing we have an overlay (from current playback) that we can remove
-                                      removeOverlay();
-                                    }
-
-                                    // source error?
-                                    try {
-                                      await sl<MyAudioHandler>()
-                                          .player
-                                          .setUrl(episode.enclosureUrl);
-                                      sl<MyAudioHandler>().play();
-
-                                      // We need to wait for the previous overlayEntry, if any, to be removed before we can insert the new one
-                                      Future.delayed(
-                                          const Duration(seconds: 2));
-                                      if (context.mounted) {
-                                        BlocProvider.of<CurrentUrlCubit>(
-                                                context)
-                                            .setCurrentEpisodeUrl(
-                                                episode.enclosureUrl);
-                                        showOverlayPlayerMin(
-                                            context, episode, podcast.title);
-                                      }
-                                    } on PlayerException {
-                                      if (context.mounted) {
-                                        showOverlayError(context,
-                                            "Error: No valid file exists under the requested url.");
-                                      }
-                                    }
-                                  },
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                  icon: const Icon(
-                                    Icons.play_arrow_rounded,
-                                    size: 80,
-                                  ),
-                                );
-                              });
-                        } else {
-                          return const Icon(
-                            Icons.play_arrow_rounded,
-                            color: Colors.white24,
-                            size: 80,
-                          );
-                        }
-                      },
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
           Container(
@@ -191,7 +209,10 @@ class PodcastSelectedEpisodePage extends StatelessWidget {
                   const SizedBox(
                     height: 8,
                   ),
-                  Text(episode.title),
+                  Text(
+                    episode.title,
+                    style: const TextStyle(fontSize: 16.0),
+                  ),
                   const SizedBox(
                     height: 8,
                   ),
