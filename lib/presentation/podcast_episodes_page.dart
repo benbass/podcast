@@ -44,7 +44,27 @@ class _PodcastEpisodesPageState extends State<PodcastEpisodesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.podcast.title),
+        toolbarHeight: 80,
+        title: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(widget.podcast.title),
+            Row(
+              children: [
+                const Icon(Icons.list_rounded, size: 30,),
+                const SizedBox(
+                  width: 8.0,
+                ),
+                Text(
+                  podcastItems.length.toString(),
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       body: FutureBuilder<List<EpisodeEntity>>(
         future:
@@ -58,22 +78,40 @@ class _PodcastEpisodesPageState extends State<PodcastEpisodesPage> {
                   SliverPadding(
                     sliver: SliverToBoxAdapter(
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const Icon(Icons.list_rounded),
-                          const SizedBox(
-                            width: 8.0,
+                          IconButton(
+                            onPressed: () {
+                              // full text search
+                            },
+                            icon: const Icon(
+                              Icons.search_rounded,
+                              size: 30,
+                            ),
                           ),
-                          Text(
-                            podcastItems.length.toString(),
-                            style: const TextStyle(
-                              fontSize: 16.0,
+                          IconButton(
+                            onPressed: () {
+                              // activate select on list items
+                            },
+                            icon: const Icon(
+                              Icons.check_rounded,
+                              size: 30,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              // make a query
+                            },
+                            icon: const Icon(
+                              Icons.refresh_rounded,
+                              size: 30,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 20.0, horizontal: 10.0),
+                    padding: const EdgeInsets.only(
+                        bottom: 20.0,)
                   ),
                   SliverList.builder(
                     itemCount: podcastItems.length,

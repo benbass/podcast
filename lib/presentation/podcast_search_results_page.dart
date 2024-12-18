@@ -4,44 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/page_transition.dart';
 
-import '../domain/repositories/podcast_query_repository.dart';
 import '../helpers/core/get_android_version.dart';
-import '../injection.dart';
 import 'package:podcast/presentation/podcast_details_page.dart';
 
-class PodcastSearchPage extends StatefulWidget {
-  const PodcastSearchPage({super.key});
+class PodcastSearchResultsPage extends StatefulWidget {
+  final List<PodcastEntity> results;
+  final String title;
+  const PodcastSearchResultsPage({super.key, required this.results, required this.title});
 
   @override
-  PodcastSearchPageState createState() => PodcastSearchPageState();
+  PodcastSearchResultsPageState createState() => PodcastSearchResultsPageState();
 }
 
-class PodcastSearchPageState extends State<PodcastSearchPage> {
-  String title = "Podcasts";
-// Map to store the extracted values
-  List<PodcastEntity> results = [];
-
-  final TextEditingController _textEditingController = TextEditingController();
-
-  bool isLoading = false;
-
-  @override
-  void initState() {
-    getAndroidVersion();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _textEditingController.dispose();
-    super.dispose();
-  }
-
+class PodcastSearchResultsPageState extends State<PodcastSearchResultsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(widget.title),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.home_rounded),
@@ -51,72 +31,10 @@ class PodcastSearchPageState extends State<PodcastSearchPage> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(
-              child: Container(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: _textEditingController,
-                        onTapOutside: (_) {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                        },
-                        decoration: const InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        style: const TextStyle(
-                          color: Color(0xFF202531),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          FocusScope.of(context).unfocus();
-
-                          //Setting isLoading true to show the loader
-                          setState(() {
-                            isLoading = true;
-                          });
-
-                          //Awaiting for web scraping function to return list of strings
-                          final response = await sl<PodcastQueryRepository>()
-                              .getPodcastsOnQuery(_textEditingController.text);
-
-                          //Setting the received strings to be displayed and making isLoading false to hide the loader
-                          setState(() {
-                            results = response;
-                            isLoading = false;
-                            title = "${results.length} podcasts";
-                          });
-                        },
-                        child: const Text(
-                          'Search',
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            isLoading
-                ? SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  )
-                : SliverList.builder(
-                    itemCount: results.length,
+            SliverList.builder(
+                    itemCount: widget.results.length,
                     itemBuilder: (context, index) {
-                      final entry = results.elementAt(index);
+                      final entry = widget.results.elementAt(index);
                       final title = entry.title;
                       final imgSrc = entry.artwork;
                       return Card(

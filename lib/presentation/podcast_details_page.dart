@@ -46,41 +46,52 @@ class PodcastDetailsPage extends StatelessWidget {
                   ),
                 )),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+              padding: const EdgeInsets.fromLTRB(40.0, 10.0, 40.0, 10.0),
               sliver: SliverToBoxAdapter(
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      podcast.episodeCount.toString(),
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          SlideRightRoute(
-                            page: PodcastEpisodesPage(
-                              podcast: podcast,
-                            ),
+                    Row(
+                      children: [
+                        Text(
+                          podcast.episodeCount.toString(),
+                          style: const TextStyle(
+                            fontSize: 16,
                           ),
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.view_list_rounded,
-                        size: 40,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 20.0,
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              SlideRightRoute(
+                                page: PodcastEpisodesPage(
+                                  podcast: podcast,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.view_list_rounded,
+                            size: 40,
+                          ),
+                        ),
+                      ],
                     ),
                     IconButton(
                       onPressed: () {
-                        // save podcast to db
+                        // subscribe to podcast
                       },
                       icon: const Icon(
                         Icons.subscriptions_rounded,
+                        size: 30,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        // share podcast link
+                      },
+                      icon: const Icon(
+                        Icons.share_rounded,
                         size: 30,
                       ),
                     ),
