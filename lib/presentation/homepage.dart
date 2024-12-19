@@ -18,7 +18,6 @@ class HomePageState extends State<HomePage> {
   // Map to store the extracted values
   List<PodcastEntity> results = [];
 
-  String title = "Podcasts";
   String hintText = "Search";
 
   final TextEditingController _textEditingController = TextEditingController();
@@ -62,6 +61,9 @@ class HomePageState extends State<HomePage> {
                         onTapOutside: (_) {
                           FocusManager.instance.primaryFocus?.unfocus();
                         },
+                        onTap: (){
+                          hintText = "Search";
+                        },
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
@@ -69,44 +71,49 @@ class HomePageState extends State<HomePage> {
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.search),
                             onPressed: () async {
-                              FocusScope.of(context).unfocus();
+                              if (_textEditingController.text.isNotEmpty) {
+                                FocusScope.of(context).unfocus();
 
-                              //Setting isLoading true to show the loader
-                              setState(() {
-                                isLoading = true;
-                              });
+                                //Setting isLoading true to show the loader
+                                setState(() {
+                                  isLoading = true;
+                                });
 
-                              //Awaiting for web scraping function to return list of strings
-                              final response =
-                                  await sl<PodcastQueryRepository>()
-                                      .getPodcastsOnQuery(
-                                          _textEditingController.text);
-                              final String keyword = _textEditingController.text;
-                              _textEditingController.clear();
+                                //Awaiting for web scraping function to return list of strings
+                                final response =
+                                    await sl<PodcastQueryRepository>()
+                                        .getPodcastsOnQuery(
+                                            _textEditingController.text);
+                                final String keyword =
+                                    _textEditingController.text;
+                                _textEditingController.clear();
 
-                              //Setting the received strings to be displayed and making isLoading false to hide the loader
-                              setState(() {
-                                results = response;
-                                isLoading = false;
-                                title = "${results.length} podcasts";
-                                if(results.isEmpty){
-                                  hintText = "No podcast was found";
-                                }
-                              });
-                              if (results.isNotEmpty) {
-                                if (context.mounted) {
-                                  Navigator.push(
-                                    context,
-                                    SlideRightRoute(
-                                      page: PodcastSearchResultsPage(
-                                        results: results,
-                                        title:
-                                            '$title for "$keyword"',
+                                //Setting the received strings to be displayed and making isLoading false to hide the loader
+                                setState(() {
+                                  results = response;
+                                  isLoading = false;
+                                  if (results.isEmpty) {
+                                    hintText = "No podcast was found";
+                                  }
+                                });
+                                if (results.isNotEmpty) {
+                                  final String title = '${results.length} podcasts for "$keyword"';
+                                  if (context.mounted) {
+                                    Navigator.push(
+                                      context,
+                                      SlideRightRoute(
+                                        page: PodcastSearchResultsPage(
+                                          results: results,
+                                          title: title,
+                                        ),
                                       ),
-                                    ),
-                                  );
+                                    );
+                                  }
                                 }
-                                hintText = keyword;
+                              } else {
+                                setState(() {
+                                  hintText = "Please enter a keyword";
+                                });
                               }
                             },
                           ),
