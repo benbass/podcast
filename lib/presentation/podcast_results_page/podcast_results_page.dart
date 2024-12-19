@@ -2,21 +2,21 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
-import 'package:podcast/presentation/page_transition.dart';
+import 'package:podcast/presentation/custom_widgets/page_transition.dart';
 
-import '../helpers/core/get_android_version.dart';
-import 'package:podcast/presentation/podcast_details_page.dart';
+import '../../helpers/core/get_android_version.dart';
+import 'package:podcast/presentation/podcast_details_page/podcast_details_page.dart';
 
-class PodcastSearchResultsPage extends StatefulWidget {
+class PodcastResultsPage extends StatefulWidget {
   final List<PodcastEntity> results;
   final String title;
-  const PodcastSearchResultsPage({super.key, required this.results, required this.title});
+  const PodcastResultsPage({super.key, required this.results, required this.title});
 
   @override
-  PodcastSearchResultsPageState createState() => PodcastSearchResultsPageState();
+  PodcastResultsPageState createState() => PodcastResultsPageState();
 }
 
-class PodcastSearchResultsPageState extends State<PodcastSearchResultsPage> {
+class PodcastResultsPageState extends State<PodcastResultsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -5,9 +5,9 @@ import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 
-import '../helpers/player/audiohandler.dart';
-import '../injection.dart';
-import 'audioplayer_overlay.dart';
+import '../../helpers/player/audiohandler.dart';
+import '../../injection.dart';
+import '../audioplayer_overlays/audioplayer_overlays.dart';
 
 class FlexibleSpace extends StatelessWidget {
   final PodcastEntity? podcast;

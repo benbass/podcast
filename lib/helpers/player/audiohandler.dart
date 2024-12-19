@@ -1,7 +1,6 @@
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/helpers/notifications/create_notification.dart';
-
-import '../../presentation/audioplayer_overlay.dart';
+import '../../presentation/audioplayer_overlays/audioplayer_overlays.dart';
 
 /*
 ProcessingState.idle: player is idle and didn't load any audio file.

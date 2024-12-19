@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:podcast/domain/entities/podcast_entity.dart';
-import 'package:podcast/presentation/page_transition.dart';
-import 'package:podcast/presentation/podcast_selected_episode_page.dart';
-import '../domain/entities/episode_entity.dart';
-import '../domain/repositories/episode_repository.dart';
-import '../helpers/core/format_pubdate_string.dart';
-import '../helpers/core/get_android_version.dart';
-import '../injection.dart';
+import 'package:podcast/presentation/custom_widgets/page_transition.dart';
+import '../../domain/entities/episode_entity.dart';
+import '../../domain/repositories/episode_repository.dart';
+import '../../helpers/core/format_pubdate_string.dart';
+import '../../helpers/core/get_android_version.dart';
+import '../../injection.dart';
+import '../episode_selected/episode_selected_page.dart';
 
 class PodcastEpisodesPage extends StatefulWidget {
   final PodcastEntity podcast;
@@ -160,7 +160,7 @@ class _PodcastEpisodesPageState extends State<PodcastEpisodesPage> {
                               Navigator.push(
                                 context,
                                 ScaleRoute(
-                                  page: PodcastSelectedEpisodePage(
+                                  page: EpisodeSelectedPage(
                                     episode: episode,
                                     podcast: widget.podcast,
                                   ),

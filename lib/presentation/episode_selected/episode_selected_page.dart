@@ -4,20 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
-import 'package:podcast/presentation/webview.dart';
+import 'package:podcast/presentation/custom_widgets/webview.dart';
 
-import '../application/podcast_episode_url/current_url_cubit.dart';
-import '../domain/entities/episode_entity.dart';
-import '../helpers/core/format_duration.dart';
-import '../helpers/core/format_pubdate_string.dart';
-import '../helpers/player/audiohandler.dart';
-import '../injection.dart';
-import 'audioplayer_overlay.dart';
+import '../../application/podcast_episode_url/current_url_cubit.dart';
+import '../../domain/entities/episode_entity.dart';
+import '../../helpers/core/format_duration.dart';
+import '../../helpers/core/format_pubdate_string.dart';
+import '../../helpers/player/audiohandler.dart';
+import '../../injection.dart';
+import '../audioplayer_overlays/audioplayer_overlays.dart';
 
-class PodcastSelectedEpisodePage extends StatelessWidget {
+class EpisodeSelectedPage extends StatelessWidget {
   final EpisodeEntity episode;
   final PodcastEntity podcast;
-  const PodcastSelectedEpisodePage({
+  const EpisodeSelectedPage({
     super.key,
     required this.episode,
     required this.podcast,

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:podcast/presentation/page_transition.dart';
+import 'package:podcast/presentation/custom_widgets/page_transition.dart';
 
-import '../domain/entities/podcast_entity.dart';
-import 'package:podcast/presentation/podcast_episodes_page.dart';
+import '../../domain/entities/podcast_entity.dart';
+import 'package:podcast/presentation/episodes_list_page/episodes_list_page.dart';
 
-import 'flexible_space.dart';
+import '../custom_widgets/flexible_space.dart';
 
 class PodcastDetailsPage extends StatelessWidget {
   final PodcastEntity podcast;

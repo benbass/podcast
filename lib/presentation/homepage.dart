@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:podcast/presentation/page_transition.dart';
-import 'package:podcast/presentation/podcast_search_results_page.dart';
+import 'package:podcast/presentation/custom_widgets/page_transition.dart';
+import 'package:podcast/presentation/podcast_results_page/podcast_results_page.dart';
 
 import '../domain/entities/podcast_entity.dart';
 import '../domain/repositories/podcast_repository.dart';
@@ -102,7 +102,7 @@ class HomePageState extends State<HomePage> {
                                     Navigator.push(
                                       context,
                                       SlideRightRoute(
-                                        page: PodcastSearchResultsPage(
+                                        page: PodcastResultsPage(
                                           results: results,
                                           title: title,
                                         ),
