@@ -27,8 +27,7 @@ class PodcastDataSourceImpl implements PodcastDataSources {
       // If the server did return a 200 OK response,
       // then parse the JSON.
       var jsonFeed = json.decode(response.body);
-      List<PodcastEntity> podcasts = List<PodcastEntity>.from(jsonFeed['feeds'].map((x) => PodcastModel.fromJson(x)));
-      return podcasts;
+      return List<PodcastModel>.from(jsonFeed['feeds'].map((feed) => PodcastModel.fromJson(feed)));
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.

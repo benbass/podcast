@@ -1,8 +1,5 @@
-import 'package:html/parser.dart';
 import 'package:objectbox/objectbox.dart';
-import 'package:podcast/domain/entities/podcast_entity.dart';
 
-import '../../helpers/core/format_pubdate_string.dart';
 
 @Entity()
 class EpisodeEntity {
@@ -39,8 +36,6 @@ class EpisodeEntity {
   final bool completed;
   final int position;
 
-  final podcast = ToOne<PodcastEntity>();
-
   EpisodeEntity({
     required this.pId,
     required this.title,
@@ -67,31 +62,4 @@ class EpisodeEntity {
     required this.position,
   });
 
-  factory EpisodeEntity.fromJson(Map<String, dynamic> json) {
-    return EpisodeEntity(
-      pId: json['id'],
-      title: parse(json['title']).documentElement?.text ?? "",
-      description: parse(json['description']).documentElement?.text ?? "",
-      guid: json['guid'],
-      datePublished: json['datePublished'], // timestamp
-      datePublishedPretty: extractDataFromDateString(json['datePublishedPretty']),
-      enclosureUrl: json['enclosureUrl'],
-      enclosureLength: json['enclosureLength'],
-      duration: json['duration'] ?? 0,
-      explicit: json['explicit'],
-      episodeNr: json['episode'] ?? 0,
-      episodeType: json['episodeType'] ?? "",
-      season: json['season'],
-      image: json['image'],
-      feedUrl: json['feedUrl'],
-      link: json['link'],
-      feedImage: json['feedImage'],
-      feedId: json['feedId'],
-      podcastGuid: json['podcastGuid'],
-      favorite: false,
-      read: false,
-      completed: false,
-      position: 0,
-    );
-  }
 }

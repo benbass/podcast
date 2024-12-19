@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:podcast/domain/entities/podcast_entity.dart';
 
-import 'package:podcast/domain/repositories/episode_query_repository.dart';
+import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/page_transition.dart';
 import 'package:podcast/presentation/podcast_selected_episode_page.dart';
 import '../domain/entities/episode_entity.dart';
+import '../domain/repositories/episode_repository.dart';
 import '../helpers/core/format_pubdate_string.dart';
 import '../helpers/core/get_android_version.dart';
 import '../injection.dart';
@@ -27,8 +27,8 @@ class _PodcastEpisodesPageState extends State<PodcastEpisodesPage> {
   late List<EpisodeEntity> podcastItems = [];
 
   getEpisodes() async {
-    final List<EpisodeEntity> items = await sl<EpisodeQueryRepository>()
-        .getEpisodesOnQuery(widget.podcast.id);
+    final List<EpisodeEntity> items = await sl<EpisodeRepository>()
+        .fetchEpisodesByFeedId(widget.podcast.id);
     setState(() {
       podcastItems = [...items];
     });
@@ -68,7 +68,7 @@ class _PodcastEpisodesPageState extends State<PodcastEpisodesPage> {
       ),
       body: FutureBuilder<List<EpisodeEntity>>(
         future:
-            sl<EpisodeQueryRepository>().getEpisodesOnQuery(widget.podcast.id),
+            sl<EpisodeRepository>().fetchEpisodesByFeedId(widget.podcast.id),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final podcastItems = snapshot.data!;
