@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../domain/entities/podcast_entity.dart';
-import '../../domain/entities/podcast_query_entity.dart';
 import '../../helpers/authorization/authorization.dart';
+import '../models/podcast_model.dart';
 
-abstract class PodcastQueryDataSources {
+abstract class PodcastDataSources {
   Future<List<PodcastEntity>> fetchPodcastsByKeywords(String keyword);
 }
 
-class PodcastQueryDataSourceImpl implements PodcastQueryDataSources {
+class PodcastDataSourceImpl implements PodcastDataSources {
   @override
   Future<List<PodcastEntity>> fetchPodcastsByKeywords(String keyword) async {
     // Preparing keyword for web search
@@ -26,9 +26,9 @@ class PodcastQueryDataSourceImpl implements PodcastQueryDataSources {
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      PodcastQuery podCastSearchQuery =
-          PodcastQuery.fromJson(json.decode(response.body));
-      return podCastSearchQuery.podcasts;
+      var jsonFeed = json.decode(response.body);
+      List<PodcastEntity> podcasts = List<PodcastEntity>.from(jsonFeed['feeds'].map((x) => PodcastModel.fromJson(x)));
+      return podcasts;
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.

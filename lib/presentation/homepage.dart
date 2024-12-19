@@ -3,7 +3,7 @@ import 'package:podcast/presentation/page_transition.dart';
 import 'package:podcast/presentation/podcast_search_results_page.dart';
 
 import '../domain/entities/podcast_entity.dart';
-import '../domain/repositories/podcast_query_repository.dart';
+import '../domain/repositories/podcast_repository.dart';
 import '../helpers/core/get_android_version.dart';
 import '../injection.dart';
 
@@ -81,8 +81,8 @@ class HomePageState extends State<HomePage> {
 
                                 //Awaiting for web scraping function to return list of strings
                                 final response =
-                                    await sl<PodcastQueryRepository>()
-                                        .getPodcastsOnQuery(
+                                    await sl<PodcastRepository>()
+                                        .fetchPodcastsByKeywords(
                                             _textEditingController.text);
                                 final String keyword =
                                     _textEditingController.text;

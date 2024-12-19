@@ -1,4 +1,3 @@
-import 'package:html/parser.dart';
 
 class PodcastEntity {
   final int id;
@@ -35,26 +34,4 @@ class PodcastEntity {
     required this.episodeCount,
     required this.categories,
   });
-
-  factory PodcastEntity.fromJson(Map<String, dynamic> json) {
-    return PodcastEntity(
-      id: json['id'],
-      podcastGuid: json['podcastGuid'],
-      title: parse(json['title']).documentElement?.text ?? "",
-      url: json['url'] ?? "",
-      link: json['link'] ?? "",
-      description: parse(json['description']).documentElement?.text ?? "",
-      author: parse(json['author']).documentElement?.text ?? "",
-      ownerName: parse(json['ownerName']).documentElement?.text ?? "",
-      artwork: json['artwork'] ?? "",
-      lastUpdateTime: json['lastUpdateTime'] ?? 0,
-      language: json['language'] ?? "",
-      explicit: json['explicit'] ?? false,
-      medium: json['medium'] ?? "",
-      episodeCount: json['episodeCount'] ?? 0,
-      categories: json['categories'] != null
-          ? Map<String, String>.from(json['categories'])
-          : {},
-    );
-  }
 }
