@@ -47,6 +47,7 @@ class _PodcastEpisodesPageState extends State<PodcastEpisodesPage> {
         toolbarHeight: 80,
         title: Column(
           mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(widget.podcast.title),
             Row(
