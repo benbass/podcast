@@ -6,7 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/webview.dart';
 
-import '../../application/podcast_episode_url/current_url_cubit.dart';
+import '../../application/episode_playback_url/episode_playback_url_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../helpers/core/format_duration.dart';
 import '../../helpers/core/format_pubdate_string.dart';
@@ -132,7 +132,7 @@ class EpisodeSelectedPage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        BlocBuilder<CurrentUrlCubit, String>(
+                        BlocBuilder<EpisodePlaybackUrlCubit, String>(
                           builder: (context, state) {
                             if (state != episode.enclosureUrl) {
                               return StreamBuilder<PlayerState>(
@@ -160,9 +160,9 @@ class EpisodeSelectedPage extends StatelessWidget {
                                           Future.delayed(
                                               const Duration(seconds: 2));
                                           if (context.mounted) {
-                                            BlocProvider.of<CurrentUrlCubit>(
+                                            BlocProvider.of<EpisodePlaybackUrlCubit>(
                                                     context)
-                                                .setCurrentEpisodeUrl(
+                                                .setPlaybackEpisodeUrl(
                                                     episode.enclosureUrl);
                                             showOverlayPlayerMin(context,
                                                 episode, podcast.title);

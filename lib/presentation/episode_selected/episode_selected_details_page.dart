@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 
-import '../../application/podcast_episode_url/current_url_cubit.dart';
+import '../../application/episode_playback_url/episode_playback_url_cubit.dart';
 import '../../helpers/core/format_duration.dart';
 import '../../helpers/core/format_pubdate_string.dart';
 import '../../helpers/core/get_android_version.dart';
@@ -178,8 +178,8 @@ class EpisodeSelectedDetailsPage extends StatelessWidget {
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   sl<MyAudioHandler>().stop();
-                                  BlocProvider.of<CurrentUrlCubit>(context)
-                                      .setCurrentEpisodeUrl("");
+                                  BlocProvider.of<EpisodePlaybackUrlCubit>(context)
+                                      .setPlaybackEpisodeUrl("");
                                   removeOverlay();
                                 },
                                 icon: const Icon(
