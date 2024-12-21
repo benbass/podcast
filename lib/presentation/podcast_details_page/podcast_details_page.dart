@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:podcast/presentation/custom_widgets/page_transition.dart';
+import 'package:podcast/presentation/podcast_details_page/widgets/categories.dart';
+import 'package:podcast/presentation/podcast_details_page/widgets/row_icon_buttons_podcasts.dart';
 
 import '../../domain/entities/podcast_entity.dart';
-import 'package:podcast/presentation/episodes_list_page/episodes_list_page.dart';
 
 import '../custom_widgets/flexible_space.dart';
 
@@ -32,71 +32,14 @@ class PodcastDetailsPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ...podcast.categories.values.map((value) => Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 4.0),
-                            child: Text(
-                              value,
-                              style: const TextStyle(
-                                fontSize: 16,
-                              ),
-                            ),
-                          )),
+                      ...podcast.categories.values.map((value) => Categories(value: value,)),
                     ],
                   ),
                 )),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(40.0, 10.0, 40.0, 10.0),
               sliver: SliverToBoxAdapter(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          podcast.episodeCount.toString(),
-                          style: const TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              SlideRightRoute(
-                                page: PodcastEpisodesPage(
-                                  podcast: podcast,
-                                ),
-                              ),
-                            );
-                          },
-                          icon: const Icon(
-                            Icons.view_list_rounded,
-                            size: 40,
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        // subscribe to podcast
-                      },
-                      icon: const Icon(
-                        Icons.subscriptions_rounded,
-                        size: 30,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        // share podcast link
-                      },
-                      icon: const Icon(
-                        Icons.share_rounded,
-                        size: 30,
-                      ),
-                    ),
-                  ],
-                ),
+                child: RowIconButtonsPodcasts(podcast: podcast),
               ),
             ),
             SliverPadding(
@@ -141,3 +84,4 @@ class PodcastDetailsPage extends StatelessWidget {
     );
   }
 }
+
