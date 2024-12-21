@@ -20,6 +20,48 @@ class _SearchTextFieldState extends State<SearchTextField> {
   String hintText = "Search";
   List<PodcastEntity> results = [];
 
+  void handleOnPressed(IsLoadingCubit isLoadingCubit, BuildContext context) async {
+    if (_textEditingController.text.isNotEmpty) {
+      FocusScope.of(context).unfocus();
+
+      //Setting isLoading true to show the loader
+      isLoadingCubit.setIsLoading(true);
+
+      results = await sl<PodcastRepository>()
+          .fetchPodcastsByKeywords(_textEditingController.text);
+
+      final String keyword = _textEditingController.text;
+
+      _textEditingController.clear();
+
+      isLoadingCubit.setIsLoading(false);
+
+      if (results.isEmpty) {
+        setState(() {
+          hintText = "No podcast was found";
+        });
+      } else {
+        final String title =
+            '${results.length} podcasts for "$keyword"';
+        if (context.mounted) {
+          Navigator.push(
+            context,
+            SlideRightRoute(
+              page: PodcastResultsPage(
+                results: results,
+                title: title,
+              ),
+            ),
+          );
+        }
+      }
+    } else {
+      setState(() {
+        hintText = "Please enter a keyword";
+      });
+    }
+  }
+
   @override
   void dispose() {
     _textEditingController.dispose();
@@ -43,47 +85,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
         hintText: hintText,
         suffixIcon: IconButton(
           icon: const Icon(Icons.search),
-          onPressed: () async {
-            if (_textEditingController.text.isNotEmpty) {
-              FocusScope.of(context).unfocus();
-
-              //Setting isLoading true to show the loader
-              isLoadingCubit.setIsLoading(true);
-
-              results = await sl<PodcastRepository>()
-                  .fetchPodcastsByKeywords(_textEditingController.text);
-
-              final String keyword = _textEditingController.text;
-
-              _textEditingController.clear();
-
-              isLoadingCubit.setIsLoading(false);
-
-              if (results.isEmpty) {
-                setState(() {
-                  hintText = "No podcast was found";
-                });
-              } else {
-                final String title =
-                    '${results.length} podcasts for "$keyword"';
-                if (context.mounted) {
-                  Navigator.push(
-                    context,
-                    SlideRightRoute(
-                      page: PodcastResultsPage(
-                        results: results,
-                        title: title,
-                      ),
-                    ),
-                  );
-                }
-              }
-            } else {
-              setState(() {
-                hintText = "Please enter a keyword";
-              });
-            }
-          },
+          onPressed: () => handleOnPressed(isLoadingCubit, context),
         ),
       ),
       style: const TextStyle(
