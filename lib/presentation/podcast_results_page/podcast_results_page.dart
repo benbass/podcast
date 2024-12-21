@@ -2,15 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
-import 'package:podcast/presentation/custom_widgets/page_transition.dart';
+import 'package:podcast/presentation/podcast_results_page/widgets/podcast_card.dart';
 
 import '../../helpers/core/get_android_version.dart';
-import 'package:podcast/presentation/podcast_details_page/podcast_details_page.dart';
 
 class PodcastResultsPage extends StatefulWidget {
   final List<PodcastEntity> results;
   final String title;
-  const PodcastResultsPage({super.key, required this.results, required this.title});
+  const PodcastResultsPage(
+      {super.key, required this.results, required this.title});
 
   @override
   PodcastResultsPageState createState() => PodcastResultsPageState();
@@ -32,87 +32,18 @@ class PodcastResultsPageState extends State<PodcastResultsPage> {
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverList.builder(
-                    itemCount: widget.results.length,
-                    itemBuilder: (context, index) {
-                      final entry = widget.results.elementAt(index);
-                      final title = entry.title;
-                      final imgSrc = entry.artwork;
-                      return Card(
-                        key: ValueKey(entry.id),
-                        color: Theme.of(context).colorScheme.secondary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        elevation: 5.0,
-                        shadowColor: Colors.black,
-                        margin: const EdgeInsets.all(8.0),
-                        clipBehavior: Clip.antiAlias,
-                        child: SizedBox(
-                          height: 90.0,
-                          child: InkWell(
-                            splashColor: Colors.black87,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                ScaleRoute(
-                                  page: PodcastDetailsPage(
-                                    podcast: entry,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
-                                  child: FadeInImage(
-                                    fadeOutDuration:
-                                        const Duration(milliseconds: 100),
-                                    fadeInDuration:
-                                        const Duration(milliseconds: 200),
-                                    imageErrorBuilder:
-                                        (context, error, stackTrace) {
-                                      return Image.asset(
-                                        "assets/placeholder.png",
-                                        fit: BoxFit.cover,
-                                        height: 90,
-                                      );
-                                    },
-                                    height: 90,
-                                    width: 90,
-                                    fit: BoxFit.cover,
-                                    placeholder: const AssetImage(
-                                        'assets/placeholder.png'),
-                                    image: Image.network(
-                                      imgSrc,
-                                    ).image,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                      6.0,
-                                      10.0,
-                                      8.0,
-                                      10.0,
-                                    ),
-                                    child: Text(
-                                      title,
-                                      style: const TextStyle(
-                                        fontSize: 16.0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+              itemCount: widget.results.length,
+              itemBuilder: (context, index) {
+                final entry = widget.results.elementAt(index);
+                final title = entry.title;
+                final imgSrc = entry.artwork;
+                return PodcastCard(
+                  entry: entry,
+                  imgSrc: imgSrc,
+                  title: title,
+                );
+              },
+            ),
             const SliverToBoxAdapter(
               child: SizedBox(
                 height: 80,
