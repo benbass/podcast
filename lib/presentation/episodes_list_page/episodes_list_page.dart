@@ -10,6 +10,7 @@ import '../../helpers/core/format_pubdate_string.dart';
 import '../../helpers/core/get_android_version.dart';
 import '../../injection.dart';
 import '../episode_selected/episode_selected_page.dart';
+import 'widgets/row_icon_buttons_episodes.dart';
 
 class PodcastEpisodesPage extends StatefulWidget {
   final PodcastEntity podcast;
@@ -45,27 +46,10 @@ class _PodcastEpisodesPageState extends State<PodcastEpisodesPage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
-        title: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.podcast.title),
-            Row(
-              children: [
-                const Icon(Icons.list_rounded, size: 30,),
-                const SizedBox(
-                  width: 8.0,
-                ),
-                Text(
-                  podcastItems.length.toString(),
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+        title: Text("${widget.podcast.title} (${podcastItems.length})",
+        softWrap: true,
+        maxLines: 4,
+        overflow: TextOverflow.ellipsis,),
       ),
       body: FutureBuilder<List<EpisodeEntity>>(
         future:
@@ -76,42 +60,11 @@ class _PodcastEpisodesPageState extends State<PodcastEpisodesPage> {
             return SafeArea(
               child: CustomScrollView(
                 slivers: [
-                  SliverPadding(
+                  const SliverPadding(
                     sliver: SliverToBoxAdapter(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              // full text search
-                            },
-                            icon: const Icon(
-                              Icons.search_rounded,
-                              size: 30,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              // activate select on list items
-                            },
-                            icon: const Icon(
-                              Icons.check_rounded,
-                              size: 30,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              // make a query
-                            },
-                            icon: const Icon(
-                              Icons.refresh_rounded,
-                              size: 30,
-                            ),
-                          ),
-                        ],
-                      ),
+                      child: RowIconButtonsEpisodes(),
                     ),
-                    padding: const EdgeInsets.only(
+                    padding: EdgeInsets.only(
                         bottom: 20.0,)
                   ),
                   SliverList.builder(
