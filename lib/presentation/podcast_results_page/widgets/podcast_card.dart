@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:podcast/helpers/core/image_provider.dart';
 
 import '../../../domain/entities/podcast_entity.dart';
 import '../../custom_widgets/page_transition.dart';
@@ -18,6 +19,7 @@ class PodcastCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ImageProvider img = MyImageProvider(url: imgSrc).imageProvider;
     return Card(
       key: ValueKey(entry.id),
       color: Theme.of(context).colorScheme.secondary,
@@ -48,27 +50,14 @@ class PodcastCard extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
-                child: FadeInImage(
-                  fadeOutDuration:
-                  const Duration(milliseconds: 100),
-                  fadeInDuration:
-                  const Duration(milliseconds: 200),
-                  imageErrorBuilder:
-                      (context, error, stackTrace) {
-                    return Image.asset(
-                      "assets/placeholder.png",
-                      fit: BoxFit.cover,
-                      height: 90,
-                    );
-                  },
-                  height: 90,
+                child: Container(
                   width: 90,
-                  fit: BoxFit.cover,
-                  placeholder: const AssetImage(
-                      'assets/placeholder.png'),
-                  image: Image.network(
-                    imgSrc,
-                  ).image,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: img,
+                      fit: BoxFit.fitWidth,
+                    ),
+                  ),
                 ),
               ),
               Expanded(

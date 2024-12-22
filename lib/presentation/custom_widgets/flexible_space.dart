@@ -5,6 +5,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 
+import '../../helpers/core/image_provider.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
@@ -31,6 +32,8 @@ class FlexibleSpace extends StatelessWidget {
       image = podcast!.artwork;
     }
 
+    ImageProvider img = MyImageProvider(url: image).imageProvider;
+
     return SliverAppBar(
       collapsedHeight: 90,
       expandedHeight: MediaQuery.of(context).size.height / 3,
@@ -48,9 +51,7 @@ class FlexibleSpace extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: image != ""
-                        ? NetworkImage(image)
-                        : const AssetImage("assets/placeholder.png"),
+                    image: img,
                     fit: BoxFit.fitWidth,
                   ),
                 ),
@@ -58,22 +59,13 @@ class FlexibleSpace extends StatelessWidget {
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
                     child: Center(
-                      child: FadeInImage(
-                        fadeOutDuration: const Duration(milliseconds: 100),
-                        fadeInDuration: const Duration(milliseconds: 200),
-                        imageErrorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            "assets/placeholder.png",
-                            fit: BoxFit.cover,
-                            //height: 300,
-                            //width: 300,
-                          );
-                        },
-                        //height: 300,
-                        //width: 300,
-                        fit: BoxFit.cover,
-                        placeholder: const AssetImage('assets/placeholder.png'),
-                        image: NetworkImage(image),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: img,
+                            fit: BoxFit.fitHeight,
+                          ),
+                        ),
                       ),
                     ),
                   ),

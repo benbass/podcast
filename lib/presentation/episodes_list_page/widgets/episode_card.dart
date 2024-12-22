@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/format_pubdate_string.dart';
+import '../../../helpers/core/image_provider.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../../episode_selected_page/episode_selected_page.dart';
 import '../episodes_list_page.dart';
@@ -18,6 +19,7 @@ class EpisodeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ImageProvider img = MyImageProvider(url: item.image).imageProvider;
     return Card(
       key: ValueKey(item.pId),
       color: Theme.of(context).colorScheme.secondary,
@@ -33,36 +35,11 @@ class EpisodeCard extends StatelessWidget {
         child: InkWell(
           splashColor: Colors.black87,
           onTap: () async {
-            EpisodeEntity episode = EpisodeEntity(
-              pId: item.pId,
-              title: item.title,
-              description: item.description,
-              guid: item.guid,
-              datePublished: item.datePublished,
-              datePublishedPretty: item.datePublishedPretty,
-              enclosureUrl: item.enclosureUrl,
-              enclosureLength: item.enclosureLength,
-              duration: item.duration,
-              explicit: item.explicit,
-              episodeNr: item.episodeNr,
-              episodeType: item.episodeType,
-              season: item.season,
-              image: item.image,
-              feedUrl: item.feedUrl,
-              link: item.link,
-              feedImage: item.feedImage,
-              feedId: item.feedId,
-              podcastGuid: item.podcastGuid,
-              favorite: item.favorite,
-              read: item.read,
-              completed: item.completed,
-              position: item.position,
-            );
             Navigator.push(
               context,
               ScaleRoute(
                 page: EpisodeSelectedPage(
-                  episode: episode,
+                  episode: item,
                   podcast: widget.podcast,
                 ),
               ),
@@ -74,23 +51,14 @@ class EpisodeCard extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
-                child: FadeInImage(
-                  fadeOutDuration: const Duration(milliseconds: 100),
-                  fadeInDuration: const Duration(milliseconds: 200),
-                  imageErrorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      "assets/placeholder.png",
-                      fit: BoxFit.cover,
-                      height: 90.0,
-                    );
-                  },
-                  height: 90.0,
-                  width: 90.0,
-                  fit: BoxFit.cover,
-                  placeholder: const AssetImage('assets/placeholder.png'),
-                  image: Image.network(
-                    item.image,
-                  ).image,
+                child: Container(
+                  width: 90,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: img,
+                      fit: BoxFit.fitWidth,
+                    ),
+                  ),
                 ),
               ),
               Expanded(

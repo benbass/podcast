@@ -7,6 +7,7 @@ import 'package:podcast/presentation/episode_selected_page/widgets/podcast_websi
 import 'package:podcast/presentation/episode_selected_page/widgets/episode_info_button.dart';
 
 import '../../domain/entities/episode_entity.dart';
+import '../../helpers/core/image_provider.dart';
 import '../custom_widgets/play_button.dart';
 
 class EpisodeSelectedPage extends StatelessWidget {
@@ -20,10 +21,7 @@ class EpisodeSelectedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ImageProvider episodeImageProvider = episode.image != ""
-        ? NetworkImage(episode.image)
-        : const AssetImage("assets/placeholder.png");
-
+    ImageProvider img = MyImageProvider(url: episode.image).imageProvider;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -38,7 +36,7 @@ class EpisodeSelectedPage extends StatelessWidget {
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: episodeImageProvider,
+                image: img,
                 fit: BoxFit.fitWidth,
               ),
             ),
@@ -63,7 +61,7 @@ class EpisodeSelectedPage extends StatelessWidget {
                               width: 120,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
-                                  image: episodeImageProvider,
+                                  image: img,
                                   fit: BoxFit.fitWidth,
                                 ),
                               ),
