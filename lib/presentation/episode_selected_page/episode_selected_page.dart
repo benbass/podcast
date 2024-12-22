@@ -2,15 +2,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
-import 'package:podcast/presentation/custom_widgets/webview.dart';
+import 'package:podcast/presentation/episode_selected_page/widgets/episode_metadata.dart';
+import 'package:podcast/presentation/episode_selected_page/widgets/podcast_website_link.dart';
+import 'package:podcast/presentation/episode_selected_page/widgets/episode_info_button.dart';
 
 import '../../domain/entities/episode_entity.dart';
-import '../../helpers/core/format_duration.dart';
-import '../../helpers/core/format_pubdate_string.dart';
-import '../audioplayer_overlays/audioplayer_overlays.dart';
-import '../custom_widgets/page_transition.dart';
 import '../custom_widgets/play_button.dart';
-import '../episode_details_page/episode_details_page.dart';
 
 class EpisodeSelectedPage extends StatelessWidget {
   final EpisodeEntity episode;
@@ -23,6 +20,10 @@ class EpisodeSelectedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ImageProvider episodeImageProvider = episode.image != ""
+        ? NetworkImage(episode.image)
+        : const AssetImage("assets/placeholder.png");
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -34,28 +35,10 @@ class EpisodeSelectedPage extends StatelessWidget {
         children: [
           Container(
             height: 120,
+            width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: episode.image != ""
-                    ? FadeInImage(
-                        fadeOutDuration: const Duration(milliseconds: 100),
-                        fadeInDuration: const Duration(milliseconds: 200),
-                        imageErrorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            "assets/placeholder.png",
-                            fit: BoxFit.contain,
-                            height: 56,
-                          );
-                        },
-                        height: 56,
-                        width: 56,
-                        fit: BoxFit.scaleDown,
-                        placeholder: const AssetImage('assets/placeholder.png'),
-                        image: Image.network(
-                          episode.image,
-                        ).image,
-                      ).image
-                    : const AssetImage("assets/placeholder.png"),
+                image: episodeImageProvider,
                 fit: BoxFit.fitWidth,
               ),
             ),
@@ -70,63 +53,24 @@ class EpisodeSelectedPage extends StatelessWidget {
                 ClipRect(
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-                    //blendMode: BlendMode.lighten,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
-                            FadeInImage(
-                              fadeOutDuration:
-                                  const Duration(milliseconds: 100),
-                              fadeInDuration: const Duration(milliseconds: 200),
-                              imageErrorBuilder: (context, error, stackTrace) {
-                                return Image.asset(
-                                  "assets/placeholder.png",
-                                  fit: BoxFit.cover,
-                                  height: 120,
-                                );
-                              },
+                            Container(
                               height: 120,
-                              fit: BoxFit.cover,
-                              placeholder:
-                                  const AssetImage('assets/placeholder.png'),
-                              image: Image.network(
-                                episode.image,
-                              ).image,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: episodeImageProvider,
+                                  fit: BoxFit.fitWidth,
+                                ),
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(12.0),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    formatTimestamp(episode.datePublished),
-                                    style: const TextStyle(
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    episode.duration! == 0
-                                        ? ""
-                                        : formatIntDuration(episode.duration!),
-                                    style: const TextStyle(
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Icon(
-                                    episode.read == true
-                                        ? Icons.check_circle_outline_rounded
-                                        : Icons.remove_circle_outline_rounded,
-                                    //color: Colors.black,
-                                  ),
-                                ],
-                              ),
+                              child: EpisodeMetadata(episode: episode),
                             ),
                           ],
                         ),
@@ -140,68 +84,39 @@ class EpisodeSelectedPage extends StatelessWidget {
           ),
           Container(
             padding: const EdgeInsets.only(top: 120),
-            child: SingleChildScrollView(
+            child: ListView(
               padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 8,
+              children: [
+                Text(
+                  episode.title,
+                  style: const TextStyle(
+                    fontSize: 16.0,
                   ),
-                  Text(
-                    episode.title,
-                    style: const TextStyle(
-                      fontSize: 16.0,
-                    ),
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: EpisodeInfoButton(
+                    episode: episode,
+                    podcast: podcast,
                   ),
-                  IconButton(
-                    onPressed: () {
-                      removeOverlay();
-                      Navigator.of(context).push(
-                        ScaleRoute(
-                          page: EpisodeDetailsPage(
-                            episode: episode,
-                            title: podcast.title,
-                          ),
-                        ),
-                      );
-                    },
-                    iconSize: 26.0,
-                    padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
-                    constraints:
-                        const BoxConstraints(), // override default min size of 48px
-                    style: const ButtonStyle(
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    icon: const Icon(Icons.info_outline_rounded),
-                  ),
-                  Text(episode.episodeNr != 0
-                      ? "${episode.episodeNr}/${podcast.episodeCount}"
-                      : ""),
-                  podcast.link.isNotEmpty && podcast.link.contains('://')
-                      ? GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => MyWebView(
-                                  url: podcast.link,
-                                ),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "Podcast website",
-                            style: TextStyle(
-                              decoration: TextDecoration.underline,
-                              decorationColor: Colors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ],
-              ),
+                ),
+                const SizedBox(height: 16.0,),
+                Visibility(
+                  visible: episode.episodeNr != 0,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("${episode.episodeNr}/${podcast.episodeCount}"),
+                        const SizedBox(height: 16.0,),
+                      ],
+                    )
+                ),
+                Visibility(
+                  visible:
+                      podcast.link.isNotEmpty && podcast.link.contains('://'),
+                  child: PodcastWebsiteLink(podcast: podcast),
+                ),
+              ],
             ),
           ),
         ],
@@ -209,5 +124,3 @@ class EpisodeSelectedPage extends StatelessWidget {
     );
   }
 }
-
-
