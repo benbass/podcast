@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/format_pubdate_string.dart';
 import '../../custom_widgets/page_transition.dart';
-import '../../episode_selected/episode_selected_page.dart';
+import '../../episode_selected_page/episode_selected_page.dart';
 import '../episodes_list_page.dart';
 
 class EpisodeCard extends StatelessWidget {

@@ -16,11 +16,11 @@ import '../audioplayer_overlays/audioplayer_overlays.dart';
 import '../custom_widgets/flexible_space.dart';
 import '../custom_widgets/play_button.dart';
 
-class EpisodeSelectedDetailsPage extends StatelessWidget {
+class EpisodeDetailsPage extends StatelessWidget {
   final EpisodeEntity episode;
   final String title;
 
-  const EpisodeSelectedDetailsPage({
+  const EpisodeDetailsPage({
     super.key,
     required this.episode,
     required this.title,

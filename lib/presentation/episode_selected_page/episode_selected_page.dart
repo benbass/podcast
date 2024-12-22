@@ -10,7 +10,7 @@ import '../../helpers/core/format_pubdate_string.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
 import '../custom_widgets/page_transition.dart';
 import '../custom_widgets/play_button.dart';
-import 'episode_selected_details_page.dart';
+import '../episode_details_page/episode_details_page.dart';
 
 class EpisodeSelectedPage extends StatelessWidget {
   final EpisodeEntity episode;
@@ -160,7 +160,7 @@ class EpisodeSelectedPage extends StatelessWidget {
                       removeOverlay();
                       Navigator.of(context).push(
                         ScaleRoute(
-                          page: EpisodeSelectedDetailsPage(
+                          page: EpisodeDetailsPage(
                             episode: episode,
                             title: podcast.title,
                           ),

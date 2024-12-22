@@ -3,10 +3,10 @@ import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/presentation/custom_widgets/page_transition.dart';
-import 'package:podcast/presentation/episode_selected/episode_selected_details_page.dart';
 
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
+import '../episode_details_page/episode_details_page.dart';
 
 OverlayEntry? overlayEntry;
 OverlayState? overlayState;
@@ -32,7 +32,7 @@ void showOverlayPlayerMin(
                   removeOverlay();
                   Navigator.of(context).push(
                     ScaleRoute(
-                      page: EpisodeSelectedDetailsPage(
+                      page: EpisodeDetailsPage(
                         episode: episode,
                         title: title,
                       ),
