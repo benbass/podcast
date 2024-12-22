@@ -1,18 +1,16 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/webview.dart';
 
-import '../../application/episode_playback_url/episode_playback_url_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../helpers/core/format_duration.dart';
 import '../../helpers/core/format_pubdate_string.dart';
-import '../../helpers/player/audiohandler.dart';
-import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
+import '../custom_widgets/page_transition.dart';
+import '../custom_widgets/play_button.dart';
+import 'episode_selected_details_page.dart';
 
 class EpisodeSelectedPage extends StatelessWidget {
   final EpisodeEntity episode;
@@ -132,65 +130,7 @@ class EpisodeSelectedPage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        BlocBuilder<EpisodePlaybackUrlCubit, String>(
-                          builder: (context, state) {
-                            if (state != episode.enclosureUrl) {
-                              return StreamBuilder<PlayerState>(
-                                  stream: sl<MyAudioHandler>()
-                                      .player
-                                      .playerStateStream,
-                                  builder: (context, stream) {
-                                    final isPlaying = stream.data?.playing;
-
-                                    return IconButton(
-                                      onPressed: () async {
-                                        if (isPlaying == true) {
-                                          // Only if player is playing we have an overlay (from current playback) that we can remove
-                                          removeOverlay();
-                                        }
-
-                                        // source error?
-                                        try {
-                                          await sl<MyAudioHandler>()
-                                              .player
-                                              .setUrl(episode.enclosureUrl);
-                                          sl<MyAudioHandler>().play();
-
-                                          // We need to wait for the previous overlayEntry, if any, to be removed before we can insert the new one
-                                          Future.delayed(
-                                              const Duration(seconds: 2));
-                                          if (context.mounted) {
-                                            BlocProvider.of<EpisodePlaybackUrlCubit>(
-                                                    context)
-                                                .setPlaybackEpisodeUrl(
-                                                    episode.enclosureUrl);
-                                            showOverlayPlayerMin(context,
-                                                episode, podcast.title);
-                                          }
-                                        } on PlayerException {
-                                          if (context.mounted) {
-                                            showOverlayError(context,
-                                                "Error: No valid file exists under the requested url.");
-                                          }
-                                        }
-                                      },
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(),
-                                      icon: const Icon(
-                                        Icons.play_arrow_rounded,
-                                        size: 80,
-                                      ),
-                                    );
-                                  });
-                            } else {
-                              return const Icon(
-                                Icons.play_arrow_rounded,
-                                color: Colors.white24,
-                                size: 80,
-                              );
-                            }
-                          },
-                        ),
+                        PlayButton(episode: episode, title: podcast.title),
                       ],
                     ),
                   ),
@@ -211,17 +151,34 @@ class EpisodeSelectedPage extends StatelessWidget {
                   ),
                   Text(
                     episode.title,
-                    style: const TextStyle(fontSize: 16.0),
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                    ),
                   ),
-                  const SizedBox(
-                    height: 8,
+                  IconButton(
+                    onPressed: () {
+                      removeOverlay();
+                      Navigator.of(context).push(
+                        ScaleRoute(
+                          page: EpisodeSelectedDetailsPage(
+                            episode: episode,
+                            title: podcast.title,
+                          ),
+                        ),
+                      );
+                    },
+                    iconSize: 26.0,
+                    padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
+                    constraints:
+                        const BoxConstraints(), // override default min size of 48px
+                    style: const ButtonStyle(
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    icon: const Icon(Icons.info_outline_rounded),
                   ),
                   Text(episode.episodeNr != 0
                       ? "${episode.episodeNr}/${podcast.episodeCount}"
                       : ""),
-                  const SizedBox(
-                    height: 8,
-                  ),
                   podcast.link.isNotEmpty && podcast.link.contains('://')
                       ? GestureDetector(
                           onTap: () {
@@ -238,13 +195,11 @@ class EpisodeSelectedPage extends StatelessWidget {
                             style: TextStyle(
                               decoration: TextDecoration.underline,
                               decorationColor: Colors.white,
+                              fontSize: 14,
                             ),
                           ),
                         )
                       : const SizedBox.shrink(),
-                  const SizedBox(
-                    height: 8,
-                  ),
                 ],
               ),
             ),
@@ -254,3 +209,5 @@ class EpisodeSelectedPage extends StatelessWidget {
     );
   }
 }
+
+
