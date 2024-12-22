@@ -38,34 +38,34 @@ void main() async {
         Brightness.dark, // Brightness of Icons in Bottom Bar
   ));
 
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((value) => runApp(
-            MultiBlocProvider(
-              providers: [
-                BlocProvider(
-                    create: (BuildContext context) => EpisodePlaybackUrlCubit()),
-                BlocProvider(
-                    create: (BuildContext context) => IsLoadingCubit()),
-              ],
-              // We wrap the app in a SafeArea: on Android API 35, the app doesn't stop
-              // at the edge of the bottom bar but at the bottom of the screen,
-              // causing some widgets to be partially hidden by the bottom bar.
-              // We don't have this issue with API 34, though!
-              child: MaterialApp(
-                debugShowCheckedModeBanner: false,
-                localizationsDelegates: const [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: const [
-                  Locale('en', 'US'),
-                  Locale('de', 'DE'),
-                  Locale('fr', 'FR'),
-                ],
-                theme: AppTheme.lightTheme,
-                home: const HomePage(),
-              ),
-            ),
-          ));
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then(
+    (value) => runApp(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(
+              create: (BuildContext context) => EpisodePlaybackUrlCubit()),
+          BlocProvider(create: (BuildContext context) => IsLoadingCubit()),
+        ],
+        // We wrap the app in a SafeArea: on Android API 35, the app doesn't stop
+        // at the edge of the bottom bar but at the bottom of the screen,
+        // causing some widgets to be partially hidden by the bottom bar.
+        // We don't have this issue with API 34, though!
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en', 'US'),
+            Locale('de', 'DE'),
+            Locale('fr', 'FR'),
+          ],
+          theme: AppTheme.lightTheme,
+          home: const HomePage(),
+        ),
+      ),
+    ),
+  );
 }
