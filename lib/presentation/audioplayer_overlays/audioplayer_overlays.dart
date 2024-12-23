@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/presentation/audioplayer_overlays/widgets/mini_player_widget.dart';
 
+OverlayEntry? overlayEntry;
+OverlayState? overlayState;
+
 // Common positioning
 OverlayEntry _createOverlayEntry(BuildContext context, {required Widget child}) {
   return OverlayEntry(
@@ -14,8 +17,6 @@ OverlayEntry _createOverlayEntry(BuildContext context, {required Widget child}) 
   );
 }
 
-OverlayEntry? overlayEntry;
-OverlayState? overlayState;
 void showOverlayPlayerMin(
     BuildContext context, EpisodeEntity episode, String title) async {
   overlayState = Overlay.of(context);
