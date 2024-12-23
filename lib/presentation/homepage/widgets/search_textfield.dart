@@ -18,16 +18,30 @@ class SearchTextField extends StatefulWidget {
 class _SearchTextFieldState extends State<SearchTextField> {
   final TextEditingController _textEditingController = TextEditingController();
   String hintText = "Search";
-  List<PodcastEntity> results = [];
+  List<PodcastEntity> searchResults = [];
 
-  void handleOnPressed(IsLoadingCubit isLoadingCubit, BuildContext context) async {
+  void _navigateToResultsPage(
+      List<PodcastEntity> results, String title, BuildContext context) {
+    Navigator.push(
+      context,
+      SlideRightRoute(
+        page: PodcastResultsPage(
+          results: results,
+          title: title,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _performSearch(
+      IsLoadingCubit isLoadingCubit, BuildContext context) async {
     if (_textEditingController.text.isNotEmpty) {
       FocusScope.of(context).unfocus();
 
       //Setting isLoading true to show the loader
       isLoadingCubit.setIsLoading(true);
 
-      results = await sl<PodcastRepository>()
+      searchResults = await sl<PodcastRepository>()
           .fetchPodcastsByKeywords(_textEditingController.text);
 
       final String keyword = _textEditingController.text;
@@ -36,30 +50,24 @@ class _SearchTextFieldState extends State<SearchTextField> {
 
       isLoadingCubit.setIsLoading(false);
 
-      if (results.isEmpty) {
+      if (searchResults.isEmpty) {
         setState(() {
           hintText = "No podcast was found";
         });
       } else {
-        final String title =
-            '${results.length} podcasts for "$keyword"';
+        final String title = '${searchResults.length} podcasts for "$keyword"';
         if (context.mounted) {
-          Navigator.push(
-            context,
-            SlideRightRoute(
-              page: PodcastResultsPage(
-                results: results,
-                title: title,
-              ),
-            ),
-          );
+          _navigateToResultsPage(searchResults, title, context);
         }
       }
     } else {
-      setState(() {
-        hintText = "Please enter a keyword";
-      });
+      hintText = "Please enter a keyword";
     }
+  }
+
+  void handleOnPressed(
+      IsLoadingCubit isLoadingCubit, BuildContext context) async {
+    _performSearch(isLoadingCubit, context);
   }
 
   @override
@@ -71,26 +79,31 @@ class _SearchTextFieldState extends State<SearchTextField> {
   @override
   Widget build(BuildContext context) {
     IsLoadingCubit isLoadingCubit = BlocProvider.of<IsLoadingCubit>(context);
-    return TextField(
-      controller: _textEditingController,
-      onTapOutside: (_) {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      onTap: () {
-        hintText = "Search";
-      },
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        hintText: hintText,
-        suffixIcon: IconButton(
-          icon: const Icon(Icons.search),
-          onPressed: () => handleOnPressed(isLoadingCubit, context),
+    return Stack(
+      children: [
+        TextField(
+          controller: _textEditingController,
+          onTapOutside: (_) {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          onTap: () {
+            // We reset the value for hintText
+            hintText = "Search";
+          },
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            hintText: hintText,
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () => handleOnPressed(isLoadingCubit, context),
+            ),
+          ),
+          style: const TextStyle(
+            color: Color(0xFF202531),
+          ),
         ),
-      ),
-      style: const TextStyle(
-        color: Color(0xFF202531),
-      ),
+      ],
     );
   }
 }

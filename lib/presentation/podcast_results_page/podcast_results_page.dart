@@ -6,22 +6,22 @@ import 'package:podcast/presentation/podcast_results_page/widgets/podcast_card.d
 
 import '../../helpers/core/get_android_version.dart';
 
-class PodcastResultsPage extends StatefulWidget {
+class PodcastResultsPage extends StatelessWidget {
   final List<PodcastEntity> results;
   final String title;
-  const PodcastResultsPage(
-      {super.key, required this.results, required this.title});
+  const PodcastResultsPage({
+    super.key,
+    required this.results,
+    required this.title,
+  });
 
-  @override
-  PodcastResultsPageState createState() => PodcastResultsPageState();
-}
-
-class PodcastResultsPageState extends State<PodcastResultsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(title)),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.home_rounded),
@@ -32,9 +32,9 @@ class PodcastResultsPageState extends State<PodcastResultsPage> {
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverList.builder(
-              itemCount: widget.results.length,
+              itemCount: results.length,
               itemBuilder: (context, index) {
-                final entry = widget.results.elementAt(index);
+                final entry = results.elementAt(index);
                 final title = entry.title;
                 final imgSrc = entry.artwork;
                 return PodcastCard(

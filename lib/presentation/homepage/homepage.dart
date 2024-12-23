@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   // We will replace this with list of subscribed podcasts from database when implemented
-  List fakeEmptyList = [];
+  List subscribedPodcasts = [];
 
   @override
   void initState() {
@@ -38,7 +38,7 @@ class HomePageState extends State<HomePage> {
                 child: SearchTextField(),
               ),
             ),
-            fakeEmptyList.isEmpty
+            subscribedPodcasts.isEmpty
                 ? const SliverToBoxAdapter(
                     child: Column(
                       children: [
@@ -53,22 +53,17 @@ class HomePageState extends State<HomePage> {
                   )
                 : const SliverToBoxAdapter(child: SizedBox.shrink()),
             // Loader while we fetch podcasts
-            BlocBuilder<IsLoadingCubit, bool>(builder: (context, state) {
-              if (state == true) {
-                return const SliverPadding(
-                  padding: EdgeInsets.only(top: 100.0),
-                  sliver: SliverToBoxAdapter(
-                    child: Center(
-                      child: CircularProgressIndicator(),
+            BlocBuilder<IsLoadingCubit, bool>(
+              builder: (context, isLoading) => isLoading
+                  ? const SliverFillRemaining(
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : const SliverToBoxAdapter(
+                      child: SizedBox.shrink(),
                     ),
-                  ),
-                );
-              } else {
-                return const SliverToBoxAdapter(
-                  child: SizedBox.shrink(),
-                );
-              }
-            })
+            ),
           ],
         ),
       ),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:podcast/presentation/episode_details_page/widgets/playback_position_slider.dart';
 
 import '../../../application/episode_playback_url/episode_playback_url_cubit.dart';
 import '../../../domain/entities/episode_entity.dart';
-import '../../../helpers/core/format_duration.dart';
 import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
 import '../../audioplayer_overlays/audioplayer_overlays.dart';
@@ -26,58 +26,7 @@ class PlayerControls extends StatelessWidget {
       child: Center(
         child: Column(
           children: [
-            StreamBuilder<Duration>(
-              stream: sl<MyAudioHandler>().player.positionStream,
-              builder: (context, snapshot) {
-                final position = snapshot.data ?? Duration.zero;
-                final Duration totalDuration =
-                    Duration(seconds: episode.duration!);
-                final Duration remainingDuration = totalDuration - position;
-                String formattedRemainingDuration =
-                    formatRemainingDuration(remainingDuration);
-                return Column(
-                  children: [
-                    Slider(
-                      activeColor: Theme.of(context).colorScheme.onPrimary,
-                      inactiveColor: Theme.of(context).colorScheme.primary,
-                      value: position.inSeconds.toDouble(),
-                      min: 0.0,
-                      max: sl<MyAudioHandler>()
-                              .player
-                              .duration
-                              ?.inSeconds
-                              .toDouble() ??
-                          0.0,
-                      onChanged: (value) => sl<MyAudioHandler>()
-                          .player
-                          .seek(Duration(seconds: value.toInt())),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            formatDurationDuration(position),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            totalDuration == Duration.zero
-                                ? ""
-                                : formattedRemainingDuration,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
+            PlaybackPositionSlider(episode: episode),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Row(
@@ -102,10 +51,13 @@ class PlayerControls extends StatelessWidget {
                   IconButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      sl<MyAudioHandler>().stop();
-                      BlocProvider.of<EpisodePlaybackUrlCubit>(context)
-                          .setPlaybackEpisodeUrl("");
-                      removeOverlay();
+                      sl<MyAudioHandler>().stop().then((_) {
+                        if (context.mounted) {
+                          BlocProvider.of<EpisodePlaybackUrlCubit>(context)
+                              .setPlaybackEpisodeUrl("");
+                          removeOverlay();
+                        }
+                      });
                     },
                     icon: const Icon(
                       Icons.stop_rounded,

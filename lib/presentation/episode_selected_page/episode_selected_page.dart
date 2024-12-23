@@ -1,7 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
+import 'package:podcast/presentation/episode_selected_page/widgets/blurred_image_background.dart';
 import 'package:podcast/presentation/episode_selected_page/widgets/episode_metadata.dart';
 import 'package:podcast/presentation/episode_selected_page/widgets/podcast_website_link.dart';
 import 'package:podcast/presentation/episode_selected_page/widgets/episode_info_button.dart';
@@ -23,68 +22,50 @@ class EpisodeSelectedPage extends StatelessWidget {
   Widget build(BuildContext context) {
     ImageProvider img = MyImageProvider(url: episode.image).imageProvider;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          podcast.title,
-          maxLines: 3,
-        ),
-      ),
-      body: Stack(
-        children: [
-          Container(
-            height: 120,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: img,
-                fit: BoxFit.fitWidth,
-              ),
-            ),
-            child: Stack(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(4.0),
-                  decoration: const BoxDecoration(
-                    color: Colors.black38,
-                  ),
-                ),
-                ClipRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              height: 120,
-                              width: 120,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: img,
-                                  fit: BoxFit.fitWidth,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: EpisodeMetadata(episode: episode),
-                            ),
-                          ],
-                        ),
-                        PlayButton(episode: episode, title: podcast.title),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: Text(
+              podcast.title,
+              maxLines: 3,
             ),
           ),
-          Container(
-            padding: const EdgeInsets.only(top: 120),
-            child: ListView(
-              padding: const EdgeInsets.all(8.0),
-              children: [
+          SliverToBoxAdapter(
+            child: BlurredImageBackground(
+              image: img,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        height: 120,
+                        width: 120,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: img,
+                            fit: BoxFit.fitWidth,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: EpisodeMetadata(episode: episode),
+                      ),
+                    ],
+                  ),
+                  PlayButton(
+                    episode: episode,
+                    title: podcast.title,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.all(16.0),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
                 Text(
                   episode.title,
                   style: const TextStyle(
@@ -98,23 +79,16 @@ class EpisodeSelectedPage extends StatelessWidget {
                     podcast: podcast,
                   ),
                 ),
-                const SizedBox(height: 16.0,),
-                Visibility(
-                  visible: episode.episodeNr != 0,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("${episode.episodeNr}/${podcast.episodeCount}"),
-                        const SizedBox(height: 16.0,),
-                      ],
-                    )
+                const SizedBox(
+                  height: 16.0,
                 ),
-                Visibility(
-                  visible:
-                      podcast.link.isNotEmpty && podcast.link.contains('://'),
-                  child: PodcastWebsiteLink(podcast: podcast),
-                ),
-              ],
+                if (episode.episodeNr != 0) ...[
+                  Text("${episode.episodeNr}/${podcast.episodeCount}"),
+                  const SizedBox(height: 16.0),
+                ],
+                if (podcast.link.isNotEmpty && podcast.link.contains('://'))
+                  PodcastWebsiteLink(podcast: podcast),
+              ]),
             ),
           ),
         ],
