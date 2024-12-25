@@ -36,11 +36,16 @@ class EpisodeMetadata extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        Icon(
-          episode.read == true
-              ? Icons.check_circle_outline_rounded
-              : Icons.remove_circle_outline_rounded,
-          //color: Colors.black,
+        Row(
+          children: [
+            Icon(episode.favorite ? Icons.favorite_rounded : Icons.favorite_border_rounded),
+            Icon(
+              episode.read == true
+                  ? Icons.check_circle_outline_rounded
+                  : null,
+              //color: Colors.black,
+            ),
+          ],
         ),
       ],
     );

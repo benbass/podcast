@@ -88,6 +88,16 @@ class EpisodeCard extends StatelessWidget {
                   ),
                 ),
               ),
+               Padding(
+                 padding: const EdgeInsets.only(right: 8.0),
+                 child: Column(
+                   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Icon(item.read ? Icons.check_rounded : null),
+                    Icon(item.favorite ? Icons.favorite_rounded : Icons.favorite_border_rounded),
+                  ],
+                               ),
+               )
             ],
           ),
         ),

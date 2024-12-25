@@ -1,6 +1,5 @@
 import 'package:objectbox/objectbox.dart';
 
-
 @Entity()
 class EpisodeEntity {
   @Id()
@@ -35,6 +34,7 @@ class EpisodeEntity {
   final bool read;
   final bool completed;
   final int position;
+  final String filePath; // downloaded file
 
   EpisodeEntity({
     required this.pId,
@@ -60,6 +60,41 @@ class EpisodeEntity {
     required this.read,
     required this.completed,
     required this.position,
+    required this.filePath,
   });
 
+  EpisodeEntity copyWith( {
+    bool? favorite,
+    bool? read,
+    bool? completed,
+    int? position,
+    String? filePath,
+  }) {
+    return EpisodeEntity(
+      pId: pId,
+      title: title,
+      description: description,
+      guid: guid,
+      datePublished: datePublished,
+      datePublishedPretty: datePublishedPretty,
+      enclosureUrl: enclosureUrl,
+      enclosureLength: enclosureLength,
+      duration: duration,
+      explicit: explicit,
+      episodeNr: episodeNr,
+      episodeType: episodeType,
+      season: season,
+      image: image,
+      feedUrl: feedUrl,
+      link: link,
+      feedImage: feedImage,
+      feedId: feedId,
+      podcastGuid: podcastGuid,
+      favorite: favorite ?? this.favorite,
+      read: read ?? this.read,
+      completed: completed ?? this.completed,
+      position: position ?? this.position,
+      filePath: filePath ?? this.filePath,
+    );
+  }
 }

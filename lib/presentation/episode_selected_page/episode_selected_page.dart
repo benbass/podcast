@@ -74,6 +74,26 @@ class EpisodeSelectedPage extends StatelessWidget {
                 ),
                 Container(
                   alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    onPressed: () {
+                      /// TODO
+                      // Mark or unmark this episode as favorite:
+                      // save status to DB + update state of icon in widget EpisodeMetadata
+                    },
+                    iconSize: 26.0,
+                    padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
+                    constraints:
+                    const BoxConstraints(),
+                    style: const ButtonStyle(
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    icon: const Icon(
+                      Icons.favorite,
+                    ),
+                  ),
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
                   child: EpisodeInfoButton(
                     episode: episode,
                     podcast: podcast,

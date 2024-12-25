@@ -24,7 +24,7 @@ class RowIconButtonsEpisodes extends StatelessWidget {
             // activate select on list items
           },
           icon: const Icon(
-            Icons.check_rounded,
+            Icons.select_all_rounded,
             size: 30,
           ),
         ),

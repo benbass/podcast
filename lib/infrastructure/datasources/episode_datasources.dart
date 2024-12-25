@@ -22,7 +22,12 @@ class EpisodeDataSourcesImpl implements EpisodeDataSources {
 
     if (response.statusCode == 200) {
       var jsonItems = json.decode(response.body);
-      List<EpisodeEntity> episodes = List<EpisodeModel>.from(jsonItems['items'].map((x) => EpisodeModel.fromJson(x)));
+      List<EpisodeEntity> episodes = List<EpisodeEntity>.from(jsonItems['items'].map((x) => EpisodeModel.fromJson(x)));
+
+      // we test the user parameters
+      EpisodeEntity epTest = episodes.first.copyWith(favorite: true, read: true, position: 9000);
+      episodes.insert(0, epTest);
+
       return episodes;
     } else {
       // If the server did not return a 200 OK response,

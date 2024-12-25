@@ -28,6 +28,7 @@ class EpisodeModel extends EpisodeEntity {
     required super.read,
     required super.completed,
     required super.position,
+    required super.filePath,
   });
 
   factory EpisodeModel.fromJson(Map<String, dynamic> json) {
@@ -55,6 +56,7 @@ class EpisodeModel extends EpisodeEntity {
       read: false,
       completed: false,
       position: 0,
+      filePath: "",
     );
   }
 
