@@ -11,7 +11,6 @@ Search, follow and listen to Podcasts
     - infrastructure: data sources, data models
 - State Management: Bloc
 - Dependency injection: GetIt
-- Responsiveness: Sizer
 - Internationalization: Intl
 
 ## Getting Started
