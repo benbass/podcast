@@ -2,15 +2,17 @@
 
 Search, follow and listen to Podcasts
 
-# Specs
-Architecture pattern:
-- presentation: UI view
-- application: state management (view controller)
-- domain: business logic, data entities
-- infrastructure: data sources, data models
-State Management: Bloc
-Dependency injection: GetIt
-Internationalization: Intl
+## Specs
+
+- Architecture pattern:
+    - presentation: UI view
+    - application: state management (view controller)
+    - domain: business logic, data entities
+    - infrastructure: data sources, data models
+- State Management: Bloc
+- Dependency injection: GetIt
+- Responsiveness: Sizer
+- Internationalization: Intl
 
 ## Getting Started
 
