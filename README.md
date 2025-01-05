@@ -2,6 +2,17 @@
 
 Search, follow and listen to Podcasts
 
+## Specs
+
+- Architecture pattern:
+    - presentation: UI view
+    - application: state management (view controller)
+    - domain: business logic, data entities
+    - infrastructure: data sources, data models
+- State Management: Bloc
+- Dependency injection: GetIt
+- Internationalization: Intl
+
 ## Getting Started
 
 This App uses the Podcastindex API under https://api.podcastindex.org/
