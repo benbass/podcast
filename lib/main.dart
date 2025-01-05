@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcast/application/podcasts_bloc/podcasts_bloc.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 
 import 'package:podcast/presentation/homepage/homepage.dart';
 import 'package:podcast/theme.dart';
 import 'application/episode_playback_url/episode_playback_url_cubit.dart';
-import 'application/is_loading/is_loading_cubit.dart';
 import 'core/globals.dart';
 import 'core/objectbox.dart';
 import 'injection.dart' as di;
@@ -44,7 +44,7 @@ void main() async {
         providers: [
           BlocProvider(
               create: (BuildContext context) => EpisodePlaybackUrlCubit()),
-          BlocProvider(create: (BuildContext context) => IsLoadingCubit()),
+          BlocProvider(create: (BuildContext context) => di.sl<PodcastsBloc>()),
         ],
         // We wrap the app in a SafeArea: on Android API 35, the app doesn't stop
         // at the edge of the bottom bar but at the bottom of the screen,
