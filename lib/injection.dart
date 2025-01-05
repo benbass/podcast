@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:podcast/application/podcasts_bloc/podcasts_bloc.dart';
 import 'package:podcast/domain/repositories/podcast_repository.dart';
 import 'package:podcast/domain/usecases/podcast_usecases.dart';
 import 'package:podcast/helpers/player/audiohandler.dart';
@@ -25,6 +26,9 @@ Future<void> init() async {
       () => PodcastDataSourceImpl());
   sl.registerLazySingleton<EpisodeDataSources>(
           () => EpisodeDataSourcesImpl());
+
+  // State management
+  sl.registerFactory(() => PodcastsBloc(podcastUseCases: sl()));
 
   // Use cases
   sl.registerLazySingleton(() => PodcastUseCases(podcastRepository: sl()));
