@@ -1,9 +1,11 @@
 import 'package:get_it/get_it.dart';
 import 'package:podcast/domain/repositories/podcast_repository.dart';
+import 'package:podcast/domain/usecases/podcast_usecases.dart';
 import 'package:podcast/helpers/player/audiohandler.dart';
 import 'package:podcast/infrastructure/repositories/podcast_repository_impl.dart';
 
 import 'domain/repositories/episode_repository.dart';
+import 'domain/usecases/episode_usecases.dart';
 import 'infrastructure/datasources/episode_datasources.dart';
 import 'infrastructure/datasources/podcast_datasources.dart';
 import 'infrastructure/repositories/episode_repository_impl.dart';
@@ -23,6 +25,10 @@ Future<void> init() async {
       () => PodcastDataSourceImpl());
   sl.registerLazySingleton<EpisodeDataSources>(
           () => EpisodeDataSourcesImpl());
+
+  // Use cases
+  sl.registerLazySingleton(() => PodcastUseCases(podcastRepository: sl()));
+  sl.registerLazySingleton(() => EpisodeUseCases(episodeRepository: sl()));
 
   // Core
   sl.registerLazySingleton<MyAudioHandler>(() => MyAudioHandler());

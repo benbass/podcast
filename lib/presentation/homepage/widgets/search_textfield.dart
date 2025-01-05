@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/application/is_loading/is_loading_cubit.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
+import 'package:podcast/domain/usecases/podcast_usecases.dart';
 
-import '../../../domain/repositories/podcast_repository.dart';
 import '../../../injection.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../../podcast_results_page/podcast_results_page.dart';
@@ -41,8 +41,8 @@ class _SearchTextFieldState extends State<SearchTextField> {
       //Setting isLoading true to show the loader
       isLoadingCubit.setIsLoading(true);
 
-      searchResults = await sl<PodcastRepository>()
-          .fetchPodcastsByKeywords(_textEditingController.text);
+      searchResults = await sl<PodcastUseCases>()
+          .fetchPodcasts(_textEditingController.text);
 
       final String keyword = _textEditingController.text;
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:podcast/domain/entities/podcast_entity.dart';
+import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
 import '../../domain/entities/episode_entity.dart';
-import '../../domain/repositories/episode_repository.dart';
 import '../../injection.dart';
 import '../podcast_results_page/widgets/android_bottom_padding.dart';
 import 'widgets/row_icon_buttons_episodes.dart';
@@ -35,7 +35,7 @@ class PodcastEpisodesPage extends StatelessWidget {
         ...
        */
       body: FutureBuilder<List<EpisodeEntity>>(
-        future: sl<EpisodeRepository>().fetchEpisodesByFeedId(podcast.id),
+        future: sl<EpisodeUseCases>().fetchEpisodes(podcast.id),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final List<EpisodeEntity> episodes = snapshot.data!;
