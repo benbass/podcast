@@ -25,15 +25,15 @@ class SubscribedPodcastCard extends StatelessWidget {
                 fit: BoxFit.fitHeight),
             borderRadius: BorderRadius.circular(15),
           ),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Spacer(),
+              const Spacer(),
               SizedBox(
                 width: 50,
                 height: 50,
-                child: RoundedTextWidget(text: "34"),
+                child: RoundedTextWidget(text: subscribedPodcast.unreadEpisodes.toString()),
                 /*CustomPaint(
                   painter: TrianglePainter(
                     text: '410',
