@@ -34,7 +34,7 @@ Done: Search for podcasts and view description and episodes, view episode descri
 ## Todo
     - App name
     - UI design is not final
-    - Data persistence for followed podcasts and episode read status is not yet implemented: I will probably use an objectbox database.
+    - Data persistence for subscribed podcasts and episode read status is not yet implemented: I will probably use an objectbox database.
     - Playlists and favourites
     - Player (skip to previous and skip to next episode: playlists must be implemented first)
     - Share on social media or as link
