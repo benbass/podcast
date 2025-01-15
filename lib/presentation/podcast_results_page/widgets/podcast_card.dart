@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:podcast/helpers/core/image_provider.dart';
+import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 
 import '../../../domain/entities/podcast_entity.dart';
 import '../../custom_widgets/page_transition.dart';
@@ -68,11 +69,29 @@ class PodcastCard extends StatelessWidget {
                     8.0,
                     10.0,
                   ),
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16.0,
-                    ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.zero,
+                        height: 30,
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ElevatedButtonSubscribe(),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ),

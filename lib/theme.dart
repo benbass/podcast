@@ -82,13 +82,12 @@ class AppTheme {
       primaryContainer: _primaryVariantColor,
     ),
     textTheme: _textTheme,
-    /*elevatedButtonTheme: const ElevatedButtonThemeData(
+    elevatedButtonTheme: const ElevatedButtonThemeData(
         style: ButtonStyle(
       elevation: WidgetStatePropertyAll(30),
-      backgroundColor: WidgetStatePropertyAll(_primaryVariantColor),
-      textStyle: WidgetStatePropertyAll(_headingText),
-      foregroundColor: WidgetStatePropertyAll(_textColor),
-    )),*/
+      backgroundColor: WidgetStatePropertyAll(_iconColor),
+      foregroundColor: WidgetStatePropertyAll(_primaryVariantColor),
+    )),
     textButtonTheme: const TextButtonThemeData(
         style: ButtonStyle(
       textStyle: WidgetStatePropertyAll(_bodyTextLarge),
@@ -103,7 +102,7 @@ class AppTheme {
       color: _iconColor,
     ),
     dialogTheme: DialogTheme(
-      backgroundColor: _primaryVariantColor.withOpacity(0.85),
+      backgroundColor: _primaryVariantColor.withValues(alpha: 0.85),
       titleTextStyle: _bodyTextLarge.copyWith(color: _primaryColor),
       contentTextStyle: _bodyTextMedium,
     ),

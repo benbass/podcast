@@ -19,6 +19,9 @@ class PodcastResultsPage extends StatelessWidget {
         title: BlocBuilder<PodcastsBloc, PodcastsState>(
           builder: (context, state) {
             if (state is PodcastsReceivedState) {
+              print(state.podcasts[1].title);
+              print(state.podcasts[1].author);
+              print(state.podcasts[1].artwork);
               return FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
