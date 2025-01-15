@@ -4,13 +4,12 @@ import '../datasources/podcast_datasources.dart';
 
 class PodcastRepositoryImpl implements PodcastRepository {
   final PodcastDataSources podcastDataSources;
-
-  PodcastRepositoryImpl({required this.podcastDataSources});
+  const PodcastRepositoryImpl({
+    required this.podcastDataSources,
+  });
 
   @override
   Future<List<PodcastEntity>> fetchPodcastsByKeywords(String keyword) async {
     return await podcastDataSources.fetchPodcastsByKeywords(keyword);
-
-
   }
 }

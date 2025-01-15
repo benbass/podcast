@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
+import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 
 import '../../helpers/core/image_provider.dart';
 import '../../helpers/player/audiohandler.dart';
@@ -76,6 +77,11 @@ class FlexibleSpace extends StatelessWidget {
                 decoration: const BoxDecoration(
                   color: Colors.black26,
                 ),
+              ),
+              const Positioned(
+                top: 12,
+                right: 12,
+                child: ElevatedButtonSubscribe(),
               ),
             ],
           ),

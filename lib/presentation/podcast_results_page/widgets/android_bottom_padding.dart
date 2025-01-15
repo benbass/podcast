@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../helpers/core/get_android_version.dart';
 
 class AndroidBottomPadding extends StatelessWidget {
-  const AndroidBottomPadding({Key? key}) : super(key: key);
+  const AndroidBottomPadding({super.key});
 
   @override
   Widget build(BuildContext context) {

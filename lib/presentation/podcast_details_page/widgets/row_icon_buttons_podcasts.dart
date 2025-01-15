@@ -45,15 +45,6 @@ class RowIconButtonsPodcasts extends StatelessWidget {
         ),
         IconButton(
           onPressed: () {
-            // subscribe to podcast
-          },
-          icon: const Icon(
-            Icons.subscriptions_rounded,
-            size: 30,
-          ),
-        ),
-        IconButton(
-          onPressed: () {
             // share podcast link
           },
           icon: const Icon(

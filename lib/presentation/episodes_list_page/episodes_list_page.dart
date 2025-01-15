@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/domain/usecases/episode_usecases.dart';
+import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../injection.dart';
@@ -42,6 +43,9 @@ class PodcastEpisodesPage extends StatelessWidget {
             return SafeArea(
               child: CustomScrollView(
                 slivers: [
+                  const SliverToBoxAdapter(
+                    child: ElevatedButtonSubscribe(),
+                  ),
                   const SliverPadding(
                       sliver: SliverToBoxAdapter(
                         child: RowIconButtonsEpisodes(),
@@ -54,9 +58,9 @@ class PodcastEpisodesPage extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final item = episodes[index];
                       return EpisodeCard(
-                          item: item,
+                        item: item,
                         podcast: podcast,
-                          );
+                      );
                     },
                   ),
                   const SliverToBoxAdapter(

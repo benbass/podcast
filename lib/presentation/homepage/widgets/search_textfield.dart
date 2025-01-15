@@ -39,10 +39,6 @@ class _SearchTextFieldState extends State<SearchTextField> {
     }
   }
 
-  void handleOnPressed(BuildContext context) async {
-    _performSearch(context);
-  }
-
   @override
   void dispose() {
     _textEditingController.dispose();
@@ -62,7 +58,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
         hintText: hintText,
         suffixIcon: IconButton(
           icon: const Icon(Icons.search),
-          onPressed: () => handleOnPressed(context),
+          onPressed: () => _performSearch(context),
         ),
       ),
       style: const TextStyle(

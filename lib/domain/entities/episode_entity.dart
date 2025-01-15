@@ -29,12 +29,14 @@ class EpisodeEntity {
   final int feedId;
   final String podcastGuid;
 
-  /// Additional data for user prefs and info
+  /// Additional data for user prefs and info (for subscribed podcasts)
   final bool favorite;
   final bool read;
   final bool completed;
   final int position;
-  final String filePath; // downloaded file
+
+  /// downloaded file (subscribed or not!), if applicable
+  final String filePath;
 
   EpisodeEntity({
     required this.pId,
