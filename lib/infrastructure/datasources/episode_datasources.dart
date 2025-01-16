@@ -24,8 +24,8 @@ class EpisodeDataSourcesImpl implements EpisodeDataSources {
       var jsonItems = json.decode(response.body);
       List<EpisodeEntity> episodes = List<EpisodeEntity>.from(jsonItems['items'].map((x) => EpisodeModel.fromJson(x)));
 
-      // we test the user parameters
-      EpisodeEntity epTest = episodes.first.copyWith(favorite: true, read: true, position: 9000);
+      // we create an entity with fake values for UI tests
+      EpisodeEntity epTest = episodes.first.copyWith(favorite: true, read: true, position: 2000);
       episodes.insert(0, epTest);
 
       return episodes;

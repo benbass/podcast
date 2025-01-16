@@ -19,10 +19,11 @@ class EpisodeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var themeData = Theme.of(context);;
     ImageProvider img = MyImageProvider(url: item.image).imageProvider;
     return Card(
       key: ValueKey(item.pId),
-      color: Theme.of(context).colorScheme.secondary,
+      color: themeData.colorScheme.secondary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),
@@ -51,14 +52,32 @@ class EpisodeCard extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
-                child: Container(
-                  width: 90,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: img,
-                      fit: BoxFit.fitWidth,
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 90,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: img,
+                          fit: BoxFit.fitWidth,
+                        ),
+                      ),
                     ),
-                  ),
+                    if(item.position > 0)
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      child: SizedBox(
+                        height: 90,
+                        width: 90,
+                        child: LinearProgressIndicator(
+                          value: (item.position.toDouble()/item.duration!.toDouble()).clamp(0.0, 1.0),
+                          color: themeData.colorScheme.primary.withValues(alpha: 0.6),
+                          backgroundColor: Colors.transparent,
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
               Expanded(
