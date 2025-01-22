@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:podcast/core/globals.dart';
 
 import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/authorization/authorization.dart';
@@ -20,7 +21,7 @@ class PodcastDataSourceImpl implements PodcastDataSources {
 
     final response = await http.get(
         Uri.parse(
-            'https://api.podcastindex.org/api/1.0/search/byterm?q=$searchKeyword&pretty&max=1000'),
+            '$baseUrl/search/byterm?q=$searchKeyword&pretty&max=1000'),
         headers: headers);
 
     if (response.statusCode == 200) {
