@@ -29,14 +29,8 @@ class PodcastEpisodesPage extends StatelessWidget {
           ),
         ),
       ),
-      // Yet to be implemented, instead of a FutureBuilder:
-      /*
         body: StreamBuilder<List<EpisodeEntity>>(
-        stream: sl<EpisodeRepository>().fetchEpisodesByFeedId(widget.podcast.id),
-        ...
-       */
-      body: FutureBuilder<List<EpisodeEntity>>(
-        future: sl<EpisodeUseCases>().fetchEpisodes(podcast.id),
+        stream: sl<EpisodeUseCases>().fetchEpisodes(podcast.id),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final List<EpisodeEntity> episodes = snapshot.data!;
