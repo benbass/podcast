@@ -18,18 +18,12 @@ class EpisodeDataSourcesImpl implements EpisodeDataSources {
     Map<String, String> headers = headersForAuth(); // this is the real auth
 
     final response = await http.get(
-        Uri.parse(
-            '$baseUrl/episodes/byfeedid?id=$id&pretty&max=1000'),
+        Uri.parse('$baseUrl/episodes/byfeedid?id=$id&pretty&max=1000'),
         headers: headers);
     if (response.statusCode == 200) {
       var jsonItems = json.decode(response.body);
       List<EpisodeEntity> episodes = List<EpisodeEntity>.from(
           jsonItems['items'].map((x) => EpisodeModel.fromJson(x)));
-
-      // we create an entity with fake values for UI tests
-      EpisodeEntity epTest =
-      episodes.first.copyWith(favorite: true, read: true, position: 2000);
-      episodes.insert(0, epTest);
 
       yield episodes;
     } else {
@@ -39,4 +33,3 @@ class EpisodeDataSourcesImpl implements EpisodeDataSources {
     }
   }
 }
-
