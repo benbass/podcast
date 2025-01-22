@@ -7,7 +7,7 @@ class EpisodeUseCases{
 
   EpisodeUseCases({required this.episodeRepository});
 
-  Future<List<EpisodeEntity>> fetchEpisodes(int id){
+  Stream<List<EpisodeEntity>> fetchEpisodes(int id){
     return episodeRepository.fetchEpisodesByFeedId(id);
   }
 }

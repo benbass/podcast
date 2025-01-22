@@ -8,7 +8,7 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   EpisodeRepositoryImpl({required this.episodeDataSources});
 
   @override
-  Future<List<EpisodeEntity>> fetchEpisodesByFeedId(int id) async {
-    return await episodeDataSources.fetchEpisodesByFeedId(id);
+  Stream<List<EpisodeEntity>> fetchEpisodesByFeedId(int id) {
+    return episodeDataSources.fetchEpisodesByFeedId(id);
   }
 }
