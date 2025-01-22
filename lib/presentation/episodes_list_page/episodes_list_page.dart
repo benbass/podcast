@@ -34,6 +34,12 @@ class PodcastEpisodesPage extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final List<EpisodeEntity> episodes = snapshot.data!;
+
+            // we create an entity with fake values for UI tests
+            EpisodeEntity epTest =
+            episodes.first.copyWith(favorite: true, read: true, position: 2000);
+            episodes.insert(0, epTest);
+
             return SafeArea(
               child: CustomScrollView(
                 slivers: [
