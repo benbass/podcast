@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import '../../core/globals.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../helpers/authorization/authorization.dart';
 import '../models/episode_model.dart';
@@ -18,7 +19,7 @@ class EpisodeDataSourcesImpl implements EpisodeDataSources {
 
     final response = await http.get(
         Uri.parse(
-            'https://api.podcastindex.org/api/1.0/episodes/byfeedid?id=$id&pretty&max=1000'),
+            '$baseUrl/episodes/byfeedid?id=$id&pretty&max=1000'),
         headers: headers);
     if (response.statusCode == 200) {
       var jsonItems = json.decode(response.body);
