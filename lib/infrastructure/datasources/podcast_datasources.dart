@@ -11,6 +11,10 @@ abstract class PodcastDataSources {
 }
 
 class PodcastDataSourceImpl implements PodcastDataSources {
+  final http.Client httpClient;
+
+  PodcastDataSourceImpl({required this.httpClient});
+
   @override
   Future<List<PodcastEntity>> fetchPodcastsByKeywords(String keyword) async {
     // Preparing keyword for web search
@@ -19,7 +23,7 @@ class PodcastDataSourceImpl implements PodcastDataSources {
     // Authorization
     Map<String, String> headers = headersForAuth();
 
-    final response = await http.get(
+    final response = await httpClient.get(
         Uri.parse(
             '$baseUrl/search/byterm?q=$searchKeyword&pretty&max=1000'),
         headers: headers);

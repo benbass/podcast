@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:just_audio/just_audio.dart';
@@ -8,7 +6,6 @@ import 'package:podcast/presentation/episode_details_page/widgets/player_control
 
 import '../../helpers/core/format_duration.dart';
 import '../../helpers/core/format_pubdate_string.dart';
-import '../../helpers/core/get_android_version.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
@@ -27,9 +24,9 @@ class EpisodeDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isPlayerReady = sl<MyAudioHandler>().player.processingState == ProcessingState.ready ||
-        sl<MyAudioHandler>().player.playing;
-    bool isAndroidHigher14 = Platform.isAndroid && androidVersion > 14;
+    bool isPlayerReady = getItI<MyAudioHandler>().player.processingState == ProcessingState.ready ||
+        getItI<MyAudioHandler>().player.playing;
+
     // We wrap this widget in PopScope so we can apply a method on the OS back-button
     // where we rebuild the overlay!
     return PopScope(
@@ -38,7 +35,7 @@ class EpisodeDetailsPage extends StatelessWidget {
         if (didPop) {
           return;
         }
-        if (sl<MyAudioHandler>().player.processingState ==
+        if (getItI<MyAudioHandler>().player.processingState ==
                 ProcessingState.ready &&
             overlayEntry == null) {
           showOverlayPlayerMin(context, episode, title);
@@ -90,7 +87,7 @@ class EpisodeDetailsPage extends StatelessWidget {
             ),
             isPlayerReady
                 ? Positioned(
-                    bottom: 0,
+                    bottom: MediaQuery.of(context).padding.bottom,
                     left: 0,
                     right: 0,
                     child: PlayerControls(
@@ -98,7 +95,7 @@ class EpisodeDetailsPage extends StatelessWidget {
                     ),
                   )
                 : Positioned(
-                    bottom: isAndroidHigher14 ? 10 : 0,
+                    bottom: MediaQuery.of(context).padding.bottom,
                     left: 0,
                     right: 0,
                     child: PlayButton(
@@ -108,12 +105,6 @@ class EpisodeDetailsPage extends StatelessWidget {
                   ),
           ],
         ),
-        bottomNavigationBar: isAndroidHigher14
-            ? Container(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                height: MediaQuery.of(context).padding.bottom,
-              )
-            : null,
       ),
     );
   }

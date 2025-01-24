@@ -41,7 +41,7 @@ class PlayerControls extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () {
-                      sl<MyAudioHandler>().seekBackward();
+                      getItI<MyAudioHandler>().seekBackward();
                     },
                     icon: const Icon(
                       Icons.fast_rewind_rounded,
@@ -51,7 +51,7 @@ class PlayerControls extends StatelessWidget {
                   IconButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      sl<MyAudioHandler>().stop().then((_) {
+                      getItI<MyAudioHandler>().stop().then((_) {
                         if (context.mounted) {
                           BlocProvider.of<EpisodePlaybackUrlCubit>(context)
                               .setPlaybackEpisodeUrl("");
@@ -65,12 +65,12 @@ class PlayerControls extends StatelessWidget {
                     ),
                   ),
                   StreamBuilder<PlayerState>(
-                      stream: sl<MyAudioHandler>().player.playerStateStream,
+                      stream: getItI<MyAudioHandler>().player.playerStateStream,
                       builder: (context, stream) {
                         final isPlaying = stream.data?.playing;
                         return IconButton(
                           onPressed: () {
-                            sl<MyAudioHandler>().handlePlayPause();
+                            getItI<MyAudioHandler>().handlePlayPause();
                           },
                           icon: Icon(
                             isPlaying == true
@@ -82,7 +82,7 @@ class PlayerControls extends StatelessWidget {
                       }),
                   IconButton(
                     onPressed: () {
-                      sl<MyAudioHandler>().seekForward();
+                      getItI<MyAudioHandler>().seekForward();
                     },
                     icon: const Icon(
                       Icons.fast_forward_rounded,

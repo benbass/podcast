@@ -16,7 +16,7 @@ class PlaybackPositionSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Duration>(
-      stream: sl<MyAudioHandler>().player.positionStream,
+      stream: getItI<MyAudioHandler>().player.positionStream,
       builder: (context, snapshot) {
         final position = snapshot.data ?? Duration.zero;
         final Duration totalDuration =
@@ -31,13 +31,13 @@ class PlaybackPositionSlider extends StatelessWidget {
               inactiveColor: Theme.of(context).colorScheme.primary,
               value: position.inSeconds.toDouble(),
               min: 0.0,
-              max: sl<MyAudioHandler>()
+              max: getItI<MyAudioHandler>()
                   .player
                   .duration
                   ?.inSeconds
                   .toDouble() ??
                   0.0,
-              onChanged: (value) => sl<MyAudioHandler>()
+              onChanged: (value) => getItI<MyAudioHandler>()
                   .player
                   .seek(Duration(seconds: value.toInt())),
             ),

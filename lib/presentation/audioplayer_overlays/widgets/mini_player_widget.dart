@@ -73,7 +73,7 @@ class MiniPlayerWidget extends StatelessWidget {
                         ),
                       ),
                       StreamBuilder<Duration>(
-                        stream: sl<MyAudioHandler>().player.positionStream,
+                        stream: getItI<MyAudioHandler>().player.positionStream,
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             final currentDuration = snapshot.data!;
@@ -122,12 +122,12 @@ class MiniPlayerWidget extends StatelessWidget {
               ),
             ),
             StreamBuilder<PlayerState>(
-                stream: sl<MyAudioHandler>().player.playerStateStream,
+                stream: getItI<MyAudioHandler>().player.playerStateStream,
                 builder: (context, stream) {
                   final isPlaying = stream.data?.playing;
                   return IconButton(
                     onPressed: () {
-                      sl<MyAudioHandler>().handlePlayPause();
+                      getItI<MyAudioHandler>().handlePlayPause();
                     },
                     icon: Icon(
                       isPlaying == true

@@ -24,7 +24,7 @@ class PlayButton extends StatelessWidget {
       builder: (context, state) {
         if (state != episode.enclosureUrl) {
           return StreamBuilder<PlayerState>(
-              stream: sl<MyAudioHandler>()
+              stream: getItI<MyAudioHandler>()
                   .player
                   .playerStateStream,
               builder: (context, stream) {
@@ -39,10 +39,10 @@ class PlayButton extends StatelessWidget {
 
                     // source error?
                     try {
-                      await sl<MyAudioHandler>()
+                      await getItI<MyAudioHandler>()
                           .player
                           .setUrl(episode.enclosureUrl);
-                      sl<MyAudioHandler>().play();
+                      getItI<MyAudioHandler>().play();
 
                       // We need to wait for the previous overlayEntry, if any, to be removed before we can insert the new one
                       Future.delayed(

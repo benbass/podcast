@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../domain/entities/podcast_entity.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../../episodes_list_page/episodes_list_page.dart';
@@ -30,9 +29,11 @@ class RowIconButtonsPodcasts extends StatelessWidget {
                 Navigator.push(
                   context,
                   SlideRightRoute(
-                    page: PodcastEpisodesPage(
-                      podcast: podcast,
-                    ),
+                    page: Builder(builder: (context) {
+                      return EpisodesPage(
+                        podcast: podcast,
+                      );
+                    }),
                   ),
                 );
               },
