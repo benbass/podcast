@@ -12,12 +12,15 @@ abstract class EpisodeDataSources {
 }
 
 class EpisodeDataSourcesImpl implements EpisodeDataSources {
+  final http.Client httpClient;
+
+  EpisodeDataSourcesImpl({required this.httpClient});
   @override
   Stream<List<EpisodeEntity>> fetchEpisodesByFeedId(int id) async* {
     // Authorization:
     Map<String, String> headers = headersForAuth(); // this is the real auth
 
-    final response = await http.get(
+    final response = await httpClient.get(
         Uri.parse('$baseUrl/episodes/byfeedid?id=$id&pretty&max=1000'),
         headers: headers);
     if (response.statusCode == 200) {

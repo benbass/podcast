@@ -97,7 +97,7 @@ class FlexibleSpace extends StatelessWidget {
             IconButton(
               onPressed: () {
                 if (episode != null) {
-                  if (sl<MyAudioHandler>().player.processingState ==
+                  if (getItI<MyAudioHandler>().player.processingState ==
                           ProcessingState.ready &&
                       overlayEntry == null) {
                     showOverlayPlayerMin(context, episode!, title);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// WE DO NOT USE THIS WIDGET ANYMORE
 class TrianglePainter extends CustomPainter {
   final String text;
 

@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:podcast/domain/entities/podcast_entity.dart';
-import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
+import '../../application/episodes_bloc/episodes_bloc.dart';
 import '../../domain/entities/episode_entity.dart';
-import '../../injection.dart';
-import '../podcast_results_page/widgets/android_bottom_padding.dart';
 import 'widgets/row_icon_buttons_episodes.dart';
 
-class PodcastEpisodesPage extends StatelessWidget {
+class EpisodesPage extends StatelessWidget {
   final PodcastEntity podcast;
 
-  const PodcastEpisodesPage({
+  const EpisodesPage({
     super.key,
     required this.podcast,
   });
 
   @override
   Widget build(BuildContext context) {
+    final episodesBloc = BlocProvider.of<EpisodesBloc>(context);
+    BlocProvider.of<EpisodesBloc>(context)
+        .add(EpisodesFetchingEvent(id: podcast.id));
     return Scaffold(
-      appBar: AppBar(
+      /*  appBar: AppBar(
         toolbarHeight: 80,
         title: FittedBox(
           fit: BoxFit.scaleDown,
@@ -28,35 +30,55 @@ class PodcastEpisodesPage extends StatelessWidget {
             podcast.title,
           ),
         ),
-      ),
-        body: StreamBuilder<List<EpisodeEntity>>(
-        stream: sl<EpisodeUseCases>().fetchEpisodes(podcast.id),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final List<EpisodeEntity> episodes = snapshot.data!;
-
-            // we create an entity with fake values for UI tests
-            EpisodeEntity epTest =
-            episodes.first.copyWith(favorite: true, read: true, position: 2000);
-            episodes.insert(0, epTest);
-
+      ),*/
+      body: BlocBuilder<EpisodesBloc, EpisodesState>(
+        builder: (context, state) {
+          if (state is EpisodesInitial) {
+            episodesBloc.add(EpisodesFetchingEvent(id: podcast.id));
+          } else if (state is EpisodesFetchingState) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (state is EpisodesReceivedState) {
+            // let's test UI with user parameters...
+            List<EpisodeEntity> episodes = state.episodes;
+            episodes.insert(
+                0,
+                episodes[0]
+                    .copyWith(favorite: true, position: 2000, read: true));
             return SafeArea(
               child: CustomScrollView(
+                physics: const BouncingScrollPhysics(),
                 slivers: [
-                  const SliverToBoxAdapter(
-                    child: ElevatedButtonSubscribe(),
-                  ),
-                  const SliverPadding(
-                      sliver: SliverToBoxAdapter(
-                        child: RowIconButtonsEpisodes(),
+                  SliverAppBar(
+                    collapsedHeight: 60,
+                    expandedHeight: 170,
+                    pinned: true,
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        spacing: 12,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 80.0),
+                            child: Text(
+                              podcast.title,
+                              style: Theme.of(context).textTheme.displayLarge,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const ElevatedButtonSubscribe(),
+                          const RowIconButtonsEpisodes(),
+                          const SizedBox(height: 12,),
+                        ],
                       ),
-                      padding: EdgeInsets.only(
-                        bottom: 20.0,
-                      )),
+                    ),
+                  ),
                   SliverList.builder(
-                    itemCount: episodes.length,
+                    itemCount: state.episodes.length,
                     itemBuilder: (context, index) {
-                      final item = episodes[index];
+                      final item = state.episodes[index];
                       return EpisodeCard(
                         item: item,
                         podcast: podcast,
@@ -71,16 +93,10 @@ class PodcastEpisodesPage extends StatelessWidget {
                 ],
               ),
             );
-          } else if (snapshot.hasError) {
-            return Text('Fehler: ${snapshot.error}');
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
           }
+          return const SizedBox();
         },
       ),
-      bottomNavigationBar: const AndroidBottomPadding(),
     );
   }
 }

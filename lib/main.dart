@@ -9,22 +9,25 @@ import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/homepage/homepage.dart';
 import 'package:podcast/theme.dart';
 import 'application/episode_playback_url/episode_playback_url_cubit.dart';
+import 'application/episodes_bloc/episodes_bloc.dart';
 import 'application/subscribed_podcasts_bloc/subscribed_podcasts_bloc.dart';
 import 'core/globals.dart';
 import 'core/objectbox.dart';
 import 'injection.dart' as di;
+import 'injection.dart';
 import 'helpers/notifications/initialize_awesome_notifications.dart';
 import 'helpers/player/audiohandler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await di.init();
 
   /// Init our objectBox
   /* ObjectBox objectbox = await ObjectBox.create();
   podcastBox = objectbox.store.box<PodcastEntity>();
   episodeBox = objectbox.store.box<EpisodeEntity>();*/
 
-  await di.init();
+
   // Initialize the audio handler and audio service.
   final audioHandler = MyAudioHandler();
   initAwesomeNotifications(audioHandler);
@@ -45,8 +48,9 @@ void main() async {
         providers: [
           BlocProvider(
               create: (BuildContext context) => EpisodePlaybackUrlCubit()),
-          BlocProvider(create: (BuildContext context) => di.sl<SubscribedPodcastsBloc>()),
-          BlocProvider(create: (BuildContext context) => di.sl<PodcastsBloc>()),
+          BlocProvider(create: (BuildContext context) => getItI<SubscribedPodcastsBloc>()),
+          BlocProvider(create: (BuildContext context) => getItI<PodcastsBloc>()),
+          BlocProvider(create: (BuildContext context) => getItI<EpisodesBloc>()),
         ],
         // We wrap the app in a SafeArea: on Android API 35, the app doesn't stop
         // at the edge of the bottom bar but at the bottom of the screen,
