@@ -30,54 +30,60 @@ class PodcastResultsPage extends StatelessWidget {
           icon: const Icon(Icons.home_rounded),
         ),
       ),
-      body: BlocBuilder<PodcastsBloc, PodcastsState>(
-        builder: (context, state) {
-          return CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              if (state is PodcastsReceivedState)
-                if (state.podcasts.isNotEmpty)
-                  SliverList.builder(
-                    itemCount: state.podcasts.length,
-                    itemBuilder: (context, index) {
-                      final entry = state.podcasts.elementAt(index);
-                      final title = entry.title;
-                      final imgSrc = entry.artwork;
-                      return PodcastCard(
-                        entry: entry,
-                        imgSrc: imgSrc,
-                        title: title,
-                      );
-                    },
-                  )
-                else
-                  SliverFillRemaining(
-                    child: Center(
-                      child: Column(
-                        children: [
-                          const Spacer(),
-                          const Text(
-                              "No podcasts were found for your keyword(s)"),
-                          IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(
-                              Icons.arrow_back_rounded,
-                              size: 36,
-                            ),
-                          ),
-                          const Spacer(),
-                        ],
+      body: SafeArea(
+        child: BlocBuilder<PodcastsBloc, PodcastsState>(
+          builder: (context, state) {
+            return CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                if (state is PodcastsFetchingState)
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
                       ),
                     ),
                   ),
-              const SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 80,
-                ),
-              ),
-            ],
-          );
-        },
+                if (state is PodcastsReceivedState)
+                  if (state.podcasts.isNotEmpty)
+                    SliverPadding(
+                      // Padding will prevent last item to be hidden when overlay (mini player) is shown
+                      padding: const EdgeInsets.only(bottom: 80.0),
+                      sliver: SliverList.builder(
+                        itemCount: state.podcasts.length,
+                        itemBuilder: (context, index) {
+                          final podcast = state.podcasts.elementAt(index);
+                          return PodcastCard(
+                            podcast: podcast,
+                          );
+                        },
+                      ),
+                    )
+                  else
+                    SliverFillRemaining(
+                      child: Center(
+                        child: Column(
+                          children: [
+                            const Spacer(),
+                            const Text(
+                                "No podcasts were found for your keyword(s)"),
+                            IconButton(
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(
+                                Icons.arrow_back_rounded,
+                                size: 36,
+                              ),
+                            ),
+                            const Spacer(),
+                          ],
+                        ),
+                      ),
+                    ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
