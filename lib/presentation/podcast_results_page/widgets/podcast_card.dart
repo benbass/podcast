@@ -9,20 +9,16 @@ import '../../podcast_details_page/podcast_details_page.dart';
 class PodcastCard extends StatelessWidget {
   const PodcastCard({
     super.key,
-    required this.entry,
-    required this.imgSrc,
-    required this.title,
+    required this.podcast,
   });
 
-  final PodcastEntity entry;
-  final String imgSrc;
-  final String title;
+  final PodcastEntity podcast;
 
   @override
   Widget build(BuildContext context) {
-    ImageProvider img = MyImageProvider(url: imgSrc).imageProvider;
+    ImageProvider img = MyImageProvider(url: podcast.artwork).imageProvider;
     return Card(
-      key: ValueKey(entry.id),
+      key: ValueKey(podcast.id),
       color: Theme.of(context).colorScheme.secondary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
@@ -40,7 +36,7 @@ class PodcastCard extends StatelessWidget {
               context,
               ScaleRoute(
                 page: PodcastDetailsPage(
-                  podcast: entry,
+                  podcast: podcast,
                 ),
               ),
             );
@@ -74,7 +70,7 @@ class PodcastCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        title,
+                        podcast.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
