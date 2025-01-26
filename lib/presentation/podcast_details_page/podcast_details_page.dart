@@ -32,7 +32,9 @@ class PodcastDetailsPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ...podcast.categories.values.map((value) => Categories(value: value,)),
+                      ...podcast.categories.values.map((value) => Categories(
+                            value: value,
+                          )),
                     ],
                   ),
                 )),
@@ -67,11 +69,21 @@ class PodcastDetailsPage extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      child: Text(
-                        podcast.language.toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.language,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            podcast.language.toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -84,4 +96,3 @@ class PodcastDetailsPage extends StatelessWidget {
     );
   }
 }
-
