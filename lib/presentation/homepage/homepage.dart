@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/homepage/widgets/search_textfield.dart';
@@ -66,19 +65,11 @@ class HomePage extends StatelessWidget {
                             ),
                             itemBuilder: (BuildContext context, int index) {
                               return SubscribedPodcastCard(
-                                subscribedPodcast: state.subscribedPodcasts[index],
+                                subscribedPodcast:
+                                    state.subscribedPodcasts[index],
                               );
                             },
                           ),
-                 /* connect this to other bloc: PodcastBloc
-                  // Loader while we fetch podcasts on search
-                  if (state is PodcastsFetchingState)
-                    const SliverFillRemaining(
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  */
                 ],
               ),
             );
