@@ -23,9 +23,9 @@ void main() async {
   await di.init();
 
   /// Init our objectBox
-/*  ObjectBox objectBox = await ObjectBox.create();
+  ObjectBox objectBox = await ObjectBox.create();
   podcastBox = objectBox.store.box<PodcastEntity>();
-  episodeBox = objectBox.store.box<EpisodeEntity>();*/
+  episodeBox = objectBox.store.box<EpisodeEntity>();
 
 
   // Initialize the audio handler and audio service.
