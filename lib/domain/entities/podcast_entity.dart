@@ -24,7 +24,7 @@ class PodcastEntity {
   // Possible values for medium: https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#node-value-12
   final String medium;
   final int episodeCount;
-  final Map<String, String> categories;
+  final List<String> categories;
 
   /// User parameter
   final bool subscribed;

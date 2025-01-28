@@ -32,7 +32,7 @@ class PodcastDetailsPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ...podcast.categories.values.map((value) => Categories(
+                      ...podcast.categories.map((value) => Categories(
                             value: value,
                           )),
                     ],

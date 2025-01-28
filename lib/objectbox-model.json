@@ -1,0 +1,260 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:2426162799602985471",
+      "lastPropertyId": "26:1474311898834949682",
+      "name": "EpisodeEntity",
+      "properties": [
+        {
+          "id": "1:5928733178232725841",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8383770476776893028",
+          "name": "pId",
+          "type": 6
+        },
+        {
+          "id": "3:2474401650869444900",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "4:5345557908623253451",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "5:2347680488987561266",
+          "name": "guid",
+          "type": 9
+        },
+        {
+          "id": "6:4453282057436702721",
+          "name": "datePublished",
+          "type": 6
+        },
+        {
+          "id": "7:8840444511688388827",
+          "name": "datePublishedPretty",
+          "type": 9
+        },
+        {
+          "id": "8:8241718009185690175",
+          "name": "enclosureUrl",
+          "type": 9
+        },
+        {
+          "id": "9:5315232081961544314",
+          "name": "enclosureLength",
+          "type": 6
+        },
+        {
+          "id": "10:7757619235358289746",
+          "name": "duration",
+          "type": 6
+        },
+        {
+          "id": "11:754035681602153206",
+          "name": "explicit",
+          "type": 6
+        },
+        {
+          "id": "12:1662019783005508540",
+          "name": "episodeNr",
+          "type": 6
+        },
+        {
+          "id": "13:7183222722967433524",
+          "name": "episodeType",
+          "type": 9
+        },
+        {
+          "id": "14:4958705093200169029",
+          "name": "season",
+          "type": 6
+        },
+        {
+          "id": "15:4033075865599575621",
+          "name": "image",
+          "type": 9
+        },
+        {
+          "id": "16:3479500068354743367",
+          "name": "link",
+          "type": 9
+        },
+        {
+          "id": "17:8440795995472168448",
+          "name": "feedUrl",
+          "type": 9
+        },
+        {
+          "id": "18:8500884303513579856",
+          "name": "feedImage",
+          "type": 9
+        },
+        {
+          "id": "19:1042823862273995078",
+          "name": "feedId",
+          "type": 6
+        },
+        {
+          "id": "20:2319166019816119927",
+          "name": "podcastGuid",
+          "type": 9
+        },
+        {
+          "id": "21:7007478387172306670",
+          "name": "favorite",
+          "type": 1
+        },
+        {
+          "id": "22:8395388568443739908",
+          "name": "read",
+          "type": 1
+        },
+        {
+          "id": "23:3373849147018516174",
+          "name": "completed",
+          "type": 1
+        },
+        {
+          "id": "24:9146655709080290395",
+          "name": "position",
+          "type": 6
+        },
+        {
+          "id": "25:7596670990766320374",
+          "name": "filePath",
+          "type": 9
+        },
+        {
+          "id": "26:1474311898834949682",
+          "name": "podcastId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "1:4884476573613222508",
+          "relationTarget": "PodcastEntity"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:7010709310040266073",
+      "lastPropertyId": "17:8946010831370582095",
+      "name": "PodcastEntity",
+      "properties": [
+        {
+          "id": "1:5541803325467903899",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4591834087030658285",
+          "name": "pId",
+          "type": 6
+        },
+        {
+          "id": "3:7286463448621612487",
+          "name": "podcastGuid",
+          "type": 9
+        },
+        {
+          "id": "4:7111471965492374535",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "5:8873142500159001367",
+          "name": "url",
+          "type": 9
+        },
+        {
+          "id": "6:8534594114422633580",
+          "name": "link",
+          "type": 9
+        },
+        {
+          "id": "7:6626167074535135341",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "8:2175092397235509974",
+          "name": "author",
+          "type": 9
+        },
+        {
+          "id": "9:274160677803867514",
+          "name": "ownerName",
+          "type": 9
+        },
+        {
+          "id": "10:5007069643397433445",
+          "name": "artwork",
+          "type": 9
+        },
+        {
+          "id": "11:4669678682140042353",
+          "name": "lastUpdateTime",
+          "type": 6
+        },
+        {
+          "id": "12:235431960893443537",
+          "name": "language",
+          "type": 9
+        },
+        {
+          "id": "13:8278095497993847303",
+          "name": "explicit",
+          "type": 1
+        },
+        {
+          "id": "14:3148595867289535331",
+          "name": "medium",
+          "type": 9
+        },
+        {
+          "id": "15:9079111591071209970",
+          "name": "episodeCount",
+          "type": 6
+        },
+        {
+          "id": "16:7467291605934669106",
+          "name": "subscribed",
+          "type": 1
+        },
+        {
+          "id": "17:8946010831370582095",
+          "name": "categories",
+          "type": 30
+        }
+      ],
+      "relations": [
+        {
+          "id": "1:7140059083449002578",
+          "name": "episodes",
+          "targetId": "1:2426162799602985471"
+        }
+      ]
+    }
+  ],
+  "lastEntityId": "2:7010709310040266073",
+  "lastIndexId": "1:4884476573613222508",
+  "lastRelationId": "1:7140059083449002578",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}
