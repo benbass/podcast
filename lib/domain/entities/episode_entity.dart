@@ -1,7 +1,9 @@
 import 'package:objectbox/objectbox.dart';
+import 'package:podcast/domain/entities/podcast_entity.dart';
 
 @Entity()
 class EpisodeEntity {
+  /// ObjectBox related
   @Id()
   int id = 0;
 
@@ -34,9 +36,10 @@ class EpisodeEntity {
   final bool read;
   final bool completed;
   final int position;
+  final String? filePath; // downloaded file (subscribed or not!), if applicable
 
-  /// downloaded file (subscribed or not!), if applicable
-  final String filePath;
+  /// ObjectBox relation
+  final podcast = ToOne<PodcastEntity>();
 
   EpisodeEntity({
     required this.pId,

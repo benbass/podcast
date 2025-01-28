@@ -1,6 +1,15 @@
+import 'package:objectbox/objectbox.dart';
 
+import 'episode_entity.dart';
+
+@Entity()
 class PodcastEntity {
-  final int id;
+  /// ObjectBox related
+  @Id()
+  int id = 0;
+
+  /// Data from json
+  final int pId;
   final String podcastGuid;
   final String title;
   final String url; // xml
@@ -17,8 +26,14 @@ class PodcastEntity {
   final int episodeCount;
   final Map<String, String> categories;
 
+  /// User parameter
+  final bool subscribed;
+
+  /// ObjectBox relation
+  final episodes = ToMany<EpisodeEntity>();
+
   PodcastEntity({
-    required this.id,
+    required this.pId,
     required this.podcastGuid,
     required this.title,
     required this.url,
@@ -33,5 +48,29 @@ class PodcastEntity {
     required this.medium,
     required this.episodeCount,
     required this.categories,
+    required this.subscribed,
   });
+
+  PodcastEntity copyWith({
+    bool? subscribed,
+  }) {
+    return PodcastEntity(
+      pId: pId,
+      podcastGuid: podcastGuid,
+      title: title,
+      url: url,
+      link: link,
+      description: description,
+      author: author,
+      ownerName: ownerName,
+      artwork: artwork,
+      lastUpdateTime: lastUpdateTime,
+      language: language,
+      explicit: explicit,
+      medium: medium,
+      episodeCount: episodeCount,
+      categories: categories,
+      subscribed: subscribed ?? this.subscribed,
+    );
+  }
 }

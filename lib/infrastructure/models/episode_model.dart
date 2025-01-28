@@ -56,7 +56,7 @@ class EpisodeModel extends EpisodeEntity {
       read: false,
       completed: false,
       position: 0,
-      filePath: "",
+      filePath: null,
     );
   }
 
