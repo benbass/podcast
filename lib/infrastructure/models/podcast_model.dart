@@ -21,6 +21,18 @@ class PodcastModel extends PodcastEntity {
     required super.subscribed,
   });
 
+  /// Converts a map of categories to a list of category names.
+  /// because ObjectBox doesn't support maps so we need a List type in entity.
+  /// This method extracts the values from the 'categories' map and returns them as a list of strings.
+  static List<String> _categoryValuesToList(
+      Map<String, dynamic> categoriesJson) {
+    if (categoriesJson.isEmpty) {
+      return [];
+    }
+    // Ensure that the values are strings
+    return categoriesJson.values.whereType<String>().toList();
+  }
+
   factory PodcastModel.fromJson(Map<String, dynamic> json) {
     return PodcastModel(
       pId: json['id'],
@@ -38,10 +50,9 @@ class PodcastModel extends PodcastEntity {
       medium: json['medium'] ?? "",
       episodeCount: json['episodeCount'] ?? 0,
       categories: json['categories'] != null
-          ? Map<String, String>.from(json['categories'])
-          : {},
+          ? _categoryValuesToList(json['categories'])
+          : [],
       subscribed: false,
     );
   }
-
 }
