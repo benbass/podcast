@@ -20,7 +20,7 @@ class EpisodesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final episodesBloc = BlocProvider.of<EpisodesBloc>(context);
     BlocProvider.of<EpisodesBloc>(context)
-        .add(EpisodesFetchingEvent(id: podcast.id));
+        .add(EpisodesFetchingEvent(id: podcast.pId));
     return Scaffold(
       /*  appBar: AppBar(
         toolbarHeight: 80,
@@ -34,7 +34,7 @@ class EpisodesPage extends StatelessWidget {
       body: BlocBuilder<EpisodesBloc, EpisodesState>(
         builder: (context, state) {
           if (state is EpisodesInitial) {
-            episodesBloc.add(EpisodesFetchingEvent(id: podcast.id));
+            episodesBloc.add(EpisodesFetchingEvent(id: podcast.pId));
           } else if (state is EpisodesFetchingState) {
             return const Center(
               child: CircularProgressIndicator(),

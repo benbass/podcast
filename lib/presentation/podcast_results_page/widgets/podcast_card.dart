@@ -18,7 +18,7 @@ class PodcastCard extends StatelessWidget {
   Widget build(BuildContext context) {
     ImageProvider img = MyImageProvider(url: podcast.artwork).imageProvider;
     return Card(
-      key: ValueKey(podcast.id),
+      key: ValueKey(podcast.pId),
       color: Theme.of(context).colorScheme.secondary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),

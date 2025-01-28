@@ -3,7 +3,7 @@ import 'package:podcast/domain/entities/podcast_entity.dart';
 
 class PodcastModel extends PodcastEntity {
   PodcastModel({
-    required super.id,
+    required super.pId,
     required super.podcastGuid,
     required super.title,
     required super.url,
@@ -18,11 +18,12 @@ class PodcastModel extends PodcastEntity {
     required super.medium,
     required super.episodeCount,
     required super.categories,
+    required super.subscribed,
   });
 
   factory PodcastModel.fromJson(Map<String, dynamic> json) {
     return PodcastModel(
-      id: json['id'],
+      pId: json['id'],
       podcastGuid: json['podcastGuid'],
       title: parse(json['title']).documentElement?.text ?? "",
       url: json['url'] ?? "",
@@ -39,6 +40,7 @@ class PodcastModel extends PodcastEntity {
       categories: json['categories'] != null
           ? Map<String, String>.from(json['categories'])
           : {},
+      subscribed: false,
     );
   }
 
