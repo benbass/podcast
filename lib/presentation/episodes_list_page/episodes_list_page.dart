@@ -68,7 +68,7 @@ class EpisodesPage extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const ElevatedButtonSubscribe(),
+                          ElevatedButtonSubscribe(subscribed: podcast.subscribed,),
                           const RowIconButtonsEpisodes(),
                           const SizedBox(height: 12,),
                         ],

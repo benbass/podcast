@@ -78,10 +78,11 @@ class FlexibleSpace extends StatelessWidget {
                   color: Colors.black26,
                 ),
               ),
-              const Positioned(
+              if(podcast != null)
+                Positioned(
                 top: 12,
                 right: 12,
-                child: ElevatedButtonSubscribe(),
+                child: ElevatedButtonSubscribe(subscribed: podcast!.subscribed,),
               ),
             ],
           ),
