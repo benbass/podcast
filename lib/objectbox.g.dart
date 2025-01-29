@@ -23,7 +23,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(1, 2426162799602985471),
       name: 'EpisodeEntity',
-      lastPropertyId: const obx_int.IdUid(26, 1474311898834949682),
+      lastPropertyId: const obx_int.IdUid(27, 7451620604719252623),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -31,11 +31,6 @@ final _entities = <obx_int.ModelEntity>[
             name: 'id',
             type: 6,
             flags: 1),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 8383770476776893028),
-            name: 'pId',
-            type: 6,
-            flags: 0),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(3, 2474401650869444900),
             name: 'title',
@@ -157,7 +152,12 @@ final _entities = <obx_int.ModelEntity>[
             type: 11,
             flags: 520,
             indexId: const obx_int.IdUid(1, 4884476573613222508),
-            relationTarget: 'PodcastEntity')
+            relationTarget: 'PodcastEntity'),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(27, 7451620604719252623),
+            name: 'eId',
+            type: 6,
+            flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
@@ -253,13 +253,11 @@ final _entities = <obx_int.ModelEntity>[
             type: 30,
             flags: 0)
       ],
-      relations: <obx_int.ModelRelation>[
-        obx_int.ModelRelation(
-            id: const obx_int.IdUid(1, 7140059083449002578),
-            name: 'episodes',
-            targetId: const obx_int.IdUid(1, 2426162799602985471))
-      ],
-      backlinks: <obx_int.ModelBacklink>[])
+      relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[
+        obx_int.ModelBacklink(
+            name: 'episodes', srcEntity: 'EpisodeEntity', srcField: 'podcast')
+      ])
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -303,8 +301,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [],
       retiredIndexUids: const [],
-      retiredPropertyUids: const [],
-      retiredRelationUids: const [],
+      retiredPropertyUids: const [8383770476776893028],
+      retiredRelationUids: const [7140059083449002578],
       modelVersion: 5,
       modelVersionParserMinimum: 5,
       version: 1);
@@ -325,7 +323,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final datePublishedPrettyOffset =
               fbb.writeString(object.datePublishedPretty);
           final enclosureUrlOffset = fbb.writeString(object.enclosureUrl);
-          final episodeTypeOffset = fbb.writeString(object.episodeType);
+          final episodeTypeOffset = object.episodeType == null
+              ? null
+              : fbb.writeString(object.episodeType!);
           final imageOffset = fbb.writeString(object.image);
           final linkOffset = fbb.writeString(object.link);
           final feedUrlOffset = fbb.writeString(object.feedUrl);
@@ -334,9 +334,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final filePathOffset = object.filePath == null
               ? null
               : fbb.writeString(object.filePath!);
-          fbb.startTable(27);
+          fbb.startTable(28);
           fbb.addInt64(0, object.id);
-          fbb.addInt64(1, object.pId);
           fbb.addOffset(2, titleOffset);
           fbb.addOffset(3, descriptionOffset);
           fbb.addOffset(4, guidOffset);
@@ -361,14 +360,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addInt64(23, object.position);
           fbb.addOffset(24, filePathOffset);
           fbb.addInt64(25, object.podcast.targetId);
+          fbb.addInt64(26, object.eId);
           fbb.finish(fbb.endTable());
           return object.id;
         },
         objectFromFB: (obx.Store store, ByteData fbData) {
           final buffer = fb.BufferContext(fbData);
           final rootOffset = buffer.derefObject(0);
-          final pIdParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          final eIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 56, 0);
           final titleParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 8, '');
           final descriptionParam =
@@ -394,7 +394,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 26);
           final episodeTypeParam =
               const fb.StringReader(asciiOptimization: true)
-                  .vTableGet(buffer, rootOffset, 28, '');
+                  .vTableGetNullable(buffer, rootOffset, 28);
           final seasonParam =
               const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 30);
           final imageParam = const fb.StringReader(asciiOptimization: true)
@@ -421,7 +421,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final filePathParam = const fb.StringReader(asciiOptimization: true)
               .vTableGetNullable(buffer, rootOffset, 52);
           final object = EpisodeEntity(
-              pId: pIdParam,
+              eId: eIdParam,
               title: titleParam,
               description: descriptionParam,
               guid: guidParam,
@@ -455,7 +455,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         model: _entities[1],
         toOneRelations: (PodcastEntity object) => [],
         toManyRelations: (PodcastEntity object) => {
-              obx_int.RelInfo<PodcastEntity>.toMany(1, object.id):
+              obx_int.RelInfo<EpisodeEntity>.toOneBacklink(26, object.id,
+                      (EpisodeEntity srcObject) => srcObject.podcast):
                   object.episodes
             },
         getId: (PodcastEntity object) => object.id,
@@ -556,7 +557,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           obx_int.InternalToManyAccess.setRelInfo<PodcastEntity>(
               object.episodes,
               store,
-              obx_int.RelInfo<PodcastEntity>.toMany(1, object.id));
+              obx_int.RelInfo<EpisodeEntity>.toOneBacklink(26, object.id,
+                  (EpisodeEntity srcObject) => srcObject.podcast));
           return object;
         })
   };
@@ -570,105 +572,105 @@ class EpisodeEntity_ {
   static final id =
       obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[0]);
 
-  /// See [EpisodeEntity.pId].
-  static final pId =
-      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[1]);
-
   /// See [EpisodeEntity.title].
   static final title =
-      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[2]);
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[1]);
 
   /// See [EpisodeEntity.description].
   static final description =
-      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[3]);
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[2]);
 
   /// See [EpisodeEntity.guid].
   static final guid =
-      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[4]);
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[3]);
 
   /// See [EpisodeEntity.datePublished].
   static final datePublished =
-      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[5]);
+      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[4]);
 
   /// See [EpisodeEntity.datePublishedPretty].
   static final datePublishedPretty =
-      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[6]);
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[5]);
 
   /// See [EpisodeEntity.enclosureUrl].
   static final enclosureUrl =
-      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[7]);
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[6]);
 
   /// See [EpisodeEntity.enclosureLength].
   static final enclosureLength =
-      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[8]);
+      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[7]);
 
   /// See [EpisodeEntity.duration].
   static final duration =
-      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[9]);
+      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[8]);
 
   /// See [EpisodeEntity.explicit].
   static final explicit =
-      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[10]);
+      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[9]);
 
   /// See [EpisodeEntity.episodeNr].
   static final episodeNr =
-      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[11]);
+      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[10]);
 
   /// See [EpisodeEntity.episodeType].
   static final episodeType =
-      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[12]);
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[11]);
 
   /// See [EpisodeEntity.season].
   static final season =
-      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[13]);
+      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[12]);
 
   /// See [EpisodeEntity.image].
   static final image =
-      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[14]);
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[13]);
 
   /// See [EpisodeEntity.link].
   static final link =
-      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[15]);
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[14]);
 
   /// See [EpisodeEntity.feedUrl].
   static final feedUrl =
-      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[16]);
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[15]);
 
   /// See [EpisodeEntity.feedImage].
   static final feedImage =
-      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[17]);
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[16]);
 
   /// See [EpisodeEntity.feedId].
   static final feedId =
-      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[18]);
+      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[17]);
 
   /// See [EpisodeEntity.podcastGuid].
   static final podcastGuid =
-      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[19]);
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[18]);
 
   /// See [EpisodeEntity.favorite].
   static final favorite =
-      obx.QueryBooleanProperty<EpisodeEntity>(_entities[0].properties[20]);
+      obx.QueryBooleanProperty<EpisodeEntity>(_entities[0].properties[19]);
 
   /// See [EpisodeEntity.read].
   static final read =
-      obx.QueryBooleanProperty<EpisodeEntity>(_entities[0].properties[21]);
+      obx.QueryBooleanProperty<EpisodeEntity>(_entities[0].properties[20]);
 
   /// See [EpisodeEntity.completed].
   static final completed =
-      obx.QueryBooleanProperty<EpisodeEntity>(_entities[0].properties[22]);
+      obx.QueryBooleanProperty<EpisodeEntity>(_entities[0].properties[21]);
 
   /// See [EpisodeEntity.position].
   static final position =
-      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[23]);
+      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[22]);
 
   /// See [EpisodeEntity.filePath].
   static final filePath =
-      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[24]);
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[23]);
 
   /// See [EpisodeEntity.podcast].
   static final podcast = obx.QueryRelationToOne<EpisodeEntity, PodcastEntity>(
-      _entities[0].properties[25]);
+      _entities[0].properties[24]);
+
+  /// See [EpisodeEntity.eId].
+  static final eId =
+      obx.QueryIntegerProperty<EpisodeEntity>(_entities[0].properties[25]);
 }
 
 /// [PodcastEntity] entity fields to define ObjectBox queries.
@@ -742,6 +744,6 @@ class PodcastEntity_ {
       obx.QueryStringVectorProperty<PodcastEntity>(_entities[1].properties[16]);
 
   /// see [PodcastEntity.episodes]
-  static final episodes = obx.QueryRelationToMany<PodcastEntity, EpisodeEntity>(
-      _entities[1].relations[0]);
+  static final episodes = obx.QueryBacklinkToMany<EpisodeEntity, PodcastEntity>(
+      EpisodeEntity_.podcast);
 }
