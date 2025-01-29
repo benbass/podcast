@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 class ElevatedButtonSubscribe extends StatelessWidget {
-  const ElevatedButtonSubscribe({super.key});
+  final bool subscribed;
+  const ElevatedButtonSubscribe({super.key, required this.subscribed});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {},
-      child: const Text("Subscribe"),
+      child: Text(subscribed ? "Unsubscribed" : "Subscribe"),
     );
   }
 }
