@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:2426162799602985471",
-      "lastPropertyId": "26:1474311898834949682",
+      "lastPropertyId": "27:7451620604719252623",
       "name": "EpisodeEntity",
       "properties": [
         {
@@ -13,11 +13,6 @@
           "name": "id",
           "type": 6,
           "flags": 1
-        },
-        {
-          "id": "2:8383770476776893028",
-          "name": "pId",
-          "type": 6
         },
         {
           "id": "3:2474401650869444900",
@@ -141,6 +136,11 @@
           "flags": 520,
           "indexId": "1:4884476573613222508",
           "relationTarget": "PodcastEntity"
+        },
+        {
+          "id": "27:7451620604719252623",
+          "name": "eId",
+          "type": 6
         }
       ],
       "relations": []
@@ -237,13 +237,7 @@
           "type": 30
         }
       ],
-      "relations": [
-        {
-          "id": "1:7140059083449002578",
-          "name": "episodes",
-          "targetId": "1:2426162799602985471"
-        }
-      ]
+      "relations": []
     }
   ],
   "lastEntityId": "2:7010709310040266073",
@@ -254,7 +248,11 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
-  "retiredRelationUids": [],
+  "retiredPropertyUids": [
+    8383770476776893028
+  ],
+  "retiredRelationUids": [
+    7140059083449002578
+  ],
   "version": 1
 }
