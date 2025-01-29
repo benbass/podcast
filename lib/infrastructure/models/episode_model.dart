@@ -5,7 +5,7 @@ import '../../helpers/core/format_pubdate_string.dart';
 
 class EpisodeModel extends EpisodeEntity {
   EpisodeModel({
-    required super.pId,
+    required super.eId,
     required super.title,
     required super.description,
     required super.guid,
@@ -33,7 +33,7 @@ class EpisodeModel extends EpisodeEntity {
 
   factory EpisodeModel.fromJson(Map<String, dynamic> json) {
     return EpisodeModel(
-      pId: json['id'],
+      eId: json['id'],
       title: parse(json['title']).documentElement?.text ?? "",
       description: parse(json['description']).documentElement?.text ?? "",
       guid: json['guid'],
@@ -45,7 +45,7 @@ class EpisodeModel extends EpisodeEntity {
       explicit: json['explicit'],
       episodeNr: json['episode'] ?? 0,
       episodeType: json['episodeType'] ?? "",
-      season: json['season'],
+      season: json['season'] ?? 0,
       image: json['image'],
       feedUrl: json['feedUrl'],
       link: json['link'],

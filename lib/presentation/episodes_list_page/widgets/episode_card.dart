@@ -22,7 +22,7 @@ class EpisodeCard extends StatelessWidget {
     var themeData = Theme.of(context);;
     ImageProvider img = MyImageProvider(url: item.image).imageProvider;
     return Card(
-      key: ValueKey(item.pId),
+      key: ValueKey(item.eId),
       color: themeData.colorScheme.secondary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),

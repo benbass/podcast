@@ -9,7 +9,7 @@ class EpisodeEntity {
 
   /// Data from json
   // Episode related
-  final int pId;
+  final int eId; // internal PodcastIndex.org Episode ID
   final String title;
   final String description;
   final String guid;
@@ -20,18 +20,18 @@ class EpisodeEntity {
   final int? duration;
   final int explicit; // 0=not explicit, 1=explicit
   final int? episodeNr;
-  final String episodeType; // full┃trailer┃bonus
+  final String? episodeType; // full┃trailer┃bonus
   final int? season;
   final String image;
 
   // Podcast (feed) related
-  final String link; // page
-  final String feedUrl; // xml
-  final String feedImage;
-  final int feedId;
-  final String podcastGuid;
+  final String link; // page. = link of podcast entity
+  final String feedUrl; // xml. . = url of podcast entity
+  final String feedImage; // = image of podcast entity
+  final int feedId; // = id of podcast entity
+  final String podcastGuid; // = podcastGuid of podcast entity
 
-  /// Additional data for user prefs and info (for subscribed podcasts)
+  /// Additional data for user prefs and info (mostly for subscribed podcasts)
   final bool favorite;
   final bool read;
   final bool completed;
@@ -42,7 +42,7 @@ class EpisodeEntity {
   final podcast = ToOne<PodcastEntity>();
 
   EpisodeEntity({
-    required this.pId,
+    required this.eId,
     required this.title,
     required this.description,
     required this.guid,
@@ -76,7 +76,7 @@ class EpisodeEntity {
     String? filePath,
   }) {
     return EpisodeEntity(
-      pId: pId,
+      eId: eId,
       title: title,
       description: description,
       guid: guid,
