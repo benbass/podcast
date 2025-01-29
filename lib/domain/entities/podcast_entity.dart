@@ -9,7 +9,7 @@ class PodcastEntity {
   int id = 0;
 
   /// Data from json
-  final int pId;
+  final int pId; // internal PodcastIndex.org Feed ID
   final String podcastGuid;
   final String title;
   final String url; // xml
@@ -30,6 +30,7 @@ class PodcastEntity {
   final bool subscribed;
 
   /// ObjectBox relation
+  @Backlink('podcast')
   final episodes = ToMany<EpisodeEntity>();
 
   PodcastEntity({
