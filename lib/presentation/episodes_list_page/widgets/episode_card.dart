@@ -38,7 +38,7 @@ class EpisodeCard extends StatelessWidget {
           onTap: () async {
             Navigator.push(
               context,
-              ScaleRoute(
+              SizeRoute(
                 page: EpisodeSelectedPage(
                   episode: item,
                   podcast: podcast,

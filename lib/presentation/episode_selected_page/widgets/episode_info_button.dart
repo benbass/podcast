@@ -22,7 +22,7 @@ class EpisodeInfoButton extends StatelessWidget {
       onPressed: () {
         removeOverlay();
         Navigator.of(context).push(
-          ScaleRoute(
+          SizeRoute(
             page: EpisodeDetailsPage(
               episode: episode,
               title: podcast.title,
