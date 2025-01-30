@@ -34,7 +34,7 @@ class PodcastCard extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              ScaleRoute(
+              SizeRoute(
                 page: PodcastDetailsPage(
                   podcast: podcast,
                 ),
