@@ -28,7 +28,7 @@ class RowIconButtonsPodcasts extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  SlideRightRoute(
+                  SlideBottomRoute(
                     page: Builder(builder: (context) {
                       return EpisodesPage(
                         podcast: podcast,

@@ -19,7 +19,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
   void _navigateToResultsPage(BuildContext context) {
     Navigator.push(
       context,
-      SlideRightRoute(
+      SlideBottomRoute(
         page: const PodcastResultsPage(),
       ),
     );
