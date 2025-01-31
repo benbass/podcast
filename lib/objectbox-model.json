@@ -147,7 +147,7 @@
     },
     {
       "id": "2:7010709310040266073",
-      "lastPropertyId": "17:8946010831370582095",
+      "lastPropertyId": "18:3199516364602750447",
       "name": "PodcastEntity",
       "properties": [
         {
@@ -235,6 +235,11 @@
           "id": "17:8946010831370582095",
           "name": "categories",
           "type": 30
+        },
+        {
+          "id": "18:3199516364602750447",
+          "name": "unreadEpisodes",
+          "type": 6
         }
       ],
       "relations": []

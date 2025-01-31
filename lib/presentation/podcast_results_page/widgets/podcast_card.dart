@@ -83,7 +83,7 @@ class PodcastCard extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            ElevatedButtonSubscribe(podcast: podcast,),
+                            ElevatedButtonSubscribe(podcast: podcast, navigate: false,),
                           ],
                         ),
                       )

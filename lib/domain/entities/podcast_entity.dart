@@ -9,7 +9,7 @@ class PodcastEntity {
   int id = 0;
 
   /// Data from json
-  final int pId; // internal PodcastIndex.org Feed ID
+  final int pId; // internal PodcastIndex.org Feed ID. To be used for fetching episodes!
   final String podcastGuid;
   final String title;
   final String url; // xml
@@ -28,6 +28,7 @@ class PodcastEntity {
 
   /// User parameter
   final bool subscribed;
+  final int? unreadEpisodes;
 
   /// ObjectBox relation
   @Backlink('podcast')
@@ -50,6 +51,7 @@ class PodcastEntity {
     required this.episodeCount,
     required this.categories,
     required this.subscribed,
+    required this.unreadEpisodes,
   });
 
   PodcastEntity copyWith({
@@ -72,6 +74,7 @@ class PodcastEntity {
       episodeCount: episodeCount,
       categories: categories,
       subscribed: subscribed ?? this.subscribed,
+      unreadEpisodes: unreadEpisodes ?? episodes.length,
     );
   }
 }
