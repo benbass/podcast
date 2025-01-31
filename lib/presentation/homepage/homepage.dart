@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/homepage/widgets/search_textfield.dart';
 import 'package:podcast/presentation/homepage/widgets/subscribed_podcast_card.dart';
 
-import '../../application/subscribed_podcasts_bloc/subscribed_podcasts_bloc.dart';
+import '../../application/podcasts_bloc/podcasts_bloc.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -12,15 +12,21 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BlocProvider.of<SubscribedPodcastsBloc>(context)
-        .add(SubscribedPodcastsLoadingEvent());
+    BlocProvider.of<PodcastsBloc>(context).add(GetSubscribedPodcastsEvent());
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Podcasts"),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text("Podcasts"),
+            IconButton(
+                onPressed: () {}, icon: const Icon(Icons.search_rounded)),
+          ],
+        ),
       ),
       body: SafeArea(
-        child: BlocBuilder<SubscribedPodcastsBloc, SubscribedPodcastsState>(
+        child: BlocBuilder<PodcastsBloc, PodcastsState>(
           builder: (context, state) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: _spacing),
@@ -33,43 +39,7 @@ class HomePage extends StatelessWidget {
                       child: SearchTextField(),
                     ),
                   ),
-                  // Loader while we get subscribed (local) podcasts
-                  if (state is SubscribedPodcastsLoadingState)
-                    const SliverFillRemaining(
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  if (state is SubscribedPodcastsLoadedState)
-                    state.subscribedPodcasts.isEmpty
-                        ? const SliverToBoxAdapter(
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.arrow_upward_rounded,
-                                  size: 50,
-                                ),
-                                Text("Quite empty here!"),
-                                Text("Search and follow podcasts."),
-                              ],
-                            ),
-                          )
-                        : SliverGrid.builder(
-                            itemCount: state.subscribedPodcasts.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 200,
-                              crossAxisSpacing: _spacing,
-                              mainAxisSpacing: _spacing,
-                              //childAspectRatio: 4 / 5,
-                            ),
-                            itemBuilder: (BuildContext context, int index) {
-                              return SubscribedPodcastCard(
-                                subscribedPodcast:
-                                    state.subscribedPodcasts[index],
-                              );
-                            },
-                          ),
+                  _buildPodcastGrid(state),
                 ],
               ),
             );
@@ -77,5 +47,66 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildPodcastGrid(PodcastsState state) {
+    // Define the empty state widget
+    const emptyStateWidget = SliverToBoxAdapter(
+      child: Column(
+        children: [
+          Icon(
+            Icons.arrow_upward_rounded,
+            size: 50,
+          ),
+          Text("Quite empty here!"),
+          Text("Search and follow podcasts."),
+        ],
+      ),
+    );
+
+    // Helper function to build the grid
+    SliverGrid buildGrid(List<dynamic> podcasts) {
+      return SliverGrid.builder(
+        itemCount: podcasts.length,
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 200,
+          crossAxisSpacing: _spacing,
+          mainAxisSpacing: _spacing,
+        ),
+        itemBuilder: (BuildContext context, int index) {
+          return SubscribedPodcastCard(
+            podcast: podcasts[index],
+          );
+        },
+      );
+    }
+
+    // Build the grid based on the state
+    if (state is GotSubscribedPodcastsState) {
+      return state.podcasts.isEmpty
+          ? emptyStateWidget
+          : buildGrid(state.podcasts);
+    } else if (state is PodcastsReceivedState) {
+      return state.subscribedPodcasts.isEmpty
+          ? emptyStateWidget
+          : buildGrid(state.subscribedPodcasts);
+    } else if (state is PodcastFilledWithEpisodesState) {
+      return state.subscribedPodcasts.isEmpty
+          ? emptyStateWidget
+          : buildGrid(state.subscribedPodcasts);
+    } /*else if (state is PodcastIsSubscribedState) {
+      return state.subscribedPodcasts.isEmpty
+          ? emptyStateWidget
+          : buildGrid(state.subscribedPodcasts);
+    } else if (state is PodcastIsSubscribedState) {
+      return state.subscribedPodcasts.isEmpty
+          ? emptyStateWidget
+          : buildGrid(state.subscribedPodcasts);
+    }*/ else {
+      // Handle other states or loading state if needed
+      return const SliverToBoxAdapter(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
   }
 }

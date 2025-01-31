@@ -164,7 +164,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(2, 7010709310040266073),
       name: 'PodcastEntity',
-      lastPropertyId: const obx_int.IdUid(17, 8946010831370582095),
+      lastPropertyId: const obx_int.IdUid(18, 3199516364602750447),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -251,6 +251,11 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(17, 8946010831370582095),
             name: 'categories',
             type: 30,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(18, 3199516364602750447),
+            name: 'unreadEpisodes',
+            type: 6,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -476,7 +481,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final mediumOffset = fbb.writeString(object.medium);
           final categoriesOffset = fbb.writeList(
               object.categories.map(fbb.writeString).toList(growable: false));
-          fbb.startTable(18);
+          fbb.startTable(19);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.pId);
           fbb.addOffset(2, podcastGuidOffset);
@@ -494,6 +499,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addInt64(14, object.episodeCount);
           fbb.addBool(15, object.subscribed);
           fbb.addOffset(16, categoriesOffset);
+          fbb.addInt64(17, object.unreadEpisodes);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -536,6 +542,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
               .vTableGet(buffer, rootOffset, 36, []);
           final subscribedParam =
               const fb.BoolReader().vTableGet(buffer, rootOffset, 34, false);
+          final unreadEpisodesParam =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 38);
           final object = PodcastEntity(
               pId: pIdParam,
               podcastGuid: podcastGuidParam,
@@ -552,7 +560,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
               medium: mediumParam,
               episodeCount: episodeCountParam,
               categories: categoriesParam,
-              subscribed: subscribedParam)
+              subscribed: subscribedParam,
+              unreadEpisodes: unreadEpisodesParam)
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
           obx_int.InternalToManyAccess.setRelInfo<PodcastEntity>(
               object.episodes,
@@ -742,6 +751,10 @@ class PodcastEntity_ {
   /// See [PodcastEntity.categories].
   static final categories =
       obx.QueryStringVectorProperty<PodcastEntity>(_entities[1].properties[16]);
+
+  /// See [PodcastEntity.unreadEpisodes].
+  static final unreadEpisodes =
+      obx.QueryIntegerProperty<PodcastEntity>(_entities[1].properties[17]);
 
   /// see [PodcastEntity.episodes]
   static final episodes = obx.QueryBacklinkToMany<EpisodeEntity, PodcastEntity>(

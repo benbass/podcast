@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
-import '../../application/episodes_bloc/episodes_bloc.dart';
+import '../../application/podcasts_bloc/podcasts_bloc.dart';
 import '../../domain/entities/episode_entity.dart';
 import 'widgets/row_icon_buttons_episodes.dart';
 
@@ -18,9 +18,9 @@ class EpisodesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final episodesBloc = BlocProvider.of<EpisodesBloc>(context);
-    BlocProvider.of<EpisodesBloc>(context)
-        .add(EpisodesFetchingEvent(id: podcast.pId));
+
+    final podcastsBloc = BlocProvider.of<PodcastsBloc>(context);
+    podcastsBloc.add(FillPodcastWithEpisodesPressedEvent(podcast: podcast));
     return Scaffold(
       /*  appBar: AppBar(
         toolbarHeight: 80,
@@ -31,21 +31,21 @@ class EpisodesPage extends StatelessWidget {
           ),
         ),
       ),*/
-      body: BlocBuilder<EpisodesBloc, EpisodesState>(
+      body: BlocBuilder<PodcastsBloc, PodcastsState>(
         builder: (context, state) {
-          if (state is EpisodesInitial) {
-            episodesBloc.add(EpisodesFetchingEvent(id: podcast.pId));
-          } else if (state is EpisodesFetchingState) {
+          if (state is PodcastsFillingWithEpisodesState) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if (state is EpisodesReceivedState) {
+          } else if (state is PodcastFilledWithEpisodesState) {
+            List<EpisodeEntity> episodes = state.podcast.episodes;
+
             // let's test UI with user parameters...
-            List<EpisodeEntity> episodes = state.episodes;
-            episodes.insert(
+            /*episodes.insert(
                 0,
                 episodes[0]
-                    .copyWith(favorite: true, position: 2000, read: true));
+                    .copyWith(favorite: true, position: 2000, read: true));*/
+
             return SafeArea(
               child: CustomScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -68,7 +68,7 @@ class EpisodesPage extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          ElevatedButtonSubscribe(podcast: podcast,),
+                          ElevatedButtonSubscribe(podcast: podcast, navigate: true,),
                           const RowIconButtonsEpisodes(),
                           const SizedBox(height: 12,),
                         ],
@@ -76,9 +76,9 @@ class EpisodesPage extends StatelessWidget {
                     ),
                   ),
                   SliverList.builder(
-                    itemCount: state.episodes.length,
+                    itemCount: episodes.length,
                     itemBuilder: (context, index) {
-                      final item = state.episodes[index];
+                      final item = episodes[index];
                       return EpisodeCard(
                         item: item,
                         podcast: podcast,
