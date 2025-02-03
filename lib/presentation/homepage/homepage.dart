@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BlocProvider.of<PodcastsBloc>(context).add(GetSubscribedPodcastsEvent());
+    BlocProvider.of<PodcastsBloc>(context).add(FetchSubscribedPodcastsEvent());
 
     return Scaffold(
       appBar: AppBar(
@@ -82,30 +82,35 @@ class HomePage extends StatelessWidget {
     }
 
     // Build the grid based on the state
-    if (state is GotSubscribedPodcastsState) {
+    if (state is FetchingSubscribedPodcastsState) {
+      return const SliverToBoxAdapter(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    } else if (state is SubscribedPodcastsFetchSuccessState) {
       return state.podcasts.isEmpty
           ? emptyStateWidget
           : buildGrid(state.podcasts);
-    } else if (state is PodcastsReceivedState) {
+    } else if (state is PodcastsFetchSuccessState) {
+      // We handle this state here in case the user navigates back from the results page after a podcast search
+      // we still need to show the subscribed podcasts despite state is no more SubscribedPodcastsFetchSuccessState
       return state.subscribedPodcasts.isEmpty
           ? emptyStateWidget
           : buildGrid(state.subscribedPodcasts);
-    } else if (state is PodcastFilledWithEpisodesState) {
+    } else if (state is PodcastFillWithEpisodesSuccessState) {
+      // We handle this state here in case the user navigates back from the episodes list page after a podcast search
+      // we still need to show the subscribed podcasts despite state is no more SubscribedPodcastsFetchSuccessState
       return state.subscribedPodcasts.isEmpty
           ? emptyStateWidget
           : buildGrid(state.subscribedPodcasts);
-    } /*else if (state is PodcastIsSubscribedState) {
+    } else if (state is PodcastChangeSubscriptionState) {
+      // We handle this state here in case the user navigates back from the episodes list page after he subscribes to a podcast
+      // we still need to show the subscribed podcasts despite state is no more SubscribedPodcastsFetchSuccessState
       return state.subscribedPodcasts.isEmpty
           ? emptyStateWidget
           : buildGrid(state.subscribedPodcasts);
-    } else if (state is PodcastIsSubscribedState) {
-      return state.subscribedPodcasts.isEmpty
-          ? emptyStateWidget
-          : buildGrid(state.subscribedPodcasts);
-    }*/ else {
-      // Handle other states or loading state if needed
+    } else {
       return const SliverToBoxAdapter(
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(child: SizedBox()),
       );
     }
   }

@@ -42,10 +42,10 @@ class PodcastResultsPage extends StatelessWidget {
 
   Widget _buildAppBarTitle(PodcastsState state) {
     String keyword = "";
-    if (state is PodcastsReceivedState) {
+    if (state is PodcastsFetchSuccessState) {
       keyword = state.keyword;
     }
-    if (state is PodcastFilledWithEpisodesState) {
+    if (state is PodcastFillWithEpisodesSuccessState) {
       keyword = state.keyword;
     }
     final String titleText = "Podcasts for: $keyword";
@@ -62,10 +62,12 @@ class PodcastResultsPage extends StatelessWidget {
       slivers: [
         if (state is PodcastsFetchingState)
           _buildLoadingIndicator(context)
-        else if (state is PodcastsReceivedState)
-          _buildPodcastList(context, state.podcasts)
-        else if (state is PodcastFilledWithEpisodesState)
-          _buildPodcastList(context, state.podcasts)
+        else if (state is PodcastsFetchSuccessState)
+          _buildPodcastList(context, state.podcastsQueryResult)
+        else if (state is PodcastFillWithEpisodesSuccessState)
+          _buildPodcastList(context, state.podcastsQueryResult)
+        else if (state is PodcastChangeSubscriptionState)
+          _buildPodcastList(context, state.podcastsQueryResult)
         else
           _buildEmptyList(context),
       ],
@@ -93,7 +95,11 @@ class PodcastResultsPage extends StatelessWidget {
         itemCount: podcasts.length,
         itemBuilder: (context, index) {
           final podcast = podcasts[index];
-          return PodcastCard(podcast: podcast);
+          return BlocBuilder<PodcastsBloc, PodcastsState>(
+            builder: (context, state) {
+              return PodcastCard(podcast: podcast);
+            },
+          );
         },
       ),
     );
