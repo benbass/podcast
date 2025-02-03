@@ -36,7 +36,7 @@ Future<void> init() async {
       () => EpisodeRepositoryImpl(episodeDataSources: getItI()));
 
   // DataSources
-  getItI.registerLazySingleton<PodcastDataSources>(
+  getItI.registerLazySingleton<PodcastDataSource>(
       () => PodcastDataSourceImpl(httpClient: getItI())); // remote
   getItI.registerLazySingleton<EpisodeDataSources>(
       () => EpisodeDataSourcesImpl(httpClient: getItI()));

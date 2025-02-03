@@ -6,7 +6,7 @@ import '../../domain/repositories/podcast_repository.dart';
 import '../datasources/podcast_datasources.dart';
 
 class PodcastRepositoryImpl implements PodcastRepository {
-  final PodcastDataSources podcastDataSources;
+  final PodcastDataSource podcastDataSources;
   final EpisodeDataSources episodeDataSources;
   const PodcastRepositoryImpl({
     required this.podcastDataSources,
@@ -14,8 +14,8 @@ class PodcastRepositoryImpl implements PodcastRepository {
   });
 
   @override
-  Future<List<PodcastEntity>> fetchPodcastsByKeywords(String keyword) async {
-    return await podcastDataSources.fetchPodcastsByKeywords(keyword);
+  Future<List<PodcastEntity>> fetchPodcastsByKeywords(String keyword, List<PodcastEntity> subscribedPodcasts) async {
+    return await podcastDataSources.fetchPodcastsByKeyword(keyword, subscribedPodcasts);
   }
 
   @override
@@ -30,8 +30,7 @@ class PodcastRepositoryImpl implements PodcastRepository {
 
   @override
   Future<List<PodcastEntity>> getSubscribedPodcasts() async {
-    List<PodcastEntity> podcasts = podcastBox.getAll();
-    return podcasts;
+    return await podcastDataSources.getSubscribedPodcasts();
   }
 
   @override

@@ -8,8 +8,8 @@ class PodcastUseCases {
     required this.podcastRepository,
   });
 
-  Future<List<PodcastEntity>> fetchPodcasts(String keyword) async {
-    return podcastRepository.fetchPodcastsByKeywords(keyword);
+  Future<List<PodcastEntity>> fetchPodcasts(String keyword, List<PodcastEntity> subscribedPodcasts) async {
+    return podcastRepository.fetchPodcastsByKeywords(keyword, subscribedPodcasts);
   }
 
   Future<void> subscribeToPodcast(PodcastEntity podcast) async {
