@@ -8,6 +8,7 @@ import '../../application/podcasts_bloc/podcasts_bloc.dart';
 import '../../domain/entities/episode_entity.dart';
 import 'widgets/row_icon_buttons_episodes.dart';
 
+/// TODO: check parameter podcast! Episodes seems to be empty when podcast is subscribed
 class EpisodesPage extends StatelessWidget {
   final PodcastEntity podcast;
 
@@ -20,7 +21,9 @@ class EpisodesPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final podcastsBloc = BlocProvider.of<PodcastsBloc>(context);
-    podcastsBloc.add(FillPodcastWithEpisodesEvent(podcast: podcast));
+    if(!podcast.subscribed) {
+      podcastsBloc.add(FillPodcastWithEpisodesEvent(podcast: podcast));
+    }
     return Scaffold(
       /*  appBar: AppBar(
         toolbarHeight: 80,
@@ -46,57 +49,65 @@ class EpisodesPage extends StatelessWidget {
                 episodes[0]
                     .copyWith(favorite: true, position: 2000, read: true));*/
 
-            return SafeArea(
-              child: CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  SliverAppBar(
-                    collapsedHeight: 60,
-                    expandedHeight: 170,
-                    pinned: true,
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        spacing: 12,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 80.0),
-                            child: Text(
-                              podcast.title,
-                              style: Theme.of(context).textTheme.displayLarge,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          ElevatedButtonSubscribe(podcast: podcast, navigate: true,),
-                          const RowIconButtonsEpisodes(),
-                          const SizedBox(height: 12,),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SliverList.builder(
-                    itemCount: episodes.length,
-                    itemBuilder: (context, index) {
-                      final item = episodes[index];
-                      return EpisodeCard(
-                        item: item,
-                        podcast: podcast,
-                      );
-                    },
-                  ),
-                  const SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: 80,
-                    ),
-                  ),
-                ],
-              ),
-            );
+            return buildBodyContent(context, episodes);
+          } else if (state is SubscribedPodcastsFetchSuccessState) {
+            List<EpisodeEntity> episodes = podcast.episodes;
+            print(episodes.length);
+            return buildBodyContent(context, episodes);
           }
           return const SizedBox();
         },
       ),
     );
+  }
+
+  SafeArea buildBodyContent(BuildContext context, List<EpisodeEntity> episodes) {
+    return SafeArea(
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverAppBar(
+                  collapsedHeight: 60,
+                  expandedHeight: 170,
+                  pinned: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      spacing: 12,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 80.0),
+                          child: Text(
+                            podcast.title,
+                            style: Theme.of(context).textTheme.displayLarge,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        ElevatedButtonSubscribe(podcast: podcast, navigate: true,),
+                        const RowIconButtonsEpisodes(),
+                        const SizedBox(height: 12,),
+                      ],
+                    ),
+                  ),
+                ),
+                SliverList.builder(
+                  itemCount: episodes.length,
+                  itemBuilder: (context, index) {
+                    final item = episodes[index];
+                    return EpisodeCard(
+                      item: item,
+                      podcast: podcast,
+                    );
+                  },
+                ),
+                const SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 80,
+                  ),
+                ),
+              ],
+            ),
+          );
   }
 }
