@@ -6,37 +6,83 @@ import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/authorization/authorization.dart';
 import '../models/podcast_model.dart';
 
-abstract class PodcastDataSources {
-  Future<List<PodcastEntity>> fetchPodcastsByKeywords(String keyword);
+abstract class PodcastDataSource {
+  /// Fetches podcasts based on a keyword, considering subscribed podcasts.
+  Future<List<PodcastEntity>> fetchPodcastsByKeyword(
+      String keyword, List<PodcastEntity> subscribedPodcasts);
+  /// Retrieves the list of subscribed podcasts.
+  Future<List<PodcastEntity>> getSubscribedPodcasts();
 }
 
-class PodcastDataSourceImpl implements PodcastDataSources {
+class PodcastDataSourceImpl implements PodcastDataSource {
   final http.Client httpClient;
 
   PodcastDataSourceImpl({required this.httpClient});
 
+  /// Fetches podcasts based on a keyword, considering subscribed podcasts.
   @override
-  Future<List<PodcastEntity>> fetchPodcastsByKeywords(String keyword) async {
-    // Preparing keyword for web search
-    String searchKeyword = keyword.trim().replaceAll(' ', '+');
+  Future<List<PodcastEntity>> fetchPodcastsByKeyword(
+      String keyword, List<PodcastEntity> subscribedPodcasts) async {
+    // Prepare keyword for url
+    String encodedKeyword = _encodeKeywordForUrl(keyword);
 
-    // Authorization
+    // Authorization headers
     Map<String, String> headers = headersForAuth();
 
+    final Uri uri = Uri.parse('$baseUrl/search/byterm?q=$encodedKeyword&pretty&max=1000');
+
     final response = await httpClient.get(
-        Uri.parse(
-            '$baseUrl/search/byterm?q=$searchKeyword&pretty&max=1000'),
+        uri,
         headers: headers);
 
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      var jsonFeed = json.decode(response.body);
-      return List<PodcastEntity>.from(jsonFeed['feeds'].map((feed) => PodcastModel.fromJson(feed)));
+      final Map<String, dynamic> jsonFeed = json.decode(response.body);
+      final List<dynamic> feeds = jsonFeed['feeds'];
+      // Convert the JSON feeds to PodcastEntity objects.
+      final List<PodcastEntity> foundPodcasts =
+          feeds.map((feed) => PodcastModel.fromJson(feed)).toList();
+      // Replace found podcasts with subscribed podcasts if they exist.
+      return _mergeWithSubscribedPodcasts(foundPodcasts, subscribedPodcasts);
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
-      throw Exception('Failed to load podcasts');
+      throw Exception('Failed to load podcasts: Status code ${response.statusCode}');
     }
+  }
+
+  /// Retrieves the list of subscribed podcasts.
+  @override
+  Future<List<PodcastEntity>> getSubscribedPodcasts() async {
+    List<PodcastEntity> podcasts = podcastBox.getAll();
+    return podcasts;
+  }
+
+  /// Merges the list of found podcasts with subscribed podcasts.
+  ///
+  /// If a podcast in [foundPodcasts] is also in [subscribedPodcasts],
+  /// the subscribed version will replace the found version.
+  Future<List<PodcastEntity>> _mergeWithSubscribedPodcasts(
+      List<PodcastEntity> foundPodcasts,
+      List<PodcastEntity> subscribedPodcasts) async {
+    final Map<int, PodcastEntity> podcastMap = {};
+    // Add found podcasts to the map.
+    for (PodcastEntity podcast in foundPodcasts) {
+      podcastMap[podcast.pId] = podcast;
+    }
+    // Replace found podcasts with subscribed podcasts if they exist.
+    for (PodcastEntity podcast in subscribedPodcasts) {
+      // Replace found podcasts with subscribed podcasts
+      if (podcastMap.containsKey(podcast.pId)) {
+        podcastMap[podcast.pId] = podcast;
+      }
+    }
+    return podcastMap.values.toList();
+  }
+
+  /// Encodes the keyword for use in a URL.
+  String _encodeKeywordForUrl(String keyword) {
+    return keyword.trim().replaceAll(' ', '+');
   }
 }
