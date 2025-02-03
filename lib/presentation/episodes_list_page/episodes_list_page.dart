@@ -20,7 +20,7 @@ class EpisodesPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final podcastsBloc = BlocProvider.of<PodcastsBloc>(context);
-    podcastsBloc.add(FillPodcastWithEpisodesPressedEvent(podcast: podcast));
+    podcastsBloc.add(FillPodcastWithEpisodesEvent(podcast: podcast));
     return Scaffold(
       /*  appBar: AppBar(
         toolbarHeight: 80,
@@ -33,11 +33,11 @@ class EpisodesPage extends StatelessWidget {
       ),*/
       body: BlocBuilder<PodcastsBloc, PodcastsState>(
         builder: (context, state) {
-          if (state is PodcastsFillingWithEpisodesState) {
+          if (state is PodcastFillingWithEpisodesState) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if (state is PodcastFilledWithEpisodesState) {
+          } else if (state is PodcastFillWithEpisodesSuccessState) {
             List<EpisodeEntity> episodes = state.podcast.episodes;
 
             // let's test UI with user parameters...

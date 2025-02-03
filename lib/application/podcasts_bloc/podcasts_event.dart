@@ -3,32 +3,34 @@ part of 'podcasts_bloc.dart';
 @immutable
 sealed class PodcastsEvent {}
 
-class FindPodcastsPressedEvent extends PodcastsEvent {
+final class FetchSubscribedPodcastsEvent extends PodcastsEvent {}
+
+class FetchPodcastsEvent extends PodcastsEvent {
   final String keyword;
-  FindPodcastsPressedEvent({
+  FetchPodcastsEvent({
     required this.keyword,
   });
 }
 
-class FillPodcastWithEpisodesPressedEvent extends PodcastsEvent {
+class PodcastsFetchSuccessEvent extends PodcastsEvent {
+  final String keyword;
+  final List<PodcastEntity> podcastsQueryResult;
+  PodcastsFetchSuccessEvent({
+    required this.keyword,
+    required this.podcastsQueryResult,
+  });
+}
+
+class FillPodcastWithEpisodesEvent extends PodcastsEvent {
   final PodcastEntity podcast;
-  FillPodcastWithEpisodesPressedEvent({
+  FillPodcastWithEpisodesEvent({
     required this.podcast,
   });
 }
 
-class PodcastsReceivedEvent extends PodcastsEvent {
-  final String keyword;
-  final List<PodcastEntity> podcasts;
-  PodcastsReceivedEvent({
-    required this.keyword,
-    required this.podcasts,
-  });
-}
-
-class PodcastFilledWithEpisodesEvent extends PodcastsEvent {
+class FillPodcastWithEpisodesSuccessEvent extends PodcastsEvent {
   final PodcastEntity podcast;
-  PodcastFilledWithEpisodesEvent({
+  FillPodcastWithEpisodesSuccessEvent({
     required this.podcast,
   });
 }
@@ -46,5 +48,3 @@ final class UnsubscribeFromPodcastEvent extends PodcastsEvent {
     required this.podcast,
   });
 }
-
-final class GetSubscribedPodcastsEvent extends PodcastsEvent {}
