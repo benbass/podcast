@@ -22,7 +22,7 @@ class PodcastsBloc extends Bloc<PodcastsEvent, PodcastsState> {
     on<FetchSubscribedPodcastsEvent>((event, emit) async {
       emit(FetchingSubscribedPodcastsState());
       try {
-        subscribedPodcasts = [...await podcastUseCases.getSubscribedPodcasts()];
+        subscribedPodcasts = await podcastUseCases.getSubscribedPodcasts();
         emit(SubscribedPodcastsFetchSuccessState(podcasts: subscribedPodcasts));
       } catch (e) {
         emit(SubscribedPodcastsFetchErrorState(
