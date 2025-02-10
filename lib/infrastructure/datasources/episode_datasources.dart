@@ -28,6 +28,7 @@ class EpisodeDataSourcesImpl implements EpisodeDataSources {
       var jsonItems = json.decode(response.body);
       List<EpisodeEntity> episodes = List<EpisodeEntity>.from(
           jsonItems['items'].map((x) => EpisodeModel.fromJson(x)));
+      print("episode datasource fetchEpisodesAsStreamByFeedId: ${episodes.length}"); // OK
 
       yield episodes;
     } else {
@@ -42,8 +43,10 @@ class EpisodeDataSourcesImpl implements EpisodeDataSources {
     // Authorization:
     Map<String, String> headers = headersForAuth(); // this is the real auth
 
+    final Uri uri = Uri.parse('$baseUrl/episodes/byfeedid?id=$id&pretty&max=1000');
+
     final response = await httpClient.get(
-        Uri.parse('$baseUrl/episodes/byfeedid?id=$id&pretty&max=1000'),
+        uri,
         headers: headers);
     if (response.statusCode == 200) {
       var jsonItems = json.decode(response.body);
@@ -52,6 +55,7 @@ class EpisodeDataSourcesImpl implements EpisodeDataSources {
 
       return episodes;
     } else {
+      print("Error Episode datasource fetchEpisodesByFeedId: ${response.statusCode}");
       // If the server did not return a 200 OK response,
       // then throw an exception.
       throw Exception('Failed to load episodes');

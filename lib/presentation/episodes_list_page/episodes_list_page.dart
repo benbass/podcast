@@ -8,18 +8,16 @@ import '../../application/podcasts_bloc/podcasts_bloc.dart';
 import '../../domain/entities/episode_entity.dart';
 import 'widgets/row_icon_buttons_episodes.dart';
 
-/// TODO: check parameter podcast! Episodes seems to be empty when podcast is subscribed
-class EpisodesPage extends StatelessWidget {
+class EpisodesListPage extends StatelessWidget {
   final PodcastEntity podcast;
 
-  const EpisodesPage({
+  const EpisodesListPage({
     super.key,
     required this.podcast,
   });
 
   @override
   Widget build(BuildContext context) {
-
     final podcastsBloc = BlocProvider.of<PodcastsBloc>(context);
     if(!podcast.subscribed) {
       podcastsBloc.add(FillPodcastWithEpisodesEvent(podcast: podcast));
@@ -52,7 +50,9 @@ class EpisodesPage extends StatelessWidget {
             return buildBodyContent(context, episodes);
           } else if (state is SubscribedPodcastsFetchSuccessState) {
             List<EpisodeEntity> episodes = podcast.episodes;
-            print(episodes.length);
+            return buildBodyContent(context, episodes);
+          } else if (state is PodcastChangeSubscriptionState) {
+            List<EpisodeEntity> episodes = podcast.episodes;
             return buildBodyContent(context, episodes);
           }
           return const SizedBox();
