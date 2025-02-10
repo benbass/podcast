@@ -22,7 +22,7 @@ class SubscribedPodcastCard extends StatelessWidget {
                 Navigator.push(
           context,
           SlideBottomRoute(
-            page: EpisodesPage(
+            page: EpisodesListPage(
               podcast: podcast,
             ),
           ),

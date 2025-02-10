@@ -30,7 +30,7 @@ class RowIconButtonsPodcasts extends StatelessWidget {
                   context,
                   SlideBottomRoute(
                     page: Builder(builder: (context) {
-                      return EpisodesPage(
+                      return EpisodesListPage(
                         podcast: podcast,
                       );
                     }),

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/podcasts_bloc/podcasts_bloc.dart';
 import '../../custom_widgets/page_transition.dart';
-import '../../podcast_results_page/podcast_results_page.dart';
+import '../../podcasts_search_page/podcasts_search_page.dart';
 
 class SearchTextField extends StatefulWidget {
   const SearchTextField({super.key});
@@ -20,7 +20,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
     Navigator.push(
       context,
       SlideBottomRoute(
-        page: const PodcastResultsPage(),
+        page: const PodcastsSearchPage(),
       ),
     );
   }
