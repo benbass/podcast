@@ -20,6 +20,7 @@ class PodcastModel extends PodcastEntity {
     required super.categories,
     required super.subscribed,
     required super.unreadEpisodes,
+    required episodes,
   });
 
   /// Converts a map of categories to a list of category names.
@@ -55,6 +56,7 @@ class PodcastModel extends PodcastEntity {
           : [],
       subscribed: false,
       unreadEpisodes: null,
+      episodes: [],
     );
   }
 }
