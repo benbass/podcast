@@ -56,6 +56,7 @@ class PodcastEntity {
 
   PodcastEntity copyWith({
     bool? subscribed,
+    int? unreadEpisodes,
   }) {
     return PodcastEntity(
       pId: pId,
@@ -74,7 +75,7 @@ class PodcastEntity {
       episodeCount: episodeCount,
       categories: categories,
       subscribed: subscribed ?? this.subscribed,
-      unreadEpisodes: unreadEpisodes ?? episodes.length,
+      unreadEpisodes: unreadEpisodes ?? this.unreadEpisodes,
     );
   }
 }
