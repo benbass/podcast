@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/application/podcasts_bloc/podcasts_bloc.dart';
-import 'package:podcast/presentation/podcast_results_page/widgets/podcast_card.dart';
+import 'package:podcast/presentation/podcasts_search_page/widgets/podcast_card.dart';
 
 import '../../domain/entities/podcast_entity.dart';
+import '../custom_widgets/page_transition.dart';
+import '../homepage/widgets/search_textfield.dart';
+import '../subscribed_podcasts/subscribed_podcasts_page.dart';
 
-class PodcastResultsPage extends StatelessWidget {
-  const PodcastResultsPage({
+class PodcastsSearchPage extends StatelessWidget {
+  const PodcastsSearchPage({
     super.key,
   });
 
@@ -26,33 +29,21 @@ class PodcastResultsPage extends StatelessWidget {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-      title: BlocBuilder<PodcastsBloc, PodcastsState>(
-        builder: (context, state) {
-          return _buildAppBarTitle(state);
-        },
+      title: const Padding(
+        padding: EdgeInsets.symmetric(vertical: 20.0),
+        child: SearchTextField(),
       ),
       leading: IconButton(
         onPressed: () {
-          Navigator.pop(context);
+          Navigator.push(
+            context,
+            SlideBottomRoute(
+              page: const SubscribedPodcastsPage(),
+            ),
+          );
         },
         icon: const Icon(Icons.home_rounded),
       ),
-    );
-  }
-
-  Widget _buildAppBarTitle(PodcastsState state) {
-    String keyword = "";
-    if (state is PodcastsFetchSuccessState) {
-      keyword = state.keyword;
-    }
-    if (state is PodcastFillWithEpisodesSuccessState) {
-      keyword = state.keyword;
-    }
-    final String titleText = "Podcasts for: $keyword";
-
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      child: Text(titleText),
     );
   }
 
@@ -69,7 +60,7 @@ class PodcastResultsPage extends StatelessWidget {
         else if (state is PodcastChangeSubscriptionState)
           _buildPodcastList(context, state.podcastsQueryResult)
         else
-          _buildEmptyList(context),
+          const SliverToBoxAdapter(),
       ],
     );
   }
@@ -106,22 +97,9 @@ class PodcastResultsPage extends StatelessWidget {
   }
 
   Widget _buildEmptyList(BuildContext context) {
-    return SliverFillRemaining(
+    return const SliverFillRemaining(
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("No podcasts were found for your keyword(s)"),
-            const SizedBox(height: 16),
-            IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(
-                Icons.arrow_back_rounded,
-                size: 36,
-              ),
-            ),
-          ],
-        ),
+        child: Text("No podcasts were found for your keyword(s)"),
       ),
     );
   }
