@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../application/podcasts_bloc/podcasts_bloc.dart';
 import '../custom_widgets/page_transition.dart';
-import '../homepage/widgets/subscribed_podcast_card.dart';
+import 'widgets/subscribed_podcast_card.dart';
 import '../podcasts_search_page/podcasts_search_page.dart';
 
 class SubscribedPodcastsPage extends StatelessWidget {

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/podcasts_bloc/podcasts_bloc.dart';
 import '../../custom_widgets/page_transition.dart';
-import '../../podcasts_search_page/podcasts_search_page.dart';
+import '../podcasts_search_page.dart';
 
 class SearchTextField extends StatefulWidget {
   const SearchTextField({super.key});

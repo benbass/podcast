@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
-import 'package:podcast/presentation/homepage/widgets/rounded_text_widget.dart';
+import 'package:podcast/presentation/subscribed_podcasts/widgets/rounded_text_widget.dart';
 
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/core/image_provider.dart';
