@@ -5,7 +5,7 @@ import 'package:podcast/presentation/podcasts_search_page/widgets/podcast_card.d
 
 import '../../domain/entities/podcast_entity.dart';
 import '../custom_widgets/page_transition.dart';
-import '../homepage/widgets/search_textfield.dart';
+import 'widgets/search_textfield.dart';
 import '../subscribed_podcasts/subscribed_podcasts_page.dart';
 
 class PodcastsSearchPage extends StatelessWidget {
