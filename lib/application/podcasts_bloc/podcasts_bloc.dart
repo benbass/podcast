@@ -22,7 +22,11 @@ class PodcastsBloc extends Bloc<PodcastsEvent, PodcastsState> {
     on<FetchSubscribedPodcastsEvent>((event, emit) async {
       emit(FetchingSubscribedPodcastsState());
       try {
-        subscribedPodcasts = await podcastUseCases.getSubscribedPodcasts();
+        List<PodcastEntity>? podcasts =
+            await podcastUseCases.getSubscribedPodcasts();
+        if (podcasts != null) {
+          subscribedPodcasts = podcasts;
+        }
         emit(SubscribedPodcastsFetchSuccessState(podcasts: subscribedPodcasts));
       } catch (e) {
         emit(SubscribedPodcastsFetchErrorState(
@@ -93,56 +97,69 @@ class PodcastsBloc extends Bloc<PodcastsEvent, PodcastsState> {
 
     /// SUBSCRIPTION
     on<SubscribeToPodcastEvent>((event, emit) async {
-      PodcastEntity podcast = event.podcast;
-
-      void updateLists() {
+      void updateQueryResult(PodcastEntity podcast) {
         // Replace object in query result: necessary when user subscribes from within the results page
         // so podcast list item can be updated
         final int index = podcastsQueryResult.indexOf(event.podcast);
-        podcastsQueryResult[index] = podcast;
+        podcastsQueryResult.removeAt(index);
+        podcastsQueryResult.insert(index, podcast);
+      }
 
-        subscribedPodcasts.add(podcast);
+      saveToDb(PodcastEntity podcast) async {
+        // Set subscribed flag == true AND add episodes to podcast
+        // Note that we don't copyWith episodes: ObjectBox requires list to be filled with add or addAll method
+        final PodcastEntity podcastWithEpisodesSubscribed = podcast.copyWith(
+          subscribed: true,
+          unreadEpisodes: podcast.episodes.length,
+        )..episodes.addAll(podcast.episodes);
+        try {
+          // Save to db
+          await podcastUseCases
+              .subscribeToPodcast(podcastWithEpisodesSubscribed)
+              .whenComplete(() {
+            updateQueryResult(podcastWithEpisodesSubscribed);
+            subscribedPodcasts.add(podcastWithEpisodesSubscribed);
+            emit(PodcastChangeSubscriptionState(
+              podcast: podcastWithEpisodesSubscribed,
+              subscribedPodcasts: subscribedPodcasts,
+              podcastsQueryResult: podcastsQueryResult,
+            ));
+          });
+        } catch (e) {
+          emit(PodcastChangeSubscriptionErrorState(
+              message:
+                  'Failed to subscribe to podcast: ${event.podcast.title}'));
+        }
+      }
+
+      getEpisodesForPodcast(PodcastEntity podcast) async {
+        // Get the episodes so we can save podcast with episodes to db
+        try {
+          final PodcastEntity podcastWithEpisodes =
+              await podcastUseCases.fillPodcastWithEpisodes(podcast);
+          await saveToDb(podcastWithEpisodes);
+        } catch (e) {
+          emit(PodcastChangeSubscriptionErrorState(
+              message:
+                  'Failed to load episodes from the server.\nThe server may be down.\nError: ${e.toString()}'));
+        }
       }
 
       // Check if podcast is already subscribed
       Map<int, int> podcastPIdMap =
           {}; // key = podcast pId, value = 0  (we need only the key for the check)
+
       for (PodcastEntity podcast in subscribedPodcasts) {
         podcastPIdMap[podcast.pId] = 0;
       }
+
       if (podcastPIdMap.containsKey(event.podcast.pId)) {
         // If key exists, podcast is already subscribed
         emit(PodcastChangeSubscriptionErrorState(
             message:
                 'You already subscribed to the podcast: ${event.podcast.title}'));
       } else {
-        // Get the episodes so we can save podcast with episodes to db
-        try {
-          final PodcastEntity podcastWithEpisodes =
-              await podcastUseCases.fillPodcastWithEpisodes(podcast);
-          // Set subscribed flag == true
-          podcast = podcastWithEpisodes.copyWith(subscribed: true);
-        } catch (e) {
-          emit(PodcastChangeSubscriptionErrorState(
-              message:
-                  'Failed to load episodes from the server.\nThe server may be down.\nError: ${e.toString()}'));
-        }
-        try {
-          // Save to db
-          await podcastUseCases.subscribeToPodcast(podcast);
-
-          updateLists();
-
-          emit(PodcastChangeSubscriptionState(
-            podcast: podcast,
-            subscribedPodcasts: subscribedPodcasts,
-            podcastsQueryResult: podcastsQueryResult,
-          ));
-        } catch (e) {
-          emit(PodcastChangeSubscriptionErrorState(
-              message:
-                  'Failed to subscribe to podcast: ${event.podcast.title}'));
-        }
+        await getEpisodesForPodcast(event.podcast);
       }
     });
 
