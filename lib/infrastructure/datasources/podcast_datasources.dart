@@ -11,7 +11,7 @@ abstract class PodcastDataSource {
   Future<List<PodcastEntity>> fetchPodcastsByKeyword(
       String keyword, List<PodcastEntity> subscribedPodcasts);
   /// Retrieves the list of subscribed podcasts.
-  Future<List<PodcastEntity>> getSubscribedPodcasts();
+  Future<List<PodcastEntity>?> getSubscribedPodcasts();
 }
 
 class PodcastDataSourceImpl implements PodcastDataSource {
@@ -54,8 +54,8 @@ class PodcastDataSourceImpl implements PodcastDataSource {
 
   /// Retrieves the list of subscribed podcasts.
   @override
-  Future<List<PodcastEntity>> getSubscribedPodcasts() async {
-    List<PodcastEntity> podcasts = podcastBox.getAll();
+  Future<List<PodcastEntity>?> getSubscribedPodcasts() async {
+    List<PodcastEntity>? podcasts = podcastBox.getAll();
     return podcasts;
   }
 
