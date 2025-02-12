@@ -5,17 +5,24 @@ sealed class PodcastsEvent {}
 
 final class FetchSubscribedPodcastsEvent extends PodcastsEvent {}
 
-class FetchPodcastsEvent extends PodcastsEvent {
+final class PodcastTappedEvent extends PodcastsEvent {
+  final PodcastEntity podcast;
+  PodcastTappedEvent({
+    required this.podcast,
+  });
+}
+
+class FetchPodcastsFromRemoteEvent extends PodcastsEvent {
   final String keyword;
-  FetchPodcastsEvent({
+  FetchPodcastsFromRemoteEvent({
     required this.keyword,
   });
 }
 
-class PodcastsFetchSuccessEvent extends PodcastsEvent {
+class PodcastsFetchFromRemoteSuccessEvent extends PodcastsEvent {
   final String keyword;
   final List<PodcastEntity> podcastsQueryResult;
-  PodcastsFetchSuccessEvent({
+  PodcastsFetchFromRemoteSuccessEvent({
     required this.keyword,
     required this.podcastsQueryResult,
   });
