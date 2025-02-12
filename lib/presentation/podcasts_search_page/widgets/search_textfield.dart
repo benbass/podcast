@@ -30,7 +30,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
       FocusScope.of(context).unfocus();
 
       BlocProvider.of<PodcastsBloc>(context)
-          .add(FetchPodcastsEvent(keyword: _textEditingController.text));
+          .add(FetchPodcastsFromRemoteEvent(keyword: _textEditingController.text));
 
       _textEditingController.clear();
       _navigateToResultsPage(context);
