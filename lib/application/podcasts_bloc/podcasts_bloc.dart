@@ -7,6 +7,11 @@ import '../../domain/usecases/episode_usecases.dart';
 part 'podcasts_event.dart';
 part 'podcasts_state.dart';
 
+/// TODO: reorganize this bloc!
+/// 1. Issue with wrong list of episodes on subscribed podcasts when user called the episodes of other podcast in the meanwhile.
+/// 2. Logic is too complex
+///
+///
 class PodcastsBloc extends Bloc<PodcastsEvent, PodcastsState> {
   final PodcastUseCases podcastUseCases;
   final EpisodeUseCases episodeUseCases;
@@ -38,13 +43,13 @@ class PodcastsBloc extends Bloc<PodcastsEvent, PodcastsState> {
 
     /// REMOTE: FIND PODCASTS
     // podcasts by keyword: we get a list
-    on<FetchPodcastsEvent>((event, emit) async {
+    on<FetchPodcastsFromRemoteEvent>((event, emit) async {
       queryTerm = event.keyword;
       emit(PodcastsFetchingState());
       try {
         podcastsQueryResult =
             await podcastUseCases.fetchPodcasts(queryTerm, subscribedPodcasts);
-        add(PodcastsFetchSuccessEvent(
+        add(PodcastsFetchFromRemoteSuccessEvent(
           keyword: queryTerm,
           podcastsQueryResult: podcastsQueryResult,
         ));
@@ -57,7 +62,7 @@ class PodcastsBloc extends Bloc<PodcastsEvent, PodcastsState> {
 
     // PODCASTS query success
     // no episodes yet!
-    on<PodcastsFetchSuccessEvent>((event, emit) async {
+    on<PodcastsFetchFromRemoteSuccessEvent>((event, emit) async {
       emit(PodcastsFetchSuccessState(
         keyword: event.keyword,
         podcastsQueryResult: event.podcastsQueryResult,
