@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../application/podcasts_bloc/podcasts_bloc.dart';
+import '../../../application/podcast_bloc/podcast_bloc.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../podcasts_search_page.dart';
 
@@ -29,8 +29,8 @@ class _SearchTextFieldState extends State<SearchTextField> {
     if (_textEditingController.text.isNotEmpty) {
       FocusScope.of(context).unfocus();
 
-      BlocProvider.of<PodcastsBloc>(context)
-          .add(FetchPodcastsFromRemoteEvent(keyword: _textEditingController.text));
+      BlocProvider.of<PodcastBloc>(context)
+          .add(SearchPodcastsByKeywordProcessingEvent(keyword: _textEditingController.text));
 
       _textEditingController.clear();
       _navigateToResultsPage(context);

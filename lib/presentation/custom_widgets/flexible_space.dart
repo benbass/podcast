@@ -11,9 +11,10 @@ import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
 
+/// This widget is used to show some details about the selected podcast or episode, depending on corresponding variable being null or not.
 class FlexibleSpace extends StatelessWidget {
-  final PodcastEntity? podcast;
-  final EpisodeEntity? episode;
+  final PodcastEntity? podcast; // if null, widget is used for episode
+  final EpisodeEntity? episode; // if null, widget is used for podcast
   final String title;
 
   const FlexibleSpace({

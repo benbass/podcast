@@ -14,18 +14,37 @@ class PodcastRepositoryImpl implements PodcastRepository {
   });
 
   @override
-  Future<List<PodcastEntity>> fetchPodcastsByKeywords(String keyword, List<PodcastEntity> subscribedPodcasts) async {
-    return await podcastDataSources.fetchPodcastsByKeyword(keyword, subscribedPodcasts);
+  Future<List<PodcastEntity>> fetchPodcastsByKeywords(String keyword) async {
+    return await podcastDataSources.fetchPodcastsByKeyword(keyword);
   }
 
   @override
-  Future<void> subscribeToPodcast(PodcastEntity podcast) async {
-    podcastBox.put(podcast);
+  Future<dynamic> subscribeToPodcast(PodcastEntity podcast) async {
+    try {
+      /// 1. Get the episodes for this podcast
+      final PodcastEntity podcastWithEpisodes = await fillPodcastWithEpisodes(podcast);
+      /// 2. Create podcast with subscribed flag == true AND list of episodes
+      // Note that we don't copyWith episodes: ObjectBox requires list to be filled with add or addAll method
+      final PodcastEntity podcastWithEpisodesSubscribed = podcastWithEpisodes
+          .copyWith(
+              subscribed: true,
+              unreadEpisodes: podcastWithEpisodes.episodes.length)
+        ..episodes.addAll(podcastWithEpisodes.episodes);
+      /// 3. Save to db
+      podcastBox.put(podcastWithEpisodesSubscribed);
+      /// 4. Success. Return obj of type PodcastEntity
+      return podcastWithEpisodesSubscribed;
+    } catch (e) {
+      /// 4. Error. Return error message of type String
+      return e.toString();
+    }
   }
 
   @override
-  Future<void> unsubscribeFromPodcast(PodcastEntity podcast) async {
+  Future<List<PodcastEntity>> unsubscribeFromPodcast(
+      PodcastEntity podcast) async {
     podcastBox.remove(podcast.id);
+    return await podcastDataSources.getSubscribedPodcasts() ?? [];
   }
 
   @override
@@ -37,11 +56,11 @@ class PodcastRepositoryImpl implements PodcastRepository {
   Future<PodcastEntity> fillPodcastWithEpisodes(PodcastEntity podcast) async {
     //final Stream<List<EpisodeEntity>> episodes = episodeDataSources.fetchEpisodesAsStreamByFeedId(podcast.pId);
     //final List<EpisodeEntity> episodesList = await episodes.first;
-    final List<EpisodeEntity> episodesFuture = await episodeDataSources.fetchEpisodesByFeedId(podcast.pId);
+    final List<EpisodeEntity> episodesFuture =
+        await episodeDataSources.fetchEpisodesByFeedId(podcast.pId);
     for (EpisodeEntity episode in episodesFuture) {
       podcast.episodes.add(episode);
     }
     return podcast;
   }
-
 }

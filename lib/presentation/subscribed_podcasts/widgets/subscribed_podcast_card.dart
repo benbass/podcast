@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/subscribed_podcasts/widgets/rounded_text_widget.dart';
 
+import '../../../application/podcast_bloc/podcast_bloc.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/core/image_provider.dart';
 import '../../custom_widgets/page_transition.dart';
@@ -16,15 +18,15 @@ class SubscribedPodcastCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final podcastBloc = BlocProvider.of<PodcastBloc>(context);
     ImageProvider img = MyImageProvider(url: podcast.artwork).imageProvider;
     return InkResponse(
       onTap: () {
-                Navigator.push(
+        podcastBloc.add(PodcastTappedEvent(podcast: podcast));
+        Navigator.push(
           context,
           SlideBottomRoute(
-            page: EpisodesListPage(
-              podcast: podcast,
-            ),
+            page: const EpisodesListPage(),
           ),
         );
       },
@@ -41,7 +43,10 @@ class SubscribedPodcastCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              ElevatedButtonSubscribe(podcast: podcast, navigate: false,),
+              ElevatedButtonSubscribe(
+                podcast: podcast,
+                navigate: false,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.end,
