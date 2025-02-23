@@ -9,7 +9,7 @@ import '../models/podcast_model.dart';
 abstract class PodcastDataSource {
   /// Fetches podcasts based on a keyword, considering subscribed podcasts.
   Future<List<PodcastEntity>> fetchPodcastsByKeyword(
-      String keyword, List<PodcastEntity> subscribedPodcasts);
+      String keyword);
   /// Retrieves the list of subscribed podcasts.
   Future<List<PodcastEntity>?> getSubscribedPodcasts();
 }
@@ -22,7 +22,7 @@ class PodcastDataSourceImpl implements PodcastDataSource {
   /// Fetches podcasts based on a keyword, considering subscribed podcasts.
   @override
   Future<List<PodcastEntity>> fetchPodcastsByKeyword(
-      String keyword, List<PodcastEntity> subscribedPodcasts) async {
+      String keyword) async {
     // Prepare keyword for url
     String encodedKeyword = _encodeKeywordForUrl(keyword);
 
@@ -44,7 +44,7 @@ class PodcastDataSourceImpl implements PodcastDataSource {
       final List<PodcastEntity> foundPodcasts =
           feeds.map((feed) => PodcastModel.fromJson(feed)).toList();
       // Replace found podcasts with subscribed podcasts if they exist.
-      return _mergeWithSubscribedPodcasts(foundPodcasts, subscribedPodcasts);
+      return _mergeWithSubscribedPodcasts(foundPodcasts);
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
@@ -56,7 +56,7 @@ class PodcastDataSourceImpl implements PodcastDataSource {
   @override
   Future<List<PodcastEntity>?> getSubscribedPodcasts() async {
     List<PodcastEntity>? podcasts = podcastBox.getAll();
-    return podcasts;
+    return podcasts ;
   }
 
   /// Merges the list of found podcasts with subscribed podcasts.
@@ -64,21 +64,31 @@ class PodcastDataSourceImpl implements PodcastDataSource {
   /// If a podcast in [foundPodcasts] is also in [subscribedPodcasts],
   /// the subscribed version will replace the found version.
   Future<List<PodcastEntity>> _mergeWithSubscribedPodcasts(
-      List<PodcastEntity> foundPodcasts,
-      List<PodcastEntity> subscribedPodcasts) async {
-    final Map<int, PodcastEntity> podcastMap = {};
-    // Add found podcasts to the map.
-    for (PodcastEntity podcast in foundPodcasts) {
-      podcastMap[podcast.pId] = podcast;
-    }
-    // Replace found podcasts with subscribed podcasts if they exist.
-    for (PodcastEntity podcast in subscribedPodcasts) {
-      // Replace found podcasts with subscribed podcasts
-      if (podcastMap.containsKey(podcast.pId)) {
+      List<PodcastEntity> foundPodcasts) async {
+    // get subscribed podcasts from db
+    List<PodcastEntity>? subscribedPodcasts = await getSubscribedPodcasts();
+    subscribedPodcasts ??= [];
+
+    if (subscribedPodcasts.isNotEmpty) {
+      // Create a map to efficiently find subscribed podcasts.
+      final Map<int, PodcastEntity> podcastMap = {};
+      // Add found podcasts to the map.
+      for (PodcastEntity podcast in foundPodcasts) {
         podcastMap[podcast.pId] = podcast;
       }
+      // Replace found podcasts with subscribed podcasts if they exist.
+      for (PodcastEntity podcast in subscribedPodcasts) {
+        // Replace found podcasts with subscribed podcasts
+        if (podcastMap.containsKey(podcast.pId)) {
+          podcastMap[podcast.pId] = podcast;
+        }
+      }
+      return podcastMap.values.toList();
+    } else {
+      return foundPodcasts;
     }
-    return podcastMap.values.toList();
+
+
   }
 
   /// Encodes the keyword for use in a URL.

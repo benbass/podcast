@@ -8,16 +8,16 @@ class PodcastUseCases {
     required this.podcastRepository,
   });
 
-  Future<List<PodcastEntity>> fetchPodcasts(String keyword, List<PodcastEntity> subscribedPodcasts) async {
-    return podcastRepository.fetchPodcastsByKeywords(keyword, subscribedPodcasts);
+  Future<List<PodcastEntity>> fetchPodcasts(String keyword) async {
+    return podcastRepository.fetchPodcastsByKeywords(keyword);
   }
 
-  Future<void> subscribeToPodcast(PodcastEntity podcast) async {
-    await podcastRepository.subscribeToPodcast(podcast);
+  Future<dynamic> subscribeToPodcast(PodcastEntity podcast) async {
+    return await podcastRepository.subscribeToPodcast(podcast);
   }
 
-  Future<void> unsubscribeFromPodcast(PodcastEntity podcast) async {
-    await podcastRepository.unsubscribeFromPodcast(podcast);
+  Future<List<PodcastEntity>> unsubscribeFromPodcast(PodcastEntity podcast) async {
+    return podcastRepository.unsubscribeFromPodcast(podcast);
   }
 
   Future<List<PodcastEntity>?> getSubscribedPodcasts() async {
