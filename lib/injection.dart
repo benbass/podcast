@@ -1,6 +1,5 @@
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart' as http;
 import 'package:podcast/domain/repositories/podcast_repository.dart';
 import 'package:podcast/domain/usecases/podcast_usecases.dart';
 import 'package:podcast/helpers/player/audiohandler.dart';
