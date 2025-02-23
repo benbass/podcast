@@ -1,11 +1,12 @@
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:podcast/application/podcasts_bloc/podcasts_bloc.dart';
+import 'package:http/http.dart' as http;
 import 'package:podcast/domain/repositories/podcast_repository.dart';
 import 'package:podcast/domain/usecases/podcast_usecases.dart';
 import 'package:podcast/helpers/player/audiohandler.dart';
 import 'package:podcast/infrastructure/repositories/podcast_repository_impl.dart';
 
+import 'application/podcast_bloc/podcast_bloc.dart';
 import 'domain/repositories/episode_repository.dart';
 import 'domain/usecases/episode_usecases.dart';
 import 'infrastructure/datasources/episode_datasources.dart';
@@ -16,10 +17,9 @@ final getItI = GetIt.instance;
 
 Future<void> init() async {
   // State management
-  getItI.registerFactory(() => PodcastsBloc(
-        podcastUseCases: getItI(),
-        episodeUseCases: getItI(),
-      ));
+  getItI.registerFactory(() => PodcastBloc(
+    podcastUseCases: getItI(),
+  ));
 
   // Use cases
   getItI.registerLazySingleton(
