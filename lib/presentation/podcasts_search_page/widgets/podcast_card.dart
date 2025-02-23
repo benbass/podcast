@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:podcast/helpers/core/image_provider.dart';
-import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:podcast/helpers/core/image_provider.dart';
+import '../../../application/podcast_bloc/podcast_bloc.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../../podcast_details_page/podcast_details_page.dart';
@@ -22,6 +23,10 @@ class PodcastCard extends StatelessWidget {
       color: Theme.of(context).colorScheme.secondary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
+        side: BorderSide(
+          color: podcast.subscribed ? Colors.grey : Colors.transparent,
+          width: 3.0,
+        ),
       ),
       elevation: 5.0,
       shadowColor: Colors.black,
@@ -32,12 +37,11 @@ class PodcastCard extends StatelessWidget {
         child: InkWell(
           splashColor: Colors.black87,
           onTap: () {
+            BlocProvider.of<PodcastBloc>(context).add(PodcastTappedEvent(podcast: podcast));
             Navigator.push(
               context,
               SizeRoute(
-                page: PodcastDetailsPage(
-                  podcast: podcast,
-                ),
+                page: const PodcastDetailsPage(),
               ),
             );
           },
@@ -65,29 +69,13 @@ class PodcastCard extends StatelessWidget {
                     8.0,
                     10.0,
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        podcast.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.zero,
-                        height: 30,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            ElevatedButtonSubscribe(podcast: podcast, navigate: false,),
-                          ],
-                        ),
-                      )
-                    ],
+                  child: Text(
+                    podcast.title,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                    ),
                   ),
                 ),
               ),

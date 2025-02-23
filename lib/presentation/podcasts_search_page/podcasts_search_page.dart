@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:podcast/application/podcasts_bloc/podcasts_bloc.dart';
 import 'package:podcast/presentation/podcasts_search_page/widgets/podcast_card.dart';
 
-import '../../domain/entities/podcast_entity.dart';
+import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../custom_widgets/page_transition.dart';
 import 'widgets/search_textfield.dart';
 import '../subscribed_podcasts/subscribed_podcasts_page.dart';
@@ -18,7 +17,7 @@ class PodcastsSearchPage extends StatelessWidget {
     return Scaffold(
       appBar: _buildAppBar(context),
       body: SafeArea(
-        child: BlocBuilder<PodcastsBloc, PodcastsState>(
+        child: BlocBuilder<PodcastBloc, PodcastState>(
           builder: (context, state) {
             return _buildBody(context, state);
           },
@@ -47,20 +46,14 @@ class PodcastsSearchPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, PodcastsState state) {
+  Widget _buildBody(BuildContext context, PodcastState state) {
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
       slivers: [
-        if (state is PodcastsFetchingState)
+        if (state.loading)
           _buildLoadingIndicator(context)
-        else if (state is PodcastsFetchSuccessState)
-          _buildPodcastList(context, state.podcastsQueryResult)
-        else if (state is PodcastFillWithEpisodesSuccessState)
-          _buildPodcastList(context, state.podcastsQueryResult)
-        else if (state is PodcastChangeSubscriptionState)
-          _buildPodcastList(context, state.podcastsQueryResult)
         else
-          const SliverToBoxAdapter(),
+          _buildPodcastList(context, state)
       ],
     );
   }
@@ -76,17 +69,17 @@ class PodcastsSearchPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPodcastList(BuildContext context, List<PodcastEntity> podcasts) {
-    if (podcasts.isEmpty) {
+  Widget _buildPodcastList(BuildContext context, PodcastState state) {
+    if (state.podcastsQueryResult.isEmpty) {
       return _buildEmptyList(context);
     }
     return SliverPadding(
       padding: const EdgeInsets.only(bottom: 80.0),
       sliver: SliverList.builder(
-        itemCount: podcasts.length,
+        itemCount: state.podcastsQueryResult.length,
         itemBuilder: (context, index) {
-          final podcast = podcasts[index];
-          return BlocBuilder<PodcastsBloc, PodcastsState>(
+          final podcast = state.podcastsQueryResult[index];
+          return BlocBuilder<PodcastBloc, PodcastState>(
             builder: (context, state) {
               return PodcastCard(podcast: podcast);
             },
