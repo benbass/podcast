@@ -42,7 +42,7 @@ class PodcastDataSourceImpl implements PodcastDataSource {
       final List<dynamic> feeds = jsonFeed['feeds'];
       // Convert the JSON feeds to PodcastEntity objects.
       final List<PodcastEntity> foundPodcasts =
-          feeds.map((feed) => PodcastModel.fromJson(feed)).toList();
+          feeds.map((feed) => PodcastModel.fromJson(feed).toPodcastEntity()).toList();
       // Replace found podcasts with subscribed podcasts if they exist.
       return _mergeWithSubscribedPodcasts(foundPodcasts);
     } else {
@@ -54,8 +54,8 @@ class PodcastDataSourceImpl implements PodcastDataSource {
 
   /// Retrieves the list of subscribed podcasts.
   @override
-  Future<List<PodcastEntity>?> getSubscribedPodcasts() async {
-    List<PodcastEntity>? podcasts = podcastBox.getAll();
+  Future<List<PodcastEntity>> getSubscribedPodcasts() async {
+    List<PodcastEntity> podcasts = podcastBox.getAll();
     return podcasts ;
   }
 
@@ -66,8 +66,7 @@ class PodcastDataSourceImpl implements PodcastDataSource {
   Future<List<PodcastEntity>> _mergeWithSubscribedPodcasts(
       List<PodcastEntity> foundPodcasts) async {
     // get subscribed podcasts from db
-    List<PodcastEntity>? subscribedPodcasts = await getSubscribedPodcasts();
-    subscribedPodcasts ??= [];
+    List<PodcastEntity> subscribedPodcasts = await getSubscribedPodcasts();
 
     if (subscribedPodcasts.isNotEmpty) {
       // Create a map to efficiently find subscribed podcasts.
