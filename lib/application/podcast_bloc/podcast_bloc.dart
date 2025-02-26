@@ -14,8 +14,9 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     on<SubscribedPodcastsLoadingEvent>((event, emit) async {
       emit(state.copyWith(loading: true));
       try {
-        List<PodcastEntity>? subscribedPodcasts =
-            await podcastUseCases.getSubscribedPodcasts() ?? [];
+        List<PodcastEntity> subscribedPodcasts =
+            await podcastUseCases.getSubscribedPodcasts();
+
         emit(state.copyWith(
           subscribedPodcasts: subscribedPodcasts,
         ));
@@ -127,16 +128,21 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
       List<PodcastEntity> podcastsQueryResult = state.podcastsQueryResult;
 
       // Replace object in query result, only if object is in query result
-      List<PodcastEntity> updatedQueryResult() {
+      Future<List<PodcastEntity>> updatedQueryResult() async {
         if (podcastsQueryResult.isNotEmpty) {
+          // Create a map to store the API podcastIndex ids (pId)
           Map<int, int> map = {};
           for (PodcastEntity podcast in podcastsQueryResult) {
             map[podcast.pId] = 0;
           }
+          // Check if object is in map
           if (map.containsKey(event.podcast.pId)) {
+            // find index of object in query result
             final int index = podcastsQueryResult
                 .indexWhere((element) => element.pId == event.podcast.pId);
+            // Remove old object from query result
             podcastsQueryResult.removeAt(index);
+            // Insert new object in query result
             podcastsQueryResult.insert(index, event.podcast);
           }
         }
@@ -144,8 +150,11 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
         return podcastsQueryResult;
       }
 
+      // Update query result
+      List<PodcastEntity> updatedList = await updatedQueryResult();
+
       emit(state.copyWith(
-        podcastsQueryResult: updatedQueryResult(),
+        podcastsQueryResult: updatedList,
       ));
     });
   }
