@@ -59,4 +59,26 @@ class PodcastModel extends PodcastEntity {
       episodes: [],
     );
   }
+
+  PodcastEntity toPodcastEntity() {
+    return PodcastEntity(
+      pId: pId,
+      podcastGuid: podcastGuid,
+      title: title,
+      url: url,
+      link: link,
+      description: description,
+      author: author,
+      ownerName: ownerName,
+      artwork: artwork,
+      lastUpdateTime: lastUpdateTime,
+      language: language,
+      explicit: explicit,
+      medium: medium,
+      episodeCount: episodeCount,
+      categories: categories,
+      subscribed: subscribed,
+      unreadEpisodes: unreadEpisodes,
+    );
+  }
 }
