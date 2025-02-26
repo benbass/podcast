@@ -20,7 +20,7 @@ class PodcastUseCases {
     return podcastRepository.unsubscribeFromPodcast(podcast);
   }
 
-  Future<List<PodcastEntity>?> getSubscribedPodcasts() async {
+  Future<List<PodcastEntity>> getSubscribedPodcasts() async {
     return podcastRepository.getSubscribedPodcasts();
   }
 

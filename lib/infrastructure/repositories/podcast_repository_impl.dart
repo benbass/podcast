@@ -48,8 +48,8 @@ class PodcastRepositoryImpl implements PodcastRepository {
   }
 
   @override
-  Future<List<PodcastEntity>?> getSubscribedPodcasts() async {
-    return await podcastDataSources.getSubscribedPodcasts();
+  Future<List<PodcastEntity>> getSubscribedPodcasts() async {
+    return await podcastDataSources.getSubscribedPodcasts() ?? [];
   }
 
   @override
