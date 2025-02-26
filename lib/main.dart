@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+
+// flutter_localizations requires intl 0.19.0 (pinned)
+// This leads to incompatibility issue with awesome_notifications 0.10.1 that requires at least intl 0.20.0
+// But awesome_notifications 0.10.1 is required after Flutter SDK is updated to version > 3.27
+// pubspec.yaml contains a dependency override for intl 0.20.2 as a workaround
 import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
