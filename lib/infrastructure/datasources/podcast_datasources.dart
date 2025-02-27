@@ -36,14 +36,15 @@ class PodcastDataSourceImpl implements PodcastDataSource {
         headers: headers);
 
     if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
+      // Parse the JSON response if the server returns a 200 OK status code.
       final Map<String, dynamic> jsonFeed = json.decode(response.body);
       final List<dynamic> feeds = jsonFeed['feeds'];
-      // Convert the JSON feeds to PodcastEntity objects.
+      // Convert the JSON feeds to PodcastModel objects, then explicitly convert them to PodcastEntity objects.
+      // Explicit conversion is necessary because the list of podcasts can change during the application's lifetime.
+      // Mixing PodcastEntity and PodcastModel types would lead to inconsistencies.
       final List<PodcastEntity> foundPodcasts =
           feeds.map((feed) => PodcastModel.fromJson(feed).toPodcastEntity()).toList();
-      // Replace found podcasts with subscribed podcasts if they exist.
+      // Merge the found podcasts with subscribed podcasts, giving precedence to subscribed ones.
       return _mergeWithSubscribedPodcasts(foundPodcasts);
     } else {
       // If the server did not return a 200 OK response,
