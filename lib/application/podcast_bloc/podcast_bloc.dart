@@ -32,7 +32,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     });
 
     on<SearchPodcastsByKeywordProcessingEvent>((event, emit) async {
-      emit(state.copyWith(loading: true));
+      emit(state.copyWith(loading: true, keyword: event.keyword));
       try {
         List<PodcastEntity> podcastsQueryResult =
             await podcastUseCases.fetchPodcasts(event.keyword);
