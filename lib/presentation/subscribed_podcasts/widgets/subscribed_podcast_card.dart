@@ -25,7 +25,7 @@ class SubscribedPodcastCard extends StatelessWidget {
         podcastBloc.add(PodcastTappedEvent(podcast: podcast));
         Navigator.push(
           context,
-          SlideBottomRoute(
+          SlideRouteWithCurve(
             page: const EpisodesListPage(),
           ),
         );

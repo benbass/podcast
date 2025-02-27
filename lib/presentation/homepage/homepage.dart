@@ -11,7 +11,7 @@ class HomePage extends StatelessWidget {
     void navigateToSubscribedPodcastsPage() {
       Navigator.push(
           context,
-          SlideBottomRoute(
+          SlideRouteWithCurve(
             page: const SubscribedPodcastsPage(),
           ));
     }

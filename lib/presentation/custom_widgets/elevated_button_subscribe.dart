@@ -24,7 +24,7 @@ class ElevatedButtonSubscribe extends StatelessWidget {
         if (navigate) {
           Navigator.push(
             context,
-            SlideBottomRoute(
+            SlideRouteWithCurve(
               page: const HomePage(),
             ),
           );

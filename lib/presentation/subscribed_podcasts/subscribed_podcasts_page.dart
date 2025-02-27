@@ -34,7 +34,7 @@ class SubscribedPodcastsPage extends StatelessWidget {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              SlideBottomRoute(
+                              SlideRouteWithCurve(
                                 page: const PodcastsSearchPage(),
                               ),
                             );

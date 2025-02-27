@@ -37,7 +37,7 @@ class MiniPlayerWidget extends StatelessWidget {
               onTap: () {
                 removeOverlay();
                 Navigator.of(context).push(
-                  SlideBottomRoute(
+                  SlideRouteWithCurve(
                     page: EpisodeDetailsPage(
                       episode: episode,
                       title: title,
