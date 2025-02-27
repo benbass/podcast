@@ -19,56 +19,65 @@ class SubscribedPodcastCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final podcastBloc = BlocProvider.of<PodcastBloc>(context);
-    ImageProvider img = MyImageProvider(url: podcast.artwork).imageProvider;
-    return InkResponse(
-      onTap: () {
-        podcastBloc.add(PodcastTappedEvent(podcast: podcast));
-        Navigator.push(
-          context,
-          SlideRouteWithCurve(
-            page: const EpisodesListPage(),
-          ),
-        );
-      },
-      child: Material(
-        elevation: 16,
-        borderRadius: BorderRadius.circular(15),
-        color: Colors.transparent,
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(image: img, fit: BoxFit.fitHeight),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              ElevatedButtonSubscribe(
-                podcast: podcast,
-                navigate: false,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Spacer(),
-                  SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: RoundedTextWidget(
-                        text: podcast.unreadEpisodes.toString()),
-                    /*CustomPaint(
-                      painter: TrianglePainter(
-                        text: '410',
-                      ),
-                    ),*/
+    return FutureBuilder<ImageProvider>(
+        future: MyImageProvider(url: podcast.artwork).imageProvider,
+        builder: (BuildContext context, AsyncSnapshot<ImageProvider> snapshot) {
+          final ImageProvider imageProvider = snapshot.hasData
+              ? snapshot.data!
+              : const AssetImage('assets/placeholder.png');
+          return InkResponse(
+            onTap: () {
+              podcastBloc.add(PodcastTappedEvent(podcast: podcast));
+              Navigator.push(
+                context,
+                SlideRouteWithCurve(
+                  page: const EpisodesListPage(),
+                ),
+              );
+            },
+            child: Material(
+              elevation: 16,
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.transparent,
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: imageProvider,
+                    fit: BoxFit.fitHeight,
                   ),
-                ],
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    ElevatedButtonSubscribe(
+                      podcast: podcast,
+                      navigate: false,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Spacer(),
+                        SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: RoundedTextWidget(
+                              text: podcast.unreadEpisodes.toString()),
+                          /*CustomPaint(
+                          painter: TrianglePainter(
+                            text: '410',
+                          ),
+                        ),*/
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        });
   }
 }

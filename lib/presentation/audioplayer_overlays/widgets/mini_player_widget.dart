@@ -23,7 +23,6 @@ class MiniPlayerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ImageProvider img = MyImageProvider(url: episode.image).imageProvider;
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -49,16 +48,24 @@ class MiniPlayerWidget extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               child: Row(
                 children: [
-                Container(
-                height: kPlayerHeight,
-                width: kPlayerHeight,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: img,
-                    fit: BoxFit.fitWidth,
-                  ),
+                  FutureBuilder<ImageProvider>(
+                      future: MyImageProvider(url: episode.image).imageProvider,
+                      builder: (BuildContext context, AsyncSnapshot<ImageProvider> snapshot) {
+                        final ImageProvider imageProvider = snapshot.hasData
+                            ? snapshot.data!
+                            : const AssetImage('assets/placeholder.png');
+                    return Container(
+                    height: kPlayerHeight,
+                    width: kPlayerHeight,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.fitWidth,
+                      ),
+                    ),
+                                  );
+                  }
                 ),
-              ),
                   const SizedBox(
                     width: 4,
                   ),
