@@ -30,9 +30,10 @@ class _SearchTextFieldState extends State<SearchTextField> {
       FocusScope.of(context).unfocus();
 
       BlocProvider.of<PodcastBloc>(context)
-          .add(SearchPodcastsByKeywordProcessingEvent(keyword: _textEditingController.text));
+          .add(SearchPodcastsByKeywordProcessingEvent(
+          keyword: _textEditingController.text));
 
-      _textEditingController.clear();
+      //_textEditingController.clear();
       _navigateToResultsPage(context);
     } else {
       hintText = "Please enter a keyword";
@@ -47,23 +48,27 @@ class _SearchTextFieldState extends State<SearchTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: _textEditingController,
-      onTapOutside: (_) {
-        FocusManager.instance.primaryFocus?.unfocus();
+    return BlocBuilder<PodcastBloc, PodcastState>(
+      builder: (context, state) {
+        return TextField(
+          controller: _textEditingController,
+          onTapOutside: (_) {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            hintText: state.keyword ?? hintText,
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () => _performSearch(context),
+            ),
+          ),
+          style: const TextStyle(
+            color: Color(0xFF202531),
+          ),
+        );
       },
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        hintText: hintText,
-        suffixIcon: IconButton(
-          icon: const Icon(Icons.search),
-          onPressed: () => _performSearch(context),
-        ),
-      ),
-      style: const TextStyle(
-        color: Color(0xFF202531),
-      ),
     );
   }
 }
