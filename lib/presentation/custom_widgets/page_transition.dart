@@ -86,3 +86,42 @@ class SizeRoute extends PageRouteBuilder {
           ),
         );
 }
+
+/// NEW transition to test
+class SlideRouteWithCurve extends PageRouteBuilder {
+  final Widget page;
+  SlideRouteWithCurve({
+    required this.page,
+    Duration duration = const Duration(milliseconds: 300),
+    Duration reverseDuration = const Duration(milliseconds: 300),
+  }) : super(
+          transitionDuration: duration,
+          reverseTransitionDuration: reverseDuration,
+          pageBuilder: (
+            context,
+            animation,
+            secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            context,
+            animation,
+            secondaryAnimation,
+            child,
+          ) {
+            const begin = Offset(0.0, 1.0);
+            const end = Offset.zero;
+            const curve = Curves.slowMiddle;
+            const reverseCurve = Curves.fastOutSlowIn;
+
+            var tween =
+                Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+            final curvedAnimation = CurvedAnimation(
+                parent: animation, curve: curve, reverseCurve: reverseCurve);
+
+            return SlideTransition(
+                position: tween.animate(curvedAnimation), child: child);
+          },
+        );
+}
