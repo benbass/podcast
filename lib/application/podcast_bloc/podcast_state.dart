@@ -4,6 +4,7 @@ class PodcastState {
   final PodcastEntity? podcast;
   final List<PodcastEntity> subscribedPodcasts;
   final List<PodcastEntity> podcastsQueryResult;
+  final String? keyword;
   final bool loading;
   final String? message;
 
@@ -11,6 +12,7 @@ class PodcastState {
     required this.podcast,
     required this.subscribedPodcasts,
     required this.podcastsQueryResult,
+    required this.keyword,
     required this.loading,
     required this.message,
   });
@@ -19,6 +21,7 @@ class PodcastState {
         podcast: null,
         subscribedPodcasts: [],
         podcastsQueryResult: [],
+        keyword: null,
         loading: false,
         message: null,
       );
@@ -27,6 +30,7 @@ class PodcastState {
         podcast: null,
         subscribedPodcasts: const [],
         podcastsQueryResult: const [],
+        keyword: null,
         loading: false,
         message: message,
       );
@@ -35,13 +39,15 @@ class PodcastState {
     List<PodcastEntity>? subscribedPodcasts,
     List<PodcastEntity>? podcastsQueryResult,
     PodcastEntity? podcast,
+    String? keyword,
     bool? loading,
     String? message,
   }) {
     return PodcastState(
+      podcast: podcast ?? this.podcast,
       subscribedPodcasts: subscribedPodcasts ?? this.subscribedPodcasts,
       podcastsQueryResult: podcastsQueryResult ?? this.podcastsQueryResult,
-      podcast: podcast ?? this.podcast,
+      keyword: keyword ?? this.keyword,
       loading: loading ?? this.loading,
       message: message ?? this.message,
     );
