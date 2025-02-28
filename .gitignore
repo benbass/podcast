@@ -11,6 +11,7 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+*.bin
 
 # IntelliJ related
 *.iml
@@ -42,8 +43,6 @@ app.*.map.json
 # exclude all .env files
 *.env
 /lib/env/env.g.dart
-
-configure_fingerprint.bin
 
 # Android Studio will place build artifacts here
 /android/app/debug
