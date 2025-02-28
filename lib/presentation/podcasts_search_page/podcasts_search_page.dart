@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcast/presentation/custom_widgets/home_button.dart';
 import 'package:podcast/presentation/podcasts_search_page/widgets/podcast_card.dart';
 
 import '../../application/podcast_bloc/podcast_bloc.dart';
-import '../custom_widgets/page_transition.dart';
 import 'widgets/search_textfield.dart';
-import '../subscribed_podcasts/subscribed_podcasts_page.dart';
 
 class PodcastsSearchPage extends StatelessWidget {
   const PodcastsSearchPage({
@@ -32,17 +31,7 @@ class PodcastsSearchPage extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 20.0),
         child: SearchTextField(),
       ),
-      leading: IconButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            SlideRouteWithCurve(
-              page: const SubscribedPodcastsPage(),
-            ),
-          );
-        },
-        icon: const Icon(Icons.home_rounded),
-      ),
+      leading: const MyHomeButton()
     );
   }
 
@@ -70,8 +59,11 @@ class PodcastsSearchPage extends StatelessWidget {
   }
 
   Widget _buildPodcastList(BuildContext context, PodcastState state) {
-    if (state.podcastsQueryResult.isEmpty) {
-      return _buildEmptyList(context);
+    if (state.keyword == null) {
+      return _buildEmptyList(context, "Enter keyword(s) to\nsearch for podcasts");
+    }
+    if (state.podcastsQueryResult.isEmpty && state.keyword != null) {
+      return _buildEmptyList(context, "No podcasts found\nfor your keyword(s)");
     }
     return SliverPadding(
       padding: const EdgeInsets.only(bottom: 80.0),
@@ -89,10 +81,15 @@ class PodcastsSearchPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyList(BuildContext context) {
-    return const SliverFillRemaining(
+  Widget _buildEmptyList(BuildContext context, String text) {
+    return SliverFillRemaining(
+      hasScrollBody: false,
       child: Center(
-        child: Text("No podcasts were found for your keyword(s)"),
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 20, height: 1.7),
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }
