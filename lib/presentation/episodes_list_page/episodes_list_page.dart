@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../custom_widgets/page_transition.dart';
+import '../podcast_details_page/podcast_details_page.dart';
 import 'widgets/row_icon_buttons_episodes.dart';
 
 class EpisodesListPage extends StatelessWidget {
@@ -43,9 +45,28 @@ class EpisodesListPage extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  ElevatedButtonSubscribe(
-                                    podcast: state.podcast!,
-                                    navigate: true,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButtonSubscribe(
+                                        podcast: state.podcast!,
+                                        navigate: true,
+                                      ),
+                                      const SizedBox(
+                                        width: 30,
+                                      ),
+                                      IconButton(
+                                        onPressed: () => Navigator.push(
+                                            context,
+                                            SlideRouteWithCurve(
+                                              page: const PodcastDetailsPage(),
+                                            )),
+                                        icon: const Icon(
+                                          Icons.info_outline_rounded,
+                                          size: 30,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   const RowIconButtonsEpisodes(),
                                   const SizedBox(
