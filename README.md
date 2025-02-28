@@ -12,6 +12,7 @@ Search, follow and listen to Podcasts
 - State Management: Bloc
 - Dependency injection: GetIt
 - Internationalization: Intl
+- Data persistence: ObjectBox
 
 ## Getting Started
 
