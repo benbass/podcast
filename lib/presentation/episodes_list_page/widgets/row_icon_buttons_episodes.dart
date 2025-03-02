@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../application/podcast_bloc/podcast_bloc.dart';
 
 class RowIconButtonsEpisodes extends StatelessWidget {
   const RowIconButtonsEpisodes({
@@ -30,7 +33,7 @@ class RowIconButtonsEpisodes extends StatelessWidget {
         ),
         IconButton(
           onPressed: () {
-            // make a query
+            BlocProvider.of<PodcastBloc>(context).add(RefreshPodcastEpisodesProcessingEvent());
           },
           icon: const Icon(
             Icons.refresh_rounded,
