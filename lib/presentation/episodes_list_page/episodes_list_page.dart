@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcast/domain/entities/episode_entity.dart';
 
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
@@ -16,10 +17,13 @@ class EpisodesListPage extends StatelessWidget {
     return Scaffold(
       body: BlocBuilder<PodcastBloc, PodcastState>(
         builder: (context, state) {
+          // We make sure to sort episodes by datePublished in descending order
+          // because database returns objects by id in ascending order.
+          final List<EpisodeEntity> episodes = state.podcast!.episodes..sort((a, b) => b.datePublished.compareTo(a.datePublished));
           return SafeArea(
             child: state.loading
                 ? const Center(child: CircularProgressIndicator())
-                : state.podcast!.episodes.isNotEmpty
+                : episodes.isNotEmpty
                     ? CustomScrollView(
                         physics: const BouncingScrollPhysics(),
                         slivers: [
@@ -77,9 +81,9 @@ class EpisodesListPage extends StatelessWidget {
                             ),
                           ),
                           SliverList.builder(
-                            itemCount: state.podcast!.episodes.length,
+                            itemCount: episodes.length,
                             itemBuilder: (context, index) {
-                              final item = state.podcast!.episodes[index];
+                              final item = episodes[index];
                               return EpisodeCard(
                                 item: item,
                                 podcast: state.podcast!,
