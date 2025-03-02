@@ -53,11 +53,11 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     });
 
     on<FetchEpisodesForPodcastProcessingEvent>((event, emit) async {
-      if(!event.podcast.subscribed){
+      if (!event.podcast.subscribed) {
         emit(state.copyWith(loading: true));
         try {
           final PodcastEntity podcastWithEpisodes =
-          await podcastUseCases.fillPodcastWithEpisodes(event.podcast);
+              await podcastUseCases.fillPodcastWithEpisodes(event.podcast);
           emit(state.copyWith(
             podcast: podcastWithEpisodes,
           ));
@@ -65,13 +65,22 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
         } catch (e) {
           emit(PodcastState.error(
               message:
-              'Failed to load episodes from the server.\nThe server may be down.\nError: ${e.toString()}'));
+                  'Failed to load episodes from the server.\nThe server may be down.\nError: ${e.toString()}'));
         }
       }
     });
 
     on<FetchEpisodesForPodcastSuccessEvent>((event, emit) async {
       emit(state.copyWith(loading: false));
+    });
+
+    on<RefreshPodcastEpisodesProcessingEvent>((event, emit) async {
+      emit(state.copyWith(loading: true));
+      PodcastEntity podcast = await podcastUseCases.refreshPodcastEpisodes(state.podcast!);
+      emit(state.copyWith(
+        podcast: podcast,
+      ));
+      add(FetchEpisodesForPodcastSuccessEvent());
     });
 
     on<PodcastTappedEvent>((event, emit) async {
