@@ -22,6 +22,8 @@ final class FetchEpisodesForPodcastProcessingEvent extends PodcastEvent {
 }
 final class FetchEpisodesForPodcastSuccessEvent extends PodcastEvent {}
 
+final class RefreshPodcastEpisodesProcessingEvent extends PodcastEvent {}
+
 final class PodcastTappedEvent extends PodcastEvent {
   final PodcastEntity podcast;
   PodcastTappedEvent({
