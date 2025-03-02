@@ -27,4 +27,8 @@ class PodcastUseCases {
   Future<PodcastEntity> fillPodcastWithEpisodes(PodcastEntity podcast) async {
     return podcastRepository.fillPodcastWithEpisodes(podcast);
   }
+
+  Future<PodcastEntity> refreshPodcastEpisodes(PodcastEntity podcast) async {
+    return podcastRepository.refreshPodcastEpisodes(podcast);
+  }
 }
