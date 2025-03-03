@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/subscribed_podcasts/widgets/rounded_text_widget.dart';
 
 import '../../../application/podcast_bloc/podcast_bloc.dart';
@@ -47,31 +46,16 @@ class SubscribedPodcastCard extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                child: Stack(
                   children: [
-                    ElevatedButtonSubscribe(
-                      podcast: podcast,
-                      navigate: false,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const Spacer(),
-                        SizedBox(
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: SizedBox(
                           width: 50,
                           height: 50,
                           child: RoundedTextWidget(
-                              text: podcast.unreadEpisodes.toString()),
-                          /*CustomPaint(
-                          painter: TrianglePainter(
-                            text: '410',
-                          ),
-                        ),*/
-                        ),
-                      ],
+                              text: podcast.unreadEpisodes.toString())),
                     ),
                   ],
                 ),
