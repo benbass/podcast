@@ -19,7 +19,7 @@ class PodcastRepositoryImpl implements PodcastRepository {
   }
 
   @override
-  Future<dynamic> subscribeToPodcast(PodcastEntity podcast) async {
+  Future<bool> subscribeToPodcast(PodcastEntity podcast) async {
     try {
       /// 1. Get the episodes for this podcast
       final PodcastEntity podcastWithEpisodes =
@@ -36,19 +36,17 @@ class PodcastRepositoryImpl implements PodcastRepository {
       /// 3. Save to db
       podcastBox.put(podcastWithEpisodesSubscribed);
 
-      /// 4. Success. Return obj of type PodcastEntity
-      return podcastWithEpisodesSubscribed;
+      /// 4. Success.
+      return true;
     } catch (e) {
-      /// 4. Error. Return error message of type String
-      return e.toString();
+      /// 4. Error.
+      return false;
     }
   }
 
   @override
-  Future<List<PodcastEntity>> unsubscribeFromPodcast(
-      PodcastEntity podcast) async {
+  Future<void> unsubscribeFromPodcast(PodcastEntity podcast) async {
     podcastBox.remove(podcast.id);
-    return await podcastDataSources.getSubscribedPodcasts() ?? [];
   }
 
   @override
@@ -108,13 +106,16 @@ class PodcastRepositoryImpl implements PodcastRepository {
     final List<EpisodeEntity> episodes =
         await episodeDataSources.fetchEpisodesByFeedId(podcast.pId);
     // Filter new episodes based on PodcastIndex episode id
-    final List<EpisodeEntity> newEpisodes =
-        episodes.where((episode) => !ids.contains(episode.eId)).toList()
-          ..sort((a, b) => a.datePublished.compareTo(b.datePublished));
+    final List<EpisodeEntity> newEpisodes = episodes
+        .where((episode) => !ids.contains(episode.eId))
+        .toList()
+      ..sort((a, b) => a.datePublished.compareTo(b.datePublished));
     //newEpisodes.insert(0, episode);
     podcast.episodes.insertAll(0, newEpisodes);
-    podcast.episodes
+    if(podcast.subscribed) {
+      podcast.episodes
         .applyToDb(); // applyToDb() updates relation only which is more efficient than box.put(object)
+    }
     return podcast;
   }
 }
