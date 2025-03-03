@@ -12,11 +12,11 @@ class PodcastUseCases {
     return podcastRepository.fetchPodcastsByKeywords(keyword);
   }
 
-  Future<dynamic> subscribeToPodcast(PodcastEntity podcast) async {
+  Future<bool> subscribeToPodcast(PodcastEntity podcast) async {
     return await podcastRepository.subscribeToPodcast(podcast);
   }
 
-  Future<List<PodcastEntity>> unsubscribeFromPodcast(PodcastEntity podcast) async {
+  Future<void> unsubscribeFromPodcast(PodcastEntity podcast) async {
     return podcastRepository.unsubscribeFromPodcast(podcast);
   }
 
