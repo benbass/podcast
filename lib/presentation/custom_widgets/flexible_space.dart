@@ -51,8 +51,7 @@ class FlexibleSpace extends StatelessWidget {
                   top: 12,
                   right: 12,
                   child: ElevatedButtonSubscribe(
-                    podcast: podcast!,
-                    navigate: false,
+                    navigate: false, podcast: podcast!,
                   ),
                 ),
             ],
