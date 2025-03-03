@@ -4,6 +4,7 @@ part of 'podcast_bloc.dart';
 sealed class PodcastEvent {}
 
 final class SubscribedPodcastsLoadingEvent extends PodcastEvent {}
+
 final class SubscribedPodcastsLoadedEvent extends PodcastEvent {}
 
 final class SearchPodcastsByKeywordProcessingEvent extends PodcastEvent {
@@ -12,6 +13,7 @@ final class SearchPodcastsByKeywordProcessingEvent extends PodcastEvent {
     required this.keyword,
   });
 }
+
 final class SearchPodcastsByKeywordSuccessEvent extends PodcastEvent {}
 
 final class FetchEpisodesForPodcastProcessingEvent extends PodcastEvent {
@@ -20,6 +22,7 @@ final class FetchEpisodesForPodcastProcessingEvent extends PodcastEvent {
     required this.podcast,
   });
 }
+
 final class FetchEpisodesForPodcastSuccessEvent extends PodcastEvent {}
 
 final class RefreshPodcastEpisodesProcessingEvent extends PodcastEvent {}
@@ -31,23 +34,8 @@ final class PodcastTappedEvent extends PodcastEvent {
   });
 }
 
-final class SubscribeToPodcastEvent extends PodcastEvent {
-  final PodcastEntity podcast;
-  SubscribeToPodcastEvent({
-    required this.podcast,
-  });
-}
-final class UnSubscribeFromPodcastEvent extends PodcastEvent {
-  final PodcastEntity podcast;
-  UnSubscribeFromPodcastEvent({
-    required this.podcast,
-  });
-}
+final class SubscribeToPodcastEvent extends PodcastEvent {}
 
-final class SubscriptionStateChangedEvent extends PodcastEvent {
-  final PodcastEntity podcast;
-  SubscriptionStateChangedEvent({
-    required this.podcast,
-  });
+final class UnSubscribeFromPodcastEvent extends PodcastEvent {}
 
-}
+final class PodcastsQueryResultUpdateEvent extends PodcastEvent {}
