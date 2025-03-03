@@ -19,7 +19,7 @@ class EpisodesListPage extends StatelessWidget {
         builder: (context, state) {
           // We make sure to sort episodes by datePublished in descending order
           // because database returns objects by id in ascending order.
-          final List<EpisodeEntity> episodes = state.podcast!.episodes..sort((a, b) => b.datePublished.compareTo(a.datePublished));
+          final List<EpisodeEntity> episodes = state.podcast != null ? (state.podcast!.episodes..sort((a, b) => b.datePublished.compareTo(a.datePublished)) ): [];
           return SafeArea(
             child: state.loading
                 ? const Center(child: CircularProgressIndicator())
@@ -53,8 +53,7 @@ class EpisodesListPage extends StatelessWidget {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       ElevatedButtonSubscribe(
-                                        podcast: state.podcast!,
-                                        navigate: true,
+                                        navigate: true, podcast: state.podcast!,
                                       ),
                                       const SizedBox(
                                         width: 30,
