@@ -56,11 +56,19 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
       if (!event.podcast.subscribed) {
         emit(state.copyWith(loading: true));
         try {
-          final PodcastEntity podcastWithEpisodes =
-              await podcastUseCases.fillPodcastWithEpisodes(event.podcast);
-          emit(state.copyWith(
-            podcast: podcastWithEpisodes,
-          ));
+          if (event.podcast.episodes.isEmpty) {
+            final PodcastEntity podcastWithEpisodes =
+                await podcastUseCases.fillPodcastWithEpisodes(event.podcast);
+            emit(state.copyWith(
+              podcast: podcastWithEpisodes,
+            ));
+          } else {
+            final PodcastEntity podcastWithEpisodes =
+                await podcastUseCases.refreshPodcastEpisodes(state.podcast!);
+            emit(state.copyWith(
+              podcast: podcastWithEpisodes,
+            ));
+          }
           add(FetchEpisodesForPodcastSuccessEvent());
         } catch (e) {
           emit(PodcastState.error(
@@ -76,7 +84,8 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
 
     on<RefreshPodcastEpisodesProcessingEvent>((event, emit) async {
       emit(state.copyWith(loading: true));
-      PodcastEntity podcast = await podcastUseCases.refreshPodcastEpisodes(state.podcast!);
+      PodcastEntity podcast =
+          await podcastUseCases.refreshPodcastEpisodes(state.podcast!);
       emit(state.copyWith(
         podcast: podcast,
       ));
@@ -88,85 +97,86 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     });
 
     on<SubscribeToPodcastEvent>((event, emit) async {
-      emit(state.copyWith(podcast: event.podcast));
-
       /// Check if podcast is already subscribed
       // key = podcast pId, value = 0  (we need only the key for the check)
       Map<int, int> podcastPIdMap = {};
       for (PodcastEntity podcast in state.subscribedPodcasts) {
         podcastPIdMap[podcast.pId] = 0;
       }
-      if (podcastPIdMap.containsKey(event.podcast.pId)) {
+      if (podcastPIdMap.containsKey(state.podcast!.pId)) {
         // If key exists, podcast is already subscribed
         emit(PodcastState.error(
             message:
-                'You already subscribed to the podcast: ${event.podcast.title}'));
+                'You already subscribed to the podcast: ${state.podcast!.title}'));
       } else {
-        var obj = await podcastUseCases.subscribeToPodcast(event.podcast);
-        if (obj is PodcastEntity) {
-          emit(state.copyWith(
-              subscribedPodcasts: [...state.subscribedPodcasts, obj]));
-          add(SubscriptionStateChangedEvent(podcast: obj));
+        bool objectIsSaved =
+            await podcastUseCases.subscribeToPodcast(state.podcast!);
+        if (objectIsSaved) {
+          // Saving to db was successful
+          // We get the list of subscribed podcasts from db
+          List<PodcastEntity> subscribedPodcasts =
+              await podcastUseCases.getSubscribedPodcasts();
+          // We emit the new states with last subscribed podcast from the list
+          emit(state.copyWith(subscribedPodcasts: [
+            ...state.subscribedPodcasts,
+            subscribedPodcasts.last
+          ], podcast: subscribedPodcasts.last));
+          // We update the list from the query result, if any, so list item will be correctly displayed as subscribed
+          add(PodcastsQueryResultUpdateEvent());
         } else {
-          emit(PodcastState.error(
-              message: 'Failed to subscribe to podcast. Error: $obj'));
+          emit(PodcastState.error(message: 'Failed to subscribe to podcast.'));
         }
       }
     });
 
     on<UnSubscribeFromPodcastEvent>((event, emit) async {
-      PodcastEntity unsubscribedPodcast = event.podcast;
-      emit(state.copyWith(podcast: unsubscribedPodcast));
+      emit(state.copyWith(loading: true));
       try {
-        // Remove from db and get updated list of subscribed podcasts
-        List<PodcastEntity> subscribedPodcasts =
-            await podcastUseCases.unsubscribeFromPodcast(unsubscribedPodcast);
-        // emit state
+        await podcastUseCases.unsubscribeFromPodcast(state.podcast!);
+        List<PodcastEntity> subscribedPodcasts = state.subscribedPodcasts;
+        subscribedPodcasts
+            .removeWhere((element) => element.pId == state.podcast!.pId);
         emit(state.copyWith(
           subscribedPodcasts: subscribedPodcasts,
+          podcast: state.podcast!.copyWith(subscribed: false),
+          loading: false,
         ));
-
-        add(SubscriptionStateChangedEvent(
-            podcast: unsubscribedPodcast.copyWith(subscribed: false)));
+        add(PodcastsQueryResultUpdateEvent());
       } catch (e) {
         emit(PodcastState.error(
             message:
-                'Failed to unsubscribe from podcast: ${event.podcast.title}'));
+                'Failed to unsubscribe from podcast: ${state.podcast!.title}'));
       }
     });
 
-    on<SubscriptionStateChangedEvent>((event, emit) async {
+    on<PodcastsQueryResultUpdateEvent>((event, emit) async {
       List<PodcastEntity> podcastsQueryResult = state.podcastsQueryResult;
 
       // Replace object in query result, only if object is in query result
       Future<List<PodcastEntity>> updatedQueryResult() async {
         if (podcastsQueryResult.isNotEmpty) {
-          // Create a map to store the API podcastIndex ids (pId)
+          // Create a map to store the API podcastIndex ids (pId) as keys
           Map<int, int> map = {};
           for (PodcastEntity podcast in podcastsQueryResult) {
             map[podcast.pId] = 0;
           }
           // Check if object is in map
-          if (map.containsKey(event.podcast.pId)) {
+          if (map.containsKey(state.podcast!.pId)) {
             // find index of object in query result
             final int index = podcastsQueryResult
-                .indexWhere((element) => element.pId == event.podcast.pId);
+                .indexWhere((element) => element.pId == state.podcast!.pId);
+
             // Remove old object from query result
             podcastsQueryResult.removeAt(index);
             // Insert new object in query result
-            podcastsQueryResult.insert(index, event.podcast);
+            // the state of the new object (subscribed or not) was already set in the SubscribeToPodcastEvent or UnSubscribeFromPodcastEvent
+            podcastsQueryResult.insert(index, state.podcast!);
           }
         }
-
         return podcastsQueryResult;
       }
 
-      // Update query result
-      List<PodcastEntity> updatedList = await updatedQueryResult();
-
-      emit(state.copyWith(
-        podcastsQueryResult: updatedList,
-      ));
+      await updatedQueryResult();
     });
   }
 }
