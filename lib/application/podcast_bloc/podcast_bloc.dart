@@ -132,13 +132,15 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     on<UnSubscribeFromPodcastEvent>((event, emit) async {
       emit(state.copyWith(loading: true));
       try {
+        // We want to keep this podcast with all its episodes in case user navigates back to the episode list
+        PodcastEntity unsubscribedPodcast = state.podcast!.copyWith(subscribed: false)..episodes.addAll(state.podcast!.episodes);
         await podcastUseCases.unsubscribeFromPodcast(state.podcast!);
         List<PodcastEntity> subscribedPodcasts = state.subscribedPodcasts;
         subscribedPodcasts
             .removeWhere((element) => element.pId == state.podcast!.pId);
         emit(state.copyWith(
           subscribedPodcasts: subscribedPodcasts,
-          podcast: state.podcast!.copyWith(subscribed: false),
+          podcast: unsubscribedPodcast,
           loading: false,
         ));
         add(PodcastsQueryResultUpdateEvent());
