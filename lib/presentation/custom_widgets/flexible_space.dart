@@ -5,6 +5,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
+import 'package:podcast/presentation/custom_widgets/play_button.dart';
 
 import '../../helpers/core/image_provider.dart';
 import '../../helpers/player/audiohandler.dart';
@@ -14,17 +15,16 @@ import '../audioplayer_overlays/audioplayer_overlays.dart';
 /// This widget displays details about a selected podcast or episode,
 /// depending on which entity (podcast or episode) is provided.
 class FlexibleSpace extends StatelessWidget {
-  final PodcastEntity? podcast; // If null, widget displays episode details.
+  final PodcastEntity podcast; // If null, widget displays episode details.
   final EpisodeEntity? episode; // If null, widget displays podcast details.
   final String title;
 
   const FlexibleSpace({
     super.key,
-    this.podcast,
+    required this.podcast,
     this.episode,
     required this.title,
-  }) : assert(podcast != null || episode != null,
-            'Either podcast or episode must be provided.');
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +46,22 @@ class FlexibleSpace extends StatelessWidget {
             children: [
               _buildBackgroundImage(imageUrl),
               _buildGradientOverlay(),
-              if (podcast != null)
+              if (episode == null)
                 Positioned(
                   top: 12,
                   right: 12,
                   child: ElevatedButtonSubscribe(
-                    navigate: false, podcast: podcast!,
+                    navigate: false, podcast: podcast,
+                  ),
+                ),
+              if (episode != null)
+                Positioned(
+                  bottom: 0,
+                  right: 12,
+                  child: PlayButton(
+                    episode: episode!,
+                    podcast: podcast,
+                    podcastTitle: title,
                   ),
                 ),
             ],
@@ -68,10 +78,9 @@ class FlexibleSpace extends StatelessWidget {
   String _getImageUrl() {
     if (episode != null) {
       return episode!.image;
-    } else if (podcast != null) {
-      return podcast!.artwork;
+    } else if (episode == null) {
+      return podcast.artwork;
     } else {
-      // This should ideally never happen due to the assertion in the constructor.
       return '';
     }
   }
@@ -137,7 +146,7 @@ class FlexibleSpace extends StatelessWidget {
               if (audioHandler.player.processingState ==
                       ProcessingState.ready &&
                   overlayEntry == null) {
-                showOverlayPlayerMin(context, episode!, title);
+                showOverlayPlayerMin(context, episode!, podcast, title);
               }
             }
             Navigator.of(context).pop();
