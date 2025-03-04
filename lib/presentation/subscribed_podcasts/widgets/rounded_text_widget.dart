@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 class RoundedTextWidget extends StatelessWidget {
   final String text;
   final Color backgroundColor;
-  final double fontSize;
+  //final double fontSize;
   final double paddingValue;
 
   const RoundedTextWidget({
     super.key,
     required this.text,
-    this.backgroundColor = const Color(0xFF3B1734),
-    this.fontSize = 13.0,
+    this.backgroundColor = const Color(0xFFB2E92E),
+    //this.fontSize = 13.0,
     this.paddingValue = 5.0,
   });
 
@@ -27,10 +27,10 @@ class RoundedTextWidget extends StatelessWidget {
         padding: EdgeInsets.all(paddingValue), // Dynamisches Padding
         child: Text(
           text,
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.bold
-          ),
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                color: const Color(0xFF202531),
+            fontWeight: FontWeight.bold,
+              ),
           textAlign: TextAlign.center,
         ),
       ),
