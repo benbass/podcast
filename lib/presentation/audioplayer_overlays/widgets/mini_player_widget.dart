@@ -3,6 +3,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
 
 import '../../../domain/entities/episode_entity.dart';
+import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/core/image_provider.dart';
 import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
@@ -12,11 +13,11 @@ import '../audioplayer_overlays.dart';
 
 class MiniPlayerWidget extends StatelessWidget {
   final EpisodeEntity episode;
-  final String podcastTitle;
+  final PodcastEntity podcast;
   const MiniPlayerWidget({
     super.key,
     required this.episode,
-    required this.podcastTitle,
+    required this.podcast,
   });
 
   final double kPlayerHeight = 80.0;
@@ -39,7 +40,7 @@ class MiniPlayerWidget extends StatelessWidget {
                   SlideRouteWithCurve(
                     page: EpisodeDetailsPage(
                       episode: episode,
-                      podcastTitle: podcastTitle,
+                      podcast: podcast,
                     ),
                   ),
                 );
@@ -76,7 +77,7 @@ class MiniPlayerWidget extends StatelessWidget {
                         height: 20,
                         width: MediaQuery.of(context).size.width - 170,
                         child: Text(
-                          podcastTitle,
+                          podcast.title,
                         ),
                       ),
                       StreamBuilder<Duration>(
