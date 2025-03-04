@@ -38,7 +38,7 @@ class EpisodeMetadata extends StatelessWidget {
         const Spacer(),
         Row(
           children: [
-            Icon(episode.favorite ? Icons.favorite_rounded : Icons.favorite_border_rounded),
+            Icon(episode.favorite ? Icons.favorite_rounded : null),
             Icon(
               episode.read == true
                   ? Icons.check_circle_outline_rounded
