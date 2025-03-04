@@ -28,7 +28,7 @@ class EpisodeCard extends StatelessWidget {
               : const AssetImage('assets/placeholder.png');
           return Card(
           key: ValueKey(item.eId),
-          color: themeData.colorScheme.secondary,
+          color: themeData.colorScheme.primaryContainer,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
@@ -102,11 +102,13 @@ class EpisodeCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             softWrap: true,
                             maxLines: 2,
+                            style: Theme.of(context).textTheme.displayMedium,
                           ),
                           Text(
                             formatTimestamp(
                               item.datePublished,
                             ),
+                            style: Theme.of(context).textTheme.displayMedium,
                           ),
                         ],
                       ),
