@@ -12,11 +12,11 @@ import '../audioplayer_overlays.dart';
 
 class MiniPlayerWidget extends StatelessWidget {
   final EpisodeEntity episode;
-  final String title;
+  final String podcastTitle;
   const MiniPlayerWidget({
     super.key,
     required this.episode,
-    required this.title,
+    required this.podcastTitle,
   });
 
   final double kPlayerHeight = 80.0;
@@ -39,7 +39,7 @@ class MiniPlayerWidget extends StatelessWidget {
                   SlideRouteWithCurve(
                     page: EpisodeDetailsPage(
                       episode: episode,
-                      title: title,
+                      podcastTitle: podcastTitle,
                     ),
                   ),
                 );
@@ -76,7 +76,7 @@ class MiniPlayerWidget extends StatelessWidget {
                         height: 20,
                         width: MediaQuery.of(context).size.width - 170,
                         child: Text(
-                          title,
+                          podcastTitle,
                         ),
                       ),
                       StreamBuilder<Duration>(

@@ -12,11 +12,11 @@ class PlayButton extends StatelessWidget {
   const PlayButton({
     super.key,
     required this.episode,
-    required this.title,
+    required this.podcastTitle,
   });
 
   final EpisodeEntity episode;
-  final String title;
+  final String podcastTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +54,7 @@ class PlayButton extends StatelessWidget {
                             .setPlaybackEpisodeUrl(
                             episode.enclosureUrl);
                         showOverlayPlayerMin(context,
-                            episode, title);
+                            episode, podcastTitle);
                       }
                     } on PlayerException {
                       if (context.mounted) {

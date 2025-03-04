@@ -24,7 +24,7 @@ void showOverlayPlayerMin(
       context,
       child: MiniPlayerWidget(
         episode: episode,
-        title: title,
+        podcastTitle: title,
       ));
 
   overlayState!.insert(overlayEntry!);

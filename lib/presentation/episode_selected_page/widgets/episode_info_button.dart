@@ -25,7 +25,7 @@ class EpisodeInfoButton extends StatelessWidget {
           SizeRoute(
             page: EpisodeDetailsPage(
               episode: episode,
-              title: podcast.title,
+              podcastTitle: podcast.title,
             ),
           ),
         );
