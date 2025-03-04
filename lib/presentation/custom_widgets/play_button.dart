@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart';
 
 import '../../application/episode_playback_url/episode_playback_url_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
+import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
@@ -12,10 +13,12 @@ class PlayButton extends StatelessWidget {
   const PlayButton({
     super.key,
     required this.episode,
+    required this.podcast,
     required this.podcastTitle,
   });
 
   final EpisodeEntity episode;
+  final PodcastEntity podcast;
   final String podcastTitle;
 
   @override
@@ -54,7 +57,7 @@ class PlayButton extends StatelessWidget {
                             .setPlaybackEpisodeUrl(
                             episode.enclosureUrl);
                         showOverlayPlayerMin(context,
-                            episode, podcastTitle);
+                            episode, podcast, podcastTitle);
                       }
                     } on PlayerException {
                       if (context.mounted) {
