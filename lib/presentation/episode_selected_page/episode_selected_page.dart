@@ -61,7 +61,7 @@ class EpisodeSelectedPage extends StatelessWidget {
                       ),
                       PlayButton(
                         episode: episode,
-                        title: podcast.title,
+                        podcastTitle: podcast.title,
                       ),
                     ],
                   ),
@@ -93,7 +93,7 @@ class EpisodeSelectedPage extends StatelessWidget {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         icon: const Icon(
-                          Icons.favorite,
+                          Icons.more_horiz_rounded,
                         ),
                       ),
                     ),
