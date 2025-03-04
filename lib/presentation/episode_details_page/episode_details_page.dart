@@ -14,12 +14,12 @@ import '../custom_widgets/play_button.dart';
 
 class EpisodeDetailsPage extends StatelessWidget {
   final EpisodeEntity episode;
-  final String title;
+  final String podcastTitle;
 
   const EpisodeDetailsPage({
     super.key,
     required this.episode,
-    required this.title,
+    required this.podcastTitle,
   });
 
   @override
@@ -38,7 +38,7 @@ class EpisodeDetailsPage extends StatelessWidget {
         if (getItI<MyAudioHandler>().player.processingState ==
                 ProcessingState.ready &&
             overlayEntry == null) {
-          showOverlayPlayerMin(context, episode, title);
+          showOverlayPlayerMin(context, episode, podcastTitle);
         }
         // We don't pop immediately (it causes an exception): we use a scheduler
         SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -55,7 +55,7 @@ class EpisodeDetailsPage extends StatelessWidget {
                   FlexibleSpace(
                     podcast: null,
                     episode: episode,
-                    title: title,
+                    title: episode.title,
                   ),
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
@@ -64,6 +64,9 @@ class EpisodeDetailsPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(formatTimestamp(episode.datePublished)),
+                          Icon(!episode.favorite
+                              ? Icons.favorite_rounded
+                              : null),
                           Text(episode.duration! == 0
                               ? ""
                               : formatIntDuration(episode.duration!)),
@@ -81,7 +84,7 @@ class EpisodeDetailsPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -100,7 +103,7 @@ class EpisodeDetailsPage extends StatelessWidget {
                     right: 0,
                     child: PlayButton(
                       episode: episode,
-                      title: title,
+                      podcastTitle: podcastTitle,
                     ),
                   ),
           ],
