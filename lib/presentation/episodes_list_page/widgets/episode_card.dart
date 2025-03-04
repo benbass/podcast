@@ -5,7 +5,8 @@ import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/format_pubdate_string.dart';
 import '../../../helpers/core/image_provider.dart';
 import '../../custom_widgets/page_transition.dart';
-import '../../episode_selected_page/episode_selected_page.dart';
+import '../../episode_details_page/episode_details_page.dart';
+
 
 class EpisodeCard extends StatelessWidget {
   const EpisodeCard({
@@ -44,7 +45,7 @@ class EpisodeCard extends StatelessWidget {
                   Navigator.push(
                     context,
                     SizeRoute(
-                      page: EpisodeSelectedPage(
+                      page: EpisodeDetailsPage(
                         episode: item,
                         podcast: podcast,
                       ),
