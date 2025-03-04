@@ -4,13 +4,13 @@ class AppTheme {
   AppTheme._();
 
   static const Color _primaryColor = Color(0xFFCBD4C2);
-  static const Color _primaryVariantColor = Color(0xFF1C0B19);
-  static const Color _onPrimaryColor = Color(0xFF3B1734);
+  static const Color _primaryVariantColor = Color(0xFF202531);
+  static const Color _onPrimaryColor = Color(0xFFB2E92E);
 
-  static const Color _appbarColor = Color(0xFF1C0B19);
+  static const Color _appbarColor = Color(0xFF202531);
   static const Color _textColor = Color(0xFFCBD4C2);
-  static const Color _iconColor = Color(0xFFCBD4C2);
-  static const Color _accentColor = Color(0xFF3B1734);
+  static const Color _iconColor = Color(0xFFB2E92E);
+  static const Color _accentColor = Color(0xFFB2E92E);
 
   // https://fonts.google.com/specimen/Montserrat
   static const TextStyle _headingText = TextStyle(
@@ -40,7 +40,11 @@ class AppTheme {
   );
 
   static final TextStyle _displayMediumText = _bodyTextMedium.copyWith(
-    color: _primaryVariantColor,
+    color: _textColor,
+    fontSize: 16,
+    fontVariations: <FontVariation>[
+      const FontVariation('wght', 600),
+    ],
   );
 
   static final TextStyle _appBarText = _headingText.copyWith(
@@ -125,5 +129,6 @@ class AppTheme {
       ),
     ),
     listTileTheme: const ListTileThemeData(textColor: _textColor),
+    progressIndicatorTheme: const ProgressIndicatorThemeData(color: _accentColor),
   );
 }
