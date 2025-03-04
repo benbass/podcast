@@ -22,7 +22,7 @@ class PodcastDetailsPage extends StatelessWidget {
                   child: CustomScrollView(
                     slivers: [
                       FlexibleSpace(
-                        podcast: state.podcast,
+                        podcast: state.podcast!,
                         episode: null,
                         title: state.podcast!.title,
                       ),
