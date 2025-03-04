@@ -4,27 +4,29 @@ import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/presentation/episode_details_page/widgets/player_controls.dart';
 
+import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/core/format_duration.dart';
 import '../../helpers/core/format_pubdate_string.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
 import '../custom_widgets/flexible_space.dart';
-import '../custom_widgets/play_button.dart';
+import 'widgets/podcast_website_link.dart';
 
 class EpisodeDetailsPage extends StatelessWidget {
   final EpisodeEntity episode;
-  final String podcastTitle;
+  final PodcastEntity podcast;
 
   const EpisodeDetailsPage({
     super.key,
     required this.episode,
-    required this.podcastTitle,
+    required this.podcast,
   });
 
   @override
   Widget build(BuildContext context) {
-    bool isPlayerReady = getItI<MyAudioHandler>().player.processingState == ProcessingState.ready ||
+    bool isPlayerReady = getItI<MyAudioHandler>().player.processingState ==
+            ProcessingState.ready ||
         getItI<MyAudioHandler>().player.playing;
 
     // We wrap this widget in PopScope so we can apply a method on the OS back-button
@@ -38,7 +40,7 @@ class EpisodeDetailsPage extends StatelessWidget {
         if (getItI<MyAudioHandler>().player.processingState ==
                 ProcessingState.ready &&
             overlayEntry == null) {
-          showOverlayPlayerMin(context, episode, podcastTitle);
+          showOverlayPlayerMin(context, episode, podcast, podcast.title);
         }
         // We don't pop immediately (it causes an exception): we use a scheduler
         SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -53,7 +55,7 @@ class EpisodeDetailsPage extends StatelessWidget {
                 physics: const BouncingScrollPhysics(),
                 slivers: [
                   FlexibleSpace(
-                    podcast: null,
+                    podcast: podcast,
                     episode: episode,
                     title: episode.title,
                   ),
@@ -64,12 +66,25 @@ class EpisodeDetailsPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(formatTimestamp(episode.datePublished)),
-                          Icon(!episode.favorite
-                              ? Icons.favorite_rounded
-                              : null),
-                          Text(episode.duration! == 0
-                              ? ""
-                              : formatIntDuration(episode.duration!)),
+                          Icon(
+                            episode.read
+                                ? Icons.check_circle_outline_rounded
+                                : null,
+                            //color: Colors.black,
+                          ),
+                          Icon(
+                            episode.filePath != null ? Icons.file_download : null,
+                          ),
+                          Icon(
+                            episode.favorite ? Icons.favorite_rounded : null,
+                          ),
+                          Text(
+                            episode.duration! == 0
+                                ? ""
+                                : formatIntDuration(
+                                    episode.duration!,
+                                  ),
+                          ),
                         ],
                       ),
                     ),
@@ -77,11 +92,25 @@ class EpisodeDetailsPage extends StatelessWidget {
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 170.0),
                     sliver: SliverToBoxAdapter(
-                      child: Text(
-                        episode.description,
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            episode.description,
+                            style: const TextStyle(
+                              fontSize: 16.0,
+                            ),
+                          ),
+                          const SizedBox(height: 16.0),
+                          if (episode.episodeNr != 0) ...[
+                            Text(
+                                "${episode.episodeNr}/${podcast.episodeCount}"),
+                            const SizedBox(height: 16.0),
+                          ],
+                          if (podcast.link.isNotEmpty &&
+                              podcast.link.contains('://'))
+                            PodcastWebsiteLink(podcast: podcast),
+                        ],
                       ),
                     ),
                   ),
@@ -97,15 +126,7 @@ class EpisodeDetailsPage extends StatelessWidget {
                       episode: episode,
                     ),
                   )
-                : Positioned(
-                    bottom: MediaQuery.of(context).padding.bottom,
-                    left: 0,
-                    right: 0,
-                    child: PlayButton(
-                      episode: episode,
-                      podcastTitle: podcastTitle,
-                    ),
-                  ),
+                : const SizedBox(),
           ],
         ),
       ),
