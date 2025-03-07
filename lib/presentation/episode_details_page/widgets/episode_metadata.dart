@@ -29,7 +29,7 @@ class EpisodeMetadata extends StatelessWidget {
         Text(
           episode.duration! == 0
               ? ""
-              : formatIntDuration(episode.duration!),
+              : intToDurationFormatted(episode.duration!),
           style: const TextStyle(
             fontSize: 14.0,
             fontWeight: FontWeight.bold,
