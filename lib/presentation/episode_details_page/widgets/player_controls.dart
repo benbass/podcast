@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/presentation/episode_details_page/widgets/playback_position_slider.dart';
 
-import '../../../application/episode_playback_url/episode_playback_url_cubit.dart';
+import '../../../application/episode_playback/episode_playback_cubit.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
@@ -12,10 +12,7 @@ import '../../audioplayer_overlays/audioplayer_overlays.dart';
 class PlayerControls extends StatelessWidget {
   const PlayerControls({
     super.key,
-    required this.episode,
   });
-
-  final EpisodeEntity episode;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +23,15 @@ class PlayerControls extends StatelessWidget {
       child: Center(
         child: Column(
           children: [
-            PlaybackPositionSlider(episode: episode),
+            BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
+              builder: (context, state) {
+                if (state != null) {
+                  return PlaybackPositionSlider(episode: state);
+                } else {
+                  return const SizedBox.shrink();
+                }
+              },
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Row(
@@ -53,8 +58,8 @@ class PlayerControls extends StatelessWidget {
                       Navigator.of(context).pop();
                       getItI<MyAudioHandler>().stop().then((_) {
                         if (context.mounted) {
-                          BlocProvider.of<EpisodePlaybackUrlCubit>(context)
-                              .setPlaybackEpisodeUrl("");
+                          BlocProvider.of<EpisodePlaybackCubit>(context)
+                              .setPlaybackEpisode(null);
                           removeOverlay();
                         }
                       });
