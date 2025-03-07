@@ -13,10 +13,11 @@ import 'package:podcast/domain/entities/podcast_entity.dart';
 
 import 'package:podcast/presentation/homepage/homepage.dart';
 import 'package:podcast/theme.dart';
-import 'application/episode_playback_url/episode_playback_url_cubit.dart';
+import 'application/episode_playback/episode_playback_cubit.dart';
 import 'application/podcast_bloc/podcast_bloc.dart';
 import 'core/globals.dart';
 import 'core/objectbox.dart';
+import 'helpers/core/lifecycle_oberserver.dart';
 import 'injection.dart' as di;
 import 'injection.dart';
 import 'helpers/notifications/initialize_awesome_notifications.dart';
@@ -32,8 +33,12 @@ void main() async {
   episodeBox = objectBox.store.box<EpisodeEntity>();
 
 
-  // Initialize the audio handler and audio service.
+  // Initialize the audio handler
   final audioHandler = MyAudioHandler();
+  // Initialize the lifecycle observer
+  final observer = MyAppLifecycleObserver();
+  WidgetsBinding.instance.addObserver(observer);
+  // Initialize Awesome Notifications
   initAwesomeNotifications(audioHandler);
 
   // Design status and bottom bar
@@ -51,7 +56,7 @@ void main() async {
       MultiBlocProvider(
         providers: [
           BlocProvider(
-              create: (BuildContext context) => EpisodePlaybackUrlCubit()),
+              create: (BuildContext context) => EpisodePlaybackCubit()),
           BlocProvider(create: (BuildContext context) => getItI<PodcastBloc>()..add(SubscribedPodcastsLoadingEvent())),
           //BlocProvider(create: (BuildContext context) => getItI<EpisodesBloc>()),
         ],
