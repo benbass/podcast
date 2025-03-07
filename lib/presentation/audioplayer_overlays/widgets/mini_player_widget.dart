@@ -9,7 +9,6 @@ import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../../episode_details_page/episode_details_page.dart';
-import '../audioplayer_overlays.dart';
 
 class MiniPlayerWidget extends StatelessWidget {
   final EpisodeEntity episode;
@@ -35,7 +34,7 @@ class MiniPlayerWidget extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                removeOverlay();
+                //removeOverlay();
                 Navigator.of(context).push(
                   SlideRouteWithCurve(
                     page: EpisodeDetailsPage(
@@ -94,8 +93,8 @@ class MiniPlayerWidget extends StatelessWidget {
                               width: MediaQuery.of(context).size.width - 170,
                               child: LinearProgressIndicator(
                                 value: progress.clamp(0.0, 1.0),
-                                //color: Colors.white,
-                                //backgroundColor: Colors.green,
+                                backgroundColor: const Color(0xFFCBD4C2),
+                                color: const Color(0xFF202531),
                               ),
                             );
                           } else if (snapshot.hasError) {
