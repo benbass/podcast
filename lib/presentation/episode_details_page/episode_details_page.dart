@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/presentation/episode_details_page/widgets/player_controls.dart';
 
+import '../../application/episode_playback/episode_playback_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/core/format_duration.dart';
 import '../../helpers/core/format_pubdate_string.dart';
@@ -25,10 +27,6 @@ class EpisodeDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isPlayerReady = getItI<MyAudioHandler>().player.processingState ==
-            ProcessingState.ready ||
-        getItI<MyAudioHandler>().player.playing;
-
     // We wrap this widget in PopScope so we can apply a method on the OS back-button
     // where we rebuild the overlay!
     return PopScope(
@@ -47,88 +45,98 @@ class EpisodeDetailsPage extends StatelessWidget {
           Navigator.of(context).pop();
         });
       },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            SafeArea(
-              child: CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  FlexibleSpace(
-                    podcast: podcast,
-                    episode: episode,
-                    title: episode.title,
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
-                    sliver: SliverToBoxAdapter(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(formatTimestamp(episode.datePublished)),
-                          Icon(
-                            episode.read
-                                ? Icons.check_circle_outline_rounded
-                                : null,
-                            //color: Colors.black,
-                          ),
-                          Icon(
-                            episode.filePath != null ? Icons.file_download : null,
-                          ),
-                          Icon(
-                            episode.favorite ? Icons.favorite_rounded : null,
-                          ),
-                          Text(
-                            episode.duration! == 0
-                                ? ""
-                                : formatIntDuration(
-                                    episode.duration!,
-                                  ),
-                          ),
-                        ],
+      child: BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
+        builder: (context, state) {
+          state != null && state.eId == episode.eId ? removeOverlay() : null;
+          return Scaffold(
+            body: Stack(
+              children: [
+                SafeArea(
+                  child: CustomScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      FlexibleSpace(
+                        podcast: podcast,
+                        episode: episode,
+                        title: episode.title,
                       ),
-                    ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 170.0),
-                    sliver: SliverToBoxAdapter(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            episode.description,
-                            style: const TextStyle(
-                              fontSize: 16.0,
-                            ),
+                      SliverPadding(
+                        padding:
+                            const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+                        sliver: SliverToBoxAdapter(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(formatTimestamp(episode.datePublished)),
+                              Icon(
+                                episode.read
+                                    ? Icons.check_circle_outline_rounded
+                                    : null,
+                                //color: Colors.black,
+                              ),
+                              Icon(
+                                episode.filePath != null
+                                    ? Icons.file_download
+                                    : null,
+                              ),
+                              Icon(
+                                episode.favorite
+                                    ? Icons.favorite_rounded
+                                    : null,
+                              ),
+                              Text(
+                                episode.duration! == 0
+                                    ? ""
+                                    : intToDurationFormatted(
+                                        episode.duration!,
+                                      ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 16.0),
-                          if (episode.episodeNr != 0) ...[
-                            Text(
-                                "${episode.episodeNr}/${podcast.episodeCount}"),
-                            const SizedBox(height: 16.0),
-                          ],
-                          if (podcast.link.isNotEmpty &&
-                              podcast.link.contains('://'))
-                            PodcastWebsiteLink(podcast: podcast),
-                        ],
+                        ),
                       ),
-                    ),
+                      SliverPadding(
+                        padding:
+                            const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 170.0),
+                        sliver: SliverToBoxAdapter(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                episode.description,
+                                style: const TextStyle(
+                                  fontSize: 16.0,
+                                ),
+                              ),
+                              const SizedBox(height: 16.0),
+                              if (episode.episodeNr != 0) ...[
+                                Text(
+                                    "${episode.episodeNr}/${podcast.episodeCount}"),
+                                const SizedBox(height: 16.0),
+                              ],
+                              if (podcast.link.isNotEmpty &&
+                                  podcast.link.contains('://'))
+                                PodcastWebsiteLink(podcast: podcast),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            isPlayerReady
-                ? Positioned(
+                ),
+                Visibility(
+                  visible: state != null && state.eId == episode.eId,
+                  child: Positioned(
                     bottom: MediaQuery.of(context).padding.bottom,
                     left: 0,
                     right: 0,
-                    child: PlayerControls(
-                      episode: episode,
-                    ),
-                  )
-                : const SizedBox(),
-          ],
-        ),
+                    child: const PlayerControls(),
+                  ),
+                )
+              ],
+            ),
+          );
+        },
       ),
     );
   }
