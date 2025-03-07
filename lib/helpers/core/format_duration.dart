@@ -1,5 +1,5 @@
 // We transform the seconds to hh:mm:ss or mm:ss
-String formatIntDuration(int seconds) {
+String intToDurationFormatted(int seconds) {
   final duration = Duration(seconds: seconds);
   String twoDigits(int n) => n.toString().padLeft(2, "0");
   String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
@@ -33,7 +33,7 @@ String durationToSeconds(String durationString) {
 }
 
 // Just remove the milliseconds from duration for string in text widget
-String removeMillisecondsFromDuration(Duration duration) {
+String durationWithMillisecondsRemovedFormatted(Duration duration) {
   String twoDigits(int n) => n.toString().padLeft(2, "0");
   String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
   String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
@@ -44,7 +44,7 @@ String removeMillisecondsFromDuration(Duration duration) {
   }
 }
 
-String formatRemainingDuration(Duration duration) {
+String remainingDurationFormatted(Duration duration) {
   String twoDigits(int n) => n.toString().padLeft(2, "0");
   String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
   String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
