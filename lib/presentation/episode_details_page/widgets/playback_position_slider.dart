@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/format_duration.dart';
 import '../../../helpers/player/audiohandler.dart';
@@ -20,10 +19,10 @@ class PlaybackPositionSlider extends StatelessWidget {
       builder: (context, snapshot) {
         final position = snapshot.data ?? Duration.zero;
         final Duration totalDuration =
-        Duration(seconds: episode.duration!);
+        Duration(seconds: episode.duration ?? 0);
         final Duration remainingDuration = totalDuration - position;
         String formattedRemainingDuration =
-        formatRemainingDuration(remainingDuration);
+        remainingDurationFormatted(remainingDuration);
         return Column(
           children: [
             Slider(
@@ -47,7 +46,7 @@ class PlaybackPositionSlider extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    removeMillisecondsFromDuration(position),
+                    durationWithMillisecondsRemovedFormatted(position),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
