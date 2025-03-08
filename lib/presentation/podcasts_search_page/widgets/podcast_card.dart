@@ -24,7 +24,7 @@ class PodcastCard extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(color: podcast.subscribed ? Colors.grey : Colors.transparent, width: 3.0)
+            border: Border.all(color: podcast.subscribed ? Theme.of(context).colorScheme.secondary : Colors.transparent, width: 3.0)
           ),
           child: Stack(
             fit: StackFit.expand,
