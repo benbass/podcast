@@ -14,6 +14,19 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    // Listen for player state changes (e.g., playing, paused, buffering)
+    getItI<MyAudioHandler>().player.playerStateStream.listen((playerState) {
+      final processingState = playerState.processingState;
+
+      if( processingState == ProcessingState.completed){
+        getItI<MyAudioHandler>().stop();
+        removeOverlay();
+        BlocProvider.of<EpisodePlaybackCubit>(context)
+            .setPlaybackEpisode(null);
+      }
+    });
+
     void navigateToSubscribedPodcastsPage() {
       Navigator.push(
           context,
@@ -25,24 +38,12 @@ class HomePage extends StatelessWidget {
     Future.delayed(
         const Duration(seconds: 1), () => navigateToSubscribedPodcastsPage());
 
-    // We wrap the app in a just_audio stream builder so we can listen to player states whatever page is called
-    return StreamBuilder<ProcessingState>(
-        stream: getItI<MyAudioHandler>().myPlayerProcessingStateStream,
-        builder: (context, snapshot) {
-          final processingState = snapshot.data;
-          if (processingState == ProcessingState.completed) {
-            getItI<MyAudioHandler>().stop();
-            removeOverlay();
-            BlocProvider.of<EpisodePlaybackCubit>(context)
-                .setPlaybackEpisode(null);
-          }
-          return Center(
-            ///TODO: Replace with app logo
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Image.asset("assets/placeholder.png"),
-            ),
-          );
-        });
+    return Center(
+      ///TODO: Replace with app logo
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Image.asset("assets/placeholder.png"),
+      ),
+    );
   }
 }
