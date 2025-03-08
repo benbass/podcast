@@ -15,23 +15,6 @@ ProcessingState.completed: playback is completed
 class MyAudioHandler {
   final player = AudioPlayer(); // Instance of the JustAudio player.
 
-  ///
-  final StreamController<ProcessingState> _processingStateController =
-  StreamController<ProcessingState>.broadcast();
-
-  // We create our own stream that outputs the ProcessingState of the player.
-  // This allows us to call this stream from any widget whose context can be passed if required.
-  Stream<ProcessingState> get myPlayerProcessingStateStream =>
-      _processingStateController.stream;
-
-  MyAudioHandler() {
-    // Listen for player state changes (e.g., playing, paused, buffering)
-    player.playerStateStream.listen((playerState) {
-      final processingState = playerState.processingState;
-      _processingStateController.add(processingState);
-    });
-  }
-  ///
 /*
   MyAudioHandler() {
     // Listen for player state changes (e.g., playing, paused, buffering)
@@ -98,7 +81,6 @@ class MyAudioHandler {
   }
 
   void dispose() {
-    _processingStateController.close();
     player.dispose();
   }
 }
