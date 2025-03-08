@@ -31,6 +31,7 @@ class SlideBottomRoute extends PageRouteBuilder {
         );
 }
 
+/// That's the one!
 class ScaleRoute extends PageRouteBuilder {
   final Widget page;
   ScaleRoute({required this.page})
@@ -49,12 +50,12 @@ class ScaleRoute extends PageRouteBuilder {
           ) =>
               ScaleTransition(
             scale: Tween<double>(
-              begin: 0.0,
+              begin: 0.5,
               end: 1.0,
             ).animate(
               CurvedAnimation(
                 parent: animation,
-                curve: Curves.fastOutSlowIn,
+                curve: Curves.linearToEaseOut,
               ),
             ),
             child: child,
@@ -80,6 +81,7 @@ class SizeRoute extends PageRouteBuilder {
           ) =>
               Align(
             child: SizeTransition(
+              axis: Axis.horizontal,
               sizeFactor: animation,
               child: child,
             ),
@@ -87,7 +89,6 @@ class SizeRoute extends PageRouteBuilder {
         );
 }
 
-/// NEW transition to test
 class SlideRouteWithCurve extends PageRouteBuilder {
   final Widget page;
   SlideRouteWithCurve({
@@ -95,8 +96,8 @@ class SlideRouteWithCurve extends PageRouteBuilder {
     Duration duration = const Duration(milliseconds: 300),
     Duration reverseDuration = const Duration(milliseconds: 300),
   }) : super(
-          transitionDuration: duration,
-          reverseTransitionDuration: reverseDuration,
+          //transitionDuration: duration,
+          //reverseTransitionDuration: reverseDuration,
           pageBuilder: (
             context,
             animation,
