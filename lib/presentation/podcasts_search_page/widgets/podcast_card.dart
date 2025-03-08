@@ -23,14 +23,33 @@ class PodcastCard extends StatelessWidget {
           key: ValueKey(podcast.pId),
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: imageProvider,
-              fit: BoxFit.fitWidth,
-            ),
             borderRadius: BorderRadius.circular(10.0),
             border: Border.all(color: podcast.subscribed ? Colors.grey : Colors.transparent, width: 3.0)
           ),
-          child: snapshot.hasData ? const SizedBox() : Center(child: Text(podcast.title)),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: imageProvider,
+                    fit: BoxFit.fitWidth,
+                  ),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+              imageProvider == const AssetImage('assets/placeholder.png') ? Center(
+                child: Text(
+                  podcast.title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white, // Adjust text color as needed
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ) : const SizedBox(),
+            ],
+          ),
         );
       },
     );
