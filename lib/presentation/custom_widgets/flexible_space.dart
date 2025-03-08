@@ -45,7 +45,7 @@ class FlexibleSpace extends StatelessWidget {
           child: Stack(
             children: [
               _buildBackgroundImage(imageUrl),
-              _buildGradientOverlay(),
+              //_buildGradientOverlay(),
               if (episode == null)
                 Positioned(
                   top: 12,
