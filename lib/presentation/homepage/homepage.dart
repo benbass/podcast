@@ -30,7 +30,7 @@ class HomePage extends StatelessWidget {
     void navigateToSubscribedPodcastsPage() {
       Navigator.push(
           context,
-          SlideRouteWithCurve(
+          ScaleRoute(
             page: const SubscribedPodcastsPage(),
           ));
     }

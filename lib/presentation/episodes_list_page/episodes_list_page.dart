@@ -61,7 +61,7 @@ class EpisodesListPage extends StatelessWidget {
                                       IconButton(
                                         onPressed: () => Navigator.push(
                                             context,
-                                            SlideRouteWithCurve(
+                                            ScaleRoute(
                                               page: const PodcastDetailsPage(),
                                             )),
                                         icon: const Icon(

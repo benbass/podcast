@@ -80,7 +80,7 @@ class PodcastsSearchPage extends StatelessWidget {
             .add(PodcastTappedEvent(podcast: state.podcastsQueryResult[index]));
         Navigator.push(
           context,
-          SizeRoute(
+          ScaleRoute(
             page: const PodcastDetailsPage(),
           ),
         );

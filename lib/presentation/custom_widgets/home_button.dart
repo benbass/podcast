@@ -12,7 +12,7 @@ class MyHomeButton extends StatelessWidget {
       onPressed: () {
         Navigator.push(
           context,
-          SlideRouteWithCurve(
+          ScaleRoute(
             page: const SubscribedPodcastsPage(),
           ),
         );

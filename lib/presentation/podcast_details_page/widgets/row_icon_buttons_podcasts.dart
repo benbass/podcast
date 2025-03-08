@@ -33,7 +33,7 @@ class RowIconButtonsPodcasts extends StatelessWidget {
                 );
                 Navigator.push(
                   context,
-                  SlideRouteWithCurve(
+                  ScaleRoute(
                     page: Builder(builder: (context) {
                       return const EpisodesListPage();
                     }),
