@@ -21,27 +21,38 @@ class PodcastRepositoryImpl implements PodcastRepository {
   @override
   Future<bool> subscribeToPodcast(PodcastEntity podcast) async {
     try {
-      /// 1. Get the episodes for this podcast
-      final PodcastEntity podcastWithEpisodes =
-          await fillPodcastWithEpisodes(podcast);
+      // Determine if episodes need to be fetched.
+      final podcastWithEpisodes = podcast.episodes.isEmpty
+          ? await _fetchEpisodesIfMissing(podcast)
+          : podcast;
 
-      /// 2. Create podcast with subscribed flag == true AND list of episodes
-      // Note that we don't copyWith episodes: ObjectBox requires list to be filled with add or addAll method
-      final PodcastEntity podcastWithEpisodesSubscribed = podcastWithEpisodes
-          .copyWith(
-              subscribed: true,
-              unreadEpisodes: podcastWithEpisodes.episodes.length)
-        ..episodes.addAll(podcastWithEpisodes.episodes);
+      // Update the podcast.
+      final subscribedPodcast = _markPodcastAsSubscribed(podcastWithEpisodes);
 
-      /// 3. Save to db
-      podcastBox.put(podcastWithEpisodesSubscribed);
+      // Persist the updated podcast data.
+      podcastBox.put(subscribedPodcast);
 
-      /// 4. Success.
       return true;
     } catch (e) {
-      /// 4. Error.
+      //print("Error subscribing to podcast: $e");
       return false;
     }
+  }
+
+  /// Fetches episodes for a podcast if they are not already present.
+  Future<PodcastEntity> _fetchEpisodesIfMissing(PodcastEntity podcast) async {
+    final PodcastEntity podcastWithEpisodes =
+        await fillPodcastWithEpisodes(podcast);
+    return podcastWithEpisodes;
+  }
+
+  /// Marks a podcast as subscribed and updates the episodes with the unread episode count.
+  PodcastEntity _markPodcastAsSubscribed(PodcastEntity podcast) {
+    final PodcastEntity subscribedPodcast = podcast.copyWith(
+      subscribed: true,
+      unreadEpisodes: podcast.episodes.length,
+    )..episodes.addAll(podcast.episodes);
+    return subscribedPodcast;
   }
 
   @override
@@ -112,9 +123,9 @@ class PodcastRepositoryImpl implements PodcastRepository {
       ..sort((a, b) => a.datePublished.compareTo(b.datePublished));
     //newEpisodes.insert(0, episode);
     podcast.episodes.insertAll(0, newEpisodes);
-    if(podcast.subscribed) {
+    if (podcast.subscribed) {
       podcast.episodes
-        .applyToDb(); // applyToDb() updates relation only which is more efficient than box.put(object)
+          .applyToDb(); // applyToDb() updates relation only which is more efficient than box.put(object)
     }
     return podcast;
   }
