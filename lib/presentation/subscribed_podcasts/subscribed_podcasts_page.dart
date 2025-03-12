@@ -86,9 +86,22 @@ class SubscribedPodcastsPage extends StatelessWidget {
       );
     }
 
+    Widget buildCircularProgressIndicator() {
+      return SliverToBoxAdapter(
+          child: Builder(
+              builder: (context) => SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )));
+    }
+
     // Build the grid based on the state
-    return state.subscribedPodcasts.isEmpty
-        ? emptyStateWidget
-        : buildGrid(state.subscribedPodcasts);
+    return state.loading
+        ? buildCircularProgressIndicator()
+        : state.subscribedPodcasts.isEmpty
+            ? emptyStateWidget
+            : buildGrid(state.subscribedPodcasts);
   }
 }
