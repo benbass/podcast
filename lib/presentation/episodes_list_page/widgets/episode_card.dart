@@ -6,6 +6,8 @@ import 'package:podcast/domain/entities/podcast_entity.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/format_pubdate_string.dart';
 import '../../../helpers/core/image_provider.dart';
+import '../../../helpers/player/audiohandler.dart';
+import '../../../injection.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../../episode_details_page/episode_details_page.dart';
 
@@ -77,23 +79,54 @@ class EpisodeCard extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              if (item.position > 0)
-                                Positioned(
-                                  top: 0,
-                                  left: 0,
-                                  child: SizedBox(
-                                    height: 90,
-                                    width: 90,
-                                    child: LinearProgressIndicator(
-                                      value: (item.position.toDouble() /
-                                              item.duration!.toDouble())
-                                          .clamp(0.0, 1.0),
-                                      color: themeData.colorScheme.primary
-                                          .withValues(alpha: 0.6),
-                                      backgroundColor: Colors.transparent,
-                                    ),
-                                  ),
-                                )
+                              StreamBuilder<Duration>(
+                                  stream: getItI<MyAudioHandler>()
+                                      .player
+                                      .positionStream,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData && state != null &&
+                                        state.eId == item.eId) {
+                                      final currentDuration = snapshot.data!;
+                                      final totalDuration =
+                                          Duration(seconds: state.duration!);
+                                      final progress =
+                                          currentDuration.inMilliseconds /
+                                              totalDuration.inMilliseconds;
+                                      return Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        child: SizedBox(
+                                          height: 90,
+                                          width: 90,
+                                          child: LinearProgressIndicator(
+                                            value: progress.clamp(0.0, 1.0),
+                                            color: themeData
+                                                .colorScheme.secondary
+                                                .withValues(alpha: 0.4),
+                                            backgroundColor: Colors.transparent,
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        child: SizedBox(
+                                          height: 90,
+                                          width: 90,
+                                          child: LinearProgressIndicator(
+                                            value: (item.position.toDouble() /
+                                                    item.duration!.toDouble())
+                                                .clamp(0.0, 1.0),
+                                            color: themeData
+                                                .colorScheme.secondary
+                                                .withValues(alpha: 0.6),
+                                            backgroundColor: Colors.transparent,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  })
                             ],
                           ),
                         ),
