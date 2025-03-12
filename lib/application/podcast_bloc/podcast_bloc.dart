@@ -17,6 +17,11 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
         List<PodcastEntity> subscribedPodcasts =
             await podcastUseCases.getSubscribedPodcasts();
 
+        // Let's refresh the episodes at app start
+        for (PodcastEntity podcast in subscribedPodcasts) {
+          await podcastUseCases.refreshPodcastEpisodes(podcast);
+        }
+
         emit(state.copyWith(
           subscribedPodcasts: subscribedPodcasts,
         ));
