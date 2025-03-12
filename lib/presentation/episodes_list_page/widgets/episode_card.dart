@@ -23,7 +23,7 @@ class EpisodeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     var themeData = Theme.of(context);
     return FutureBuilder<ImageProvider>(
-        future: MyImageProvider(url: podcast.artwork).imageProvider,
+        future: MyImageProvider(url: item.image).imageProvider,
         builder: (BuildContext context, AsyncSnapshot<ImageProvider> snapshot) {
           final ImageProvider imageProvider = snapshot.hasData
               ? snapshot.data!
@@ -34,9 +34,13 @@ class EpisodeCard extends StatelessWidget {
                 key: ValueKey(item.eId),
                 color: themeData.colorScheme.primaryContainer,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  side: state?.eId == item.eId ? BorderSide(color: themeData.colorScheme.secondary, width: 2.0) : BorderSide.none
-                ),
+                    borderRadius: BorderRadius.circular(10.0),
+                    side: state?.eId == item.eId
+                        ? BorderSide(
+                            color: themeData.colorScheme.secondary,
+                            width: 2.0,
+                          )
+                        : BorderSide.none),
                 elevation: 5.0,
                 shadowColor: Colors.black,
                 margin: const EdgeInsets.all(8.0),
