@@ -106,7 +106,10 @@ class AppTheme {
       color: _iconColor,
     ),
     dialogTheme: DialogTheme(
-      backgroundColor: _primaryVariantColor.withValues(alpha: 0.85),
+      shape: ContinuousRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      backgroundColor: _primaryVariantColor,
       titleTextStyle: _bodyTextLarge.copyWith(color: _primaryColor),
       contentTextStyle: _bodyTextMedium,
     ),
@@ -129,6 +132,7 @@ class AppTheme {
       ),
     ),
     listTileTheme: const ListTileThemeData(textColor: _textColor),
-    progressIndicatorTheme: const ProgressIndicatorThemeData(color: _accentColor),
+    progressIndicatorTheme:
+        const ProgressIndicatorThemeData(color: _accentColor),
   );
 }
