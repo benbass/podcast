@@ -79,37 +79,6 @@ class PodcastRepositoryImpl implements PodcastRepository {
 
   @override
   Future<PodcastEntity> refreshPodcastEpisodes(PodcastEntity podcast) async {
-    /// For testing: create a fake episode
-    DateTime now = DateTime.now();
-    int secondsSinceEpochUtc = now.millisecondsSinceEpoch ~/ 1000;
-    EpisodeEntity episode = EpisodeEntity(
-      eId: 9009090100,
-      title: "FAKE EPISODE",
-      description: "description",
-      guid: "00098",
-      datePublished: secondsSinceEpochUtc,
-      datePublishedPretty: "null",
-      enclosureUrl: "enclosureUrl",
-      enclosureLength: 1994398,
-      duration: 213242432,
-      explicit: 0,
-      episodeNr: 0,
-      episodeType: null,
-      season: null,
-      image: "",
-      feedUrl: "feedUrl",
-      link: "link",
-      feedImage: "",
-      feedId: podcast.pId,
-      podcastGuid: podcast.podcastGuid,
-      favorite: true,
-      read: false,
-      completed: false,
-      position: 09789798,
-      filePath: null,
-    );
-
-    ///
     // Set current values
     final List<EpisodeEntity> currentEpisodes = podcast.episodes;
     final Set<int> ids = currentEpisodes.map((e) => e.eId).toSet();
@@ -121,7 +90,7 @@ class PodcastRepositoryImpl implements PodcastRepository {
         .where((episode) => !ids.contains(episode.eId))
         .toList()
       ..sort((a, b) => a.datePublished.compareTo(b.datePublished));
-    //newEpisodes.insert(0, episode);
+    //newEpisodes.insert(0, fakeEpisode);
     podcast.episodes.insertAll(0, newEpisodes);
     if (podcast.subscribed) {
       podcast.episodes
