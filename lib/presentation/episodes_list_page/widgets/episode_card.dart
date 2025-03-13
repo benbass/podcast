@@ -14,30 +14,32 @@ import '../../episode_details_page/episode_details_page.dart';
 class EpisodeCard extends StatelessWidget {
   const EpisodeCard({
     super.key,
-    required this.item,
+    required this.episode,
     required this.podcast,
   });
 
-  final EpisodeEntity item;
+  final EpisodeEntity episode;
   final PodcastEntity podcast;
 
   @override
   Widget build(BuildContext context) {
     var themeData = Theme.of(context);
     return FutureBuilder<ImageProvider>(
-        future: MyImageProvider(url: item.image).imageProvider,
+        future: MyImageProvider(url: episode.image).imageProvider,
         builder: (BuildContext context, AsyncSnapshot<ImageProvider> snapshot) {
           final ImageProvider imageProvider = snapshot.hasData
               ? snapshot.data!
               : const AssetImage('assets/placeholder.png');
           return BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
-            builder: (context, state) {
+            builder: (context, currentlyPlayingEpisodeState) {
+              final isCurrentlyPlaying =
+                  currentlyPlayingEpisodeState?.eId == episode.eId;
               return Card(
-                key: ValueKey(item.eId),
+                key: ValueKey(episode.eId),
                 color: themeData.colorScheme.primaryContainer,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
-                    side: state?.eId == item.eId
+                    side: isCurrentlyPlaying
                         ? BorderSide(
                             color: themeData.colorScheme.secondary,
                             width: 2.0,
@@ -51,128 +53,15 @@ class EpisodeCard extends StatelessWidget {
                   height: 90.0,
                   child: InkWell(
                     splashColor: Colors.black87,
-                    onTap: () async {
-                      Navigator.push(
-                        context,
-                        ScaleRoute(
-                          page: EpisodeDetailsPage(
-                            episode: item,
-                            podcast: podcast,
-                          ),
-                        ),
-                      );
-                    },
+                    onTap: () => _navigateToEpisodeDetails(context),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: 90,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: imageProvider,
-                                    fit: BoxFit.fitWidth,
-                                  ),
-                                ),
-                              ),
-                              StreamBuilder<Duration>(
-                                  stream: getItI<MyAudioHandler>()
-                                      .player
-                                      .positionStream,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData && state != null &&
-                                        state.eId == item.eId) {
-                                      final currentDuration = snapshot.data!;
-                                      final totalDuration =
-                                          Duration(seconds: state.duration!);
-                                      final progress =
-                                          currentDuration.inMilliseconds /
-                                              totalDuration.inMilliseconds;
-                                      return Positioned(
-                                        top: 0,
-                                        left: 0,
-                                        child: SizedBox(
-                                          height: 90,
-                                          width: 90,
-                                          child: LinearProgressIndicator(
-                                            value: progress.clamp(0.0, 1.0),
-                                            color: themeData
-                                                .colorScheme.secondary
-                                                .withValues(alpha: 0.4),
-                                            backgroundColor: Colors.transparent,
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      return Positioned(
-                                        top: 0,
-                                        left: 0,
-                                        child: SizedBox(
-                                          height: 90,
-                                          width: 90,
-                                          child: LinearProgressIndicator(
-                                            value: (item.position.toDouble() /
-                                                    item.duration!.toDouble())
-                                                .clamp(0.0, 1.0),
-                                            color: themeData
-                                                .colorScheme.secondary
-                                                .withValues(alpha: 0.6),
-                                            backgroundColor: Colors.transparent,
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  })
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(
-                              6.0,
-                              10.0,
-                              8.0,
-                              10.0,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  item.title,
-                                  overflow: TextOverflow.ellipsis,
-                                  softWrap: true,
-                                  maxLines: 2,
-                                  style:
-                                      Theme.of(context).textTheme.displayMedium,
-                                ),
-                                Text(
-                                  formatTimestamp(
-                                    item.datePublished,
-                                  ),
-                                  style:
-                                      Theme.of(context).textTheme.displayMedium,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Icon(item.read ? Icons.check_rounded : null),
-                              Icon(item.favorite && podcast.subscribed
-                                  ? Icons.favorite_rounded
-                                  : null),
-                            ],
-                          ),
-                        )
+                        _buildEpisodeImage(imageProvider, isCurrentlyPlaying,
+                            currentlyPlayingEpisodeState, themeData),
+                        _buildEpisodeDetails(themeData),
+                        _buildEpisodeActions(context),
                       ],
                     ),
                   ),
@@ -181,5 +70,182 @@ class EpisodeCard extends StatelessWidget {
             },
           );
         });
+  }
+
+  void _navigateToEpisodeDetails(BuildContext context) {
+    Navigator.push(
+      context,
+      ScaleRoute(
+        page: EpisodeDetailsPage(
+          episode: episode,
+          podcast: podcast,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEpisodeImage(
+      ImageProvider imageProvider,
+      bool isCurrentlyPlaying,
+      EpisodeEntity? currentlyPlayingEpisode,
+      ThemeData themeData) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: Stack(
+        children: [
+          Container(
+            width: 90,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: imageProvider,
+                fit: BoxFit.fitWidth,
+              ),
+            ),
+          ),
+          StreamBuilder<Duration>(
+            stream: getItI<MyAudioHandler>().player.positionStream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData &&
+                  isCurrentlyPlaying &&
+                  currentlyPlayingEpisode != null) {
+                final currentDuration = snapshot.data!;
+                final totalDuration =
+                    Duration(seconds: currentlyPlayingEpisode.duration!);
+                final progress = currentDuration.inMilliseconds /
+                    totalDuration.inMilliseconds;
+                return Positioned(
+                  top: 0,
+                  left: 0,
+                  child: SizedBox(
+                    height: 90,
+                    width: 90,
+                    child: LinearProgressIndicator(
+                      value: progress.clamp(0.0, 1.0),
+                      color: themeData.colorScheme.secondary
+                          .withValues(alpha: 0.4),
+                      backgroundColor: Colors.transparent,
+                    ),
+                  ),
+                );
+              } else {
+                return Positioned(
+                  top: 0,
+                  left: 0,
+                  child: SizedBox(
+                    height: 90,
+                    width: 90,
+                    child: LinearProgressIndicator(
+                      value: (episode.position.toDouble() /
+                              episode.duration!.toDouble())
+                          .clamp(0.0, 1.0),
+                      color: themeData.colorScheme.secondary
+                          .withValues(alpha: 0.4),
+                      backgroundColor: Colors.transparent,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEpisodeDetails(ThemeData themeData) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          6.0,
+          10.0,
+          8.0,
+          10.0,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              episode.title,
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
+              maxLines: 2,
+              style: themeData.textTheme.displayMedium,
+            ),
+            Text(
+              formatTimestamp(
+                episode.datePublished,
+              ),
+              style: themeData.textTheme.displayMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEpisodeActions(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          IconButton(
+            onPressed: () => _showEpisodeActionsDialog(context),
+            icon: const Icon(
+              Icons.more_horiz_rounded,
+            ),
+          ),
+          Icon(
+            episode.read ? Icons.check_rounded : null,
+            size: 16.0,
+          ),
+          Icon(
+            episode.favorite && podcast.subscribed
+                ? Icons.favorite_rounded
+                : null,
+            size: 16.0,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEpisodeActionsDialog(BuildContext context) {
+    final List<Map<String, dynamic>> menuItems = [
+      {
+        "title": "Mark as favorite",
+        "onPressed": () {
+          print("Action for marking as favorite");
+        }
+      },
+      {
+        "title": "Mark as read",
+        "onPressed": () {
+          print("Action for marking as read");
+        }
+      },
+      {"title": "Download", "onPressed": () {}},
+      {"title": "Share", "onPressed": () {}}
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var menuItem in menuItems)
+                TextButton(
+                  onPressed: () => menuItem["onPressed"](),
+                  child: Text(menuItem["title"]),
+                ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
