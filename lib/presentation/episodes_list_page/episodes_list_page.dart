@@ -84,7 +84,7 @@ class EpisodesListPage extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final item = episodes[index];
                               return EpisodeCard(
-                                item: item,
+                                episode: item,
                                 podcast: state.podcast!,
                               );
                             },
