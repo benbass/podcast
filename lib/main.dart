@@ -28,7 +28,7 @@ void main() async {
   await di.init();
 
   /// Init our objectBox
-  ObjectBox objectBox = await ObjectBox.create();
+  objectBox = await ObjectBox.create();
   podcastBox = objectBox.store.box<PodcastEntity>();
   episodeBox = objectBox.store.box<EpisodeEntity>();
 
