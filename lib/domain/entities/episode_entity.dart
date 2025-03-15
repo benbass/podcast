@@ -32,11 +32,11 @@ class EpisodeEntity {
   final String podcastGuid; // = podcastGuid of podcast entity
 
   /// Additional data for user prefs and info (mostly for subscribed podcasts)
-  final bool favorite;
-  final bool read;
-  final bool completed;
-  final int position;
-  final String? filePath; // downloaded file (subscribed or not!), if applicable
+  bool favorite;
+  bool read;
+  bool completed;
+  int position;
+  String? filePath; // downloaded file (subscribed or not!), if applicable
 
   /// ObjectBox relation
   final podcast = ToOne<PodcastEntity>();
@@ -68,7 +68,7 @@ class EpisodeEntity {
     required this.filePath,
   });
 
-  EpisodeEntity copyWith( {
+  EpisodeEntity copyWith({
     bool? favorite,
     bool? read,
     bool? completed,
