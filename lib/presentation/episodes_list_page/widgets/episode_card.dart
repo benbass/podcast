@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/application/episode_playback/episode_playback_cubit.dart';
+import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 
 import '../../../domain/entities/episode_entity.dart';
@@ -211,18 +212,41 @@ class EpisodeCard extends StatelessWidget {
     );
   }
 
+  void _performAction(String flag, dynamic value) {
+    EpisodeEntity episodeToUpdate = episodeBox.get(episode.id)!;
+    switch (flag) {
+      case "favorite":
+        episodeToUpdate.favorite = !value;
+        episodeBox.put(episodeToUpdate);
+        break;
+      case "read":
+        episodeToUpdate.read = !value;
+        episodeBox.put(episodeToUpdate);
+        break;
+      case "download":
+        break;
+      case "share":
+        break;
+      default:
+    }
+  }
+
   void _showEpisodeActionsDialog(BuildContext context) {
     final List<Map<String, dynamic>> menuItems = [
       {
-        "title": "Mark as favorite",
+        "title": episode.favorite ? "Unmark as favorite" : "Mark as favorite",
         "onPressed": () {
-          print("Action for marking as favorite");
+          final bool isFavorite = episode.favorite;
+          _performAction("favorite", isFavorite);
+          Navigator.pop(context);
         }
       },
       {
-        "title": "Mark as read",
+        "title": episode.read ? "Mark as unread" : "Mark as read",
         "onPressed": () {
-          print("Action for marking as read");
+          final bool isRead = episode.read;
+          _performAction("read", isRead);
+          Navigator.pop(context);
         }
       },
       {"title": "Download", "onPressed": () {}},
