@@ -1,5 +1,7 @@
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:podcast/core/globals.dart';
+import '../domain/entities/episode_entity.dart';
 import '../objectbox.g.dart'; // created by `flutter pub run build_runner build`
 
 class ObjectBox {
@@ -17,5 +19,12 @@ class ObjectBox {
     final store = await openStore(directory: p.join(docsDir.path, "obx-podcasts"));
     return ObjectBox._create(store);
   }
+
+  Stream<List<EpisodeEntity>> getEpisodes(int feedId) {
+    final qBuilderEpisodes = episodeBox.query(EpisodeEntity_.feedId.equals(feedId)).order(EpisodeEntity_.datePublished, flags: Order.descending);
+    return qBuilderEpisodes.watch(triggerImmediately: true).map((query) => query.find());
+  }
+
+  EpisodeEntity getEpisode(int id) => episodeBox.get(id)!;
 
 }
