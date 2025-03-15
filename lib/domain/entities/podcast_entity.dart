@@ -9,7 +9,8 @@ class PodcastEntity {
   int id = 0;
 
   /// Data from json
-  final int pId; // internal PodcastIndex.org Feed ID. To be used for fetching episodes!
+  final int
+      pId; // internal PodcastIndex.org Feed ID. To be used for fetching episodes!
   final String podcastGuid;
   final String title;
   final String url; // xml
@@ -27,8 +28,8 @@ class PodcastEntity {
   final List<String> categories;
 
   /// User parameter
-  final bool subscribed;
-  final int? unreadEpisodes;
+  bool subscribed;
+  int? unreadEpisodes;
 
   /// ObjectBox relation
   @Backlink('podcast')
