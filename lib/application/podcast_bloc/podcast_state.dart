@@ -7,6 +7,7 @@ class PodcastState {
   final String? keyword;
   final bool loading;
   final String? message;
+  final bool areReadEpisodesVisible;
 
   const PodcastState({
     required this.podcast,
@@ -15,16 +16,18 @@ class PodcastState {
     required this.keyword,
     required this.loading,
     required this.message,
+    required this.areReadEpisodesVisible,
   });
 
   factory PodcastState.initial() => const PodcastState(
-        podcast: null,
-        subscribedPodcasts: [],
-        podcastsQueryResult: [],
-        keyword: null,
-        loading: false,
-        message: null,
-      );
+      podcast: null,
+      subscribedPodcasts: [],
+      podcastsQueryResult: [],
+      keyword: null,
+      loading: false,
+      message: null,
+      areReadEpisodesVisible: false,
+  );
 
   factory PodcastState.error({required String message}) => PodcastState(
         podcast: null,
@@ -33,6 +36,7 @@ class PodcastState {
         keyword: null,
         loading: false,
         message: message,
+        areReadEpisodesVisible: false,
       );
 
   PodcastState copyWith({
@@ -42,6 +46,7 @@ class PodcastState {
     String? keyword,
     bool? loading,
     String? message,
+    bool? areReadEpisodesVisible,
   }) {
     return PodcastState(
       podcast: podcast ?? this.podcast,
@@ -50,6 +55,7 @@ class PodcastState {
       keyword: keyword ?? this.keyword,
       loading: loading ?? this.loading,
       message: message ?? this.message,
+      areReadEpisodesVisible: areReadEpisodesVisible ?? this.areReadEpisodesVisible,
     );
   }
 }
