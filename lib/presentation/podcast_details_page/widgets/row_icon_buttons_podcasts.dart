@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../application/podcast_bloc/podcast_bloc.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../../episodes_list_page/episodes_list_page.dart';
@@ -28,9 +26,6 @@ class RowIconButtonsPodcasts extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                BlocProvider.of<PodcastBloc>(context).add(
-                  FetchEpisodesForPodcastProcessingEvent(podcast: podcast),
-                );
                 Navigator.push(
                   context,
                   ScaleRoute(
