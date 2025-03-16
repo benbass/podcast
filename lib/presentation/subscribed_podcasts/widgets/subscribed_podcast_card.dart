@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcast/core/globals.dart';
 import 'package:podcast/presentation/subscribed_podcasts/widgets/rounded_text_widget.dart';
 
 import '../../../application/podcast_bloc/podcast_bloc.dart';
@@ -54,9 +55,15 @@ class SubscribedPodcastCard extends StatelessWidget {
                       child: SizedBox(
                           width: 50,
                           height: 50,
-                          child: RoundedTextWidget(
-                              text: podcast.unreadEpisodes.toString())),
-                    ),
+                          child: StreamBuilder<int>(
+                            stream: objectBox.unreadEpisodesCount(feedId: podcast.pId),
+                            builder: (context, snapshot) {
+                              return RoundedTextWidget(
+                                text: snapshot.data.toString()
+                              );
+                            }
+                          )),
+                    )
                   ],
                 ),
               ),
