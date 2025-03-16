@@ -39,3 +39,10 @@ final class SubscribeToPodcastEvent extends PodcastEvent {}
 final class UnSubscribeFromPodcastEvent extends PodcastEvent {}
 
 final class PodcastsQueryResultUpdateEvent extends PodcastEvent {}
+
+final class ToggleUnreadEpisodesVisibilityEvent extends PodcastEvent {
+  final bool areReadEpisodesVisible;
+  ToggleUnreadEpisodesVisibilityEvent({
+    required this.areReadEpisodesVisible,
+  });
+}
