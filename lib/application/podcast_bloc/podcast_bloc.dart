@@ -185,5 +185,9 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
 
       await updatedQueryResult();
     });
+
+    on<ToggleUnreadEpisodesVisibilityEvent>((event, emit) async {
+        emit(state.copyWith(areReadEpisodesVisible: event.areReadEpisodesVisible));
+    });
   }
 }
