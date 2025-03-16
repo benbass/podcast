@@ -65,13 +65,17 @@ class PodcastRepositoryImpl implements PodcastRepository {
     return await podcastDataSources.getSubscribedPodcasts() ?? [];
   }
 
+  Future<List<EpisodeEntity>> _fetchEpisodesFromRemote(int feedId) {
+    final Stream<List<EpisodeEntity>> episodes =
+        episodeDataSources.fetchEpisodesAsStreamByFeedId(feedId);
+    return episodes.first;
+  }
+
   @override
   Future<PodcastEntity> fillPodcastWithEpisodes(PodcastEntity podcast) async {
-    //final Stream<List<EpisodeEntity>> episodes = episodeDataSources.fetchEpisodesAsStreamByFeedId(podcast.pId);
-    //final List<EpisodeEntity> episodesList = await episodes.first;
-    final List<EpisodeEntity> episodesFuture =
-        await episodeDataSources.fetchEpisodesByFeedId(podcast.pId);
-    for (EpisodeEntity episode in episodesFuture) {
+    final List<EpisodeEntity> episodes =
+        await _fetchEpisodesFromRemote(podcast.pId);
+    for (EpisodeEntity episode in episodes) {
       podcast.episodes.add(episode);
     }
     return podcast;
@@ -81,13 +85,13 @@ class PodcastRepositoryImpl implements PodcastRepository {
   Future<PodcastEntity> refreshPodcastEpisodes(PodcastEntity podcast) async {
     // Set current values
     final List<EpisodeEntity> currentEpisodes = podcast.episodes;
-    final Set<int> ids = currentEpisodes.map((e) => e.eId).toSet();
+    final Set<int> episodeIds = currentEpisodes.map((ep) => ep.eId).toSet();
     // Fetch episodes
-    final List<EpisodeEntity> episodes =
-        await episodeDataSources.fetchEpisodesByFeedId(podcast.pId);
+    final List<EpisodeEntity> episodesNowOnRemote =
+        await _fetchEpisodesFromRemote(podcast.pId);
     // Filter new episodes based on PodcastIndex episode id
-    final List<EpisodeEntity> newEpisodes = episodes
-        .where((episode) => !ids.contains(episode.eId))
+    final List<EpisodeEntity> newEpisodes = episodesNowOnRemote
+        .where((episode) => !episodeIds.contains(episode.eId))
         .toList()
       ..sort((a, b) => a.datePublished.compareTo(b.datePublished));
     //newEpisodes.insert(0, fakeEpisode);
