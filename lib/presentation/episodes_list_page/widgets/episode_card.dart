@@ -191,12 +191,12 @@ class EpisodeCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          IconButton(
+          podcast.subscribed ? IconButton(
             onPressed: () => _showEpisodeActionsDialog(context),
             icon: const Icon(
               Icons.more_horiz_rounded,
             ),
-          ),
+          ) : const SizedBox(),
           Icon(
             episode.read ? Icons.check_rounded : null,
             size: 16.0,
