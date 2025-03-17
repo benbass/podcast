@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
+import 'package:podcast/domain/usecases/episode_usecases.dart';
+import 'package:podcast/injection.dart';
 
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
@@ -76,10 +77,14 @@ class EpisodesListPage extends StatelessWidget {
                         ),
                       ),
                       StreamBuilder<List<EpisodeEntity>>(
-                        // The method getEpisodes checks the subscribed flag of
-                        // the podcast and returns the correct stream
-                        // (from objectBox database or from the remote server)
-                          stream: objectBox.getEpisodes(podcast: state.podcast!, onlyUnread: !state.areReadEpisodesVisible),
+                          // The method getEpisodes checks the subscribed flag of
+                          // the podcast and returns the correct stream
+                          // (from objectBox database or from the remote server)
+                          stream: getIt<EpisodeUseCases>().getEpisodes(
+                            subscribed: state.podcast!.subscribed,
+                            feedId: state.podcast!.pId,
+                            onlyUnread: !state.areReadEpisodesVisible,
+                          ), //objectBox.getLocalEpisodes(podcast: state.podcast!, onlyUnread: !state.areReadEpisodesVisible),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
