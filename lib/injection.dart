@@ -12,37 +12,41 @@ import 'infrastructure/datasources/episode_datasources.dart';
 import 'infrastructure/datasources/podcast_datasources.dart';
 import 'infrastructure/repositories/episode_repository_impl.dart';
 
-final getItI = GetIt.instance;
+final getIt = GetIt.instance;
 
 Future<void> init() async {
   // State management
-  getItI.registerFactory(() => PodcastBloc(
-    podcastUseCases: getItI(),
-  ));
+  getIt.registerFactory(() => PodcastBloc(
+        podcastUseCases: getIt(),
+      ));
 
   // Use cases
-  getItI.registerLazySingleton(
-      () => PodcastUseCases(podcastRepository: getItI()));
-  getItI.registerLazySingleton(
-      () => EpisodeUseCases(episodeRepository: getItI()));
+  getIt
+      .registerLazySingleton(() => PodcastUseCases(podcastRepository: getIt()));
+  getIt
+      .registerLazySingleton(() => EpisodeUseCases(episodeRepository: getIt()));
 
   // Repos
-  getItI.registerLazySingleton<PodcastRepository>(() => PodcastRepositoryImpl(
-        podcastDataSources: getItI(),
-        episodeDataSources: getItI(),
+  getIt.registerLazySingleton<PodcastRepository>(() => PodcastRepositoryImpl(
+        podcastDataSources: getIt(),
+        episodeDataSources: getIt(),
       )); // remote (fetching)
-  getItI.registerLazySingleton<EpisodeRepository>(
-      () => EpisodeRepositoryImpl(episodeDataSources: getItI()));
+  getIt.registerLazySingleton<EpisodeRepository>(() => EpisodeRepositoryImpl(
+        episodeRemoteDataSource: getIt(),
+        episodeLocalDatasource: getIt(),
+      ));
 
   // DataSources
-  getItI.registerLazySingleton<PodcastDataSource>(
-      () => PodcastDataSourceImpl(httpClient: getItI())); // remote
-  getItI.registerLazySingleton<EpisodeDataSources>(
-      () => EpisodeDataSourcesImpl(httpClient: getItI()));
+  getIt.registerLazySingleton<PodcastDataSource>(
+      () => PodcastDataSourceImpl(httpClient: getIt())); // remote
+  getIt.registerLazySingleton<EpisodeRemoteDataSource>(
+      () => EpisodeRemoteDataSourceImpl(httpClient: getIt()));
+  getIt.registerLazySingleton<EpisodeLocalDatasource>(
+      () => EpisodeLocalDatasourceImpl());
 
   // Extern
-  getItI.registerLazySingleton(() => http.Client());
+  getIt.registerLazySingleton(() => http.Client());
 
   // Core
-  getItI.registerLazySingleton<MyAudioHandler>(() => MyAudioHandler());
+  getIt.registerLazySingleton<MyAudioHandler>(() => MyAudioHandler());
 }
