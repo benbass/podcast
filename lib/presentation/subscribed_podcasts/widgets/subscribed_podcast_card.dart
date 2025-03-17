@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:podcast/core/globals.dart';
+import 'package:podcast/domain/usecases/episode_usecases.dart';
+import 'package:podcast/injection.dart';
 import 'package:podcast/presentation/subscribed_podcasts/widgets/rounded_text_widget.dart';
 
 import '../../../application/podcast_bloc/podcast_bloc.dart';
@@ -56,7 +57,7 @@ class SubscribedPodcastCard extends StatelessWidget {
                           width: 50,
                           height: 50,
                           child: StreamBuilder<int>(
-                            stream: objectBox.unreadEpisodesCount(feedId: podcast.pId),
+                            stream: getIt<EpisodeUseCases>().unreadLocalEpisodesCount(feedId: podcast.pId),//objectBox.unreadLocalEpisodesCount(feedId: podcast.pId),
                             builder: (context, snapshot) {
                               return RoundedTextWidget(
                                 text: snapshot.data.toString()
