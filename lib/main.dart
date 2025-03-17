@@ -57,7 +57,7 @@ void main() async {
         providers: [
           BlocProvider(
               create: (BuildContext context) => EpisodePlaybackCubit()),
-          BlocProvider(create: (BuildContext context) => getItI<PodcastBloc>()..add(SubscribedPodcastsLoadingEvent())),
+          BlocProvider(create: (BuildContext context) => getIt<PodcastBloc>()..add(SubscribedPodcastsLoadingEvent())),
           //BlocProvider(create: (BuildContext context) => getItI<EpisodesBloc>()),
         ],
         child: MaterialApp(
