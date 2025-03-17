@@ -7,7 +7,7 @@ import '../datasources/podcast_datasources.dart';
 
 class PodcastRepositoryImpl implements PodcastRepository {
   final PodcastDataSource podcastDataSources;
-  final EpisodeDataSources episodeDataSources;
+  final EpisodeRemoteDataSource episodeDataSources;
   const PodcastRepositoryImpl({
     required this.podcastDataSources,
     required this.episodeDataSources,
@@ -67,7 +67,7 @@ class PodcastRepositoryImpl implements PodcastRepository {
 
   Future<List<EpisodeEntity>> _fetchEpisodesFromRemote(int feedId) {
     final Stream<List<EpisodeEntity>> episodes =
-        episodeDataSources.fetchEpisodesAsStreamByFeedId(feedId);
+        episodeDataSources.fetchRemoteEpisodesByFeedId(feedId);
     return episodes.first;
   }
 
