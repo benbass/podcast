@@ -5,18 +5,79 @@ import 'package:http/http.dart' as http;
 import '../../core/globals.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../helpers/authorization/authorization.dart';
+import '../../injection.dart';
+import '../../objectbox.g.dart';
 import '../models/episode_model.dart';
 
-abstract class EpisodeDataSources {
-  Stream<List<EpisodeEntity>> fetchEpisodesAsStreamByFeedId(int feedId);
+/// Local data source = objectBox database
+abstract class EpisodeLocalDatasource {
+  Stream<List<EpisodeEntity>> getEpisodes({
+    required bool subscribed,
+    required int feedId,
+    required bool onlyUnread,
+  });
+  Stream<int> unreadLocalEpisodesCount({required int feedId});
 }
 
-class EpisodeDataSourcesImpl implements EpisodeDataSources {
+class EpisodeLocalDatasourceImpl implements EpisodeLocalDatasource {
+  @override
+  Stream<List<EpisodeEntity>> getEpisodes({
+    required bool subscribed,
+    required int feedId,
+    required bool onlyUnread,
+  }) {
+    if (subscribed) {
+      if (onlyUnread) {
+        return _getUnreadLocalEpisodesByFeedId(feedId);
+      } else {
+        return _getLocalEpisodesByFeedId(feedId);
+      }
+    } else {
+      return getIt<EpisodeRemoteDataSource>()
+          .fetchRemoteEpisodesByFeedId(feedId);
+    }
+  }
+
+  Stream<List<EpisodeEntity>> _getLocalEpisodesByFeedId(int feedId) {
+    final queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId))
+      ..order(EpisodeEntity_.datePublished, flags: Order.descending);
+    return queryBuilder
+        .watch(triggerImmediately: true)
+        .map((query) => query.find());
+  }
+
+  Stream<List<EpisodeEntity>> _getUnreadLocalEpisodesByFeedId(int feedId) {
+    final queryBuilder = episodeBox.query(EpisodeEntity_.feedId
+        .equals(feedId)
+        .and(EpisodeEntity_.read.equals(false)))
+      ..order(EpisodeEntity_.datePublished, flags: Order.descending);
+    return queryBuilder
+        .watch(triggerImmediately: true)
+        .map((query) => query.find());
+  }
+
+  @override
+  Stream<int> unreadLocalEpisodesCount({required int feedId}) {
+    final queryBuilder = episodeBox.query(EpisodeEntity_.feedId
+        .equals(feedId)
+        .and(EpisodeEntity_.read.equals(false)));
+    return queryBuilder
+        .watch(triggerImmediately: true)
+        .map((query) => query.count());
+  }
+}
+
+/// Remote data source = http requests
+abstract class EpisodeRemoteDataSource {
+  Stream<List<EpisodeEntity>> fetchRemoteEpisodesByFeedId(int feedId);
+}
+
+class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
   final http.Client httpClient;
 
-  EpisodeDataSourcesImpl({required this.httpClient});
+  EpisodeRemoteDataSourceImpl({required this.httpClient});
   @override
-  Stream<List<EpisodeEntity>> fetchEpisodesAsStreamByFeedId(int feedId) async* {
+  Stream<List<EpisodeEntity>> fetchRemoteEpisodesByFeedId(int feedId) async* {
     // Authorization:
     Map<String, String> headers = headersForAuth(); // this is the real auth
 
