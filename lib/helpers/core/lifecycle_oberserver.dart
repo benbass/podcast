@@ -9,7 +9,7 @@ class MyAppLifecycleObserver extends WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.detached) {
       // App is being closed
-      getItI<MyAudioHandler>().dispose();
+      getIt<MyAudioHandler>().dispose();
     }
   }
 }
