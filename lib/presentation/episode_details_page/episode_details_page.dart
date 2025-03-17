@@ -35,7 +35,7 @@ class EpisodeDetailsPage extends StatelessWidget {
         if (didPop) {
           return;
         }
-        if (getItI<MyAudioHandler>().player.processingState ==
+        if (getIt<MyAudioHandler>().player.processingState ==
                 ProcessingState.ready &&
             overlayEntry == null) {
           showOverlayPlayerMin(context, episode, podcast, podcast.title);

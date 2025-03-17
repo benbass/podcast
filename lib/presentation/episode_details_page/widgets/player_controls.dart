@@ -46,7 +46,7 @@ class PlayerControls extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () {
-                      getItI<MyAudioHandler>().seekBackward();
+                      getIt<MyAudioHandler>().seekBackward();
                     },
                     icon: const Icon(
                       Icons.fast_rewind_rounded,
@@ -56,7 +56,7 @@ class PlayerControls extends StatelessWidget {
                   IconButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      getItI<MyAudioHandler>().stop().then((_) {
+                      getIt<MyAudioHandler>().stop().then((_) {
                         if (context.mounted) {
                           BlocProvider.of<EpisodePlaybackCubit>(context)
                               .setPlaybackEpisode(null);
@@ -70,12 +70,12 @@ class PlayerControls extends StatelessWidget {
                     ),
                   ),
                   StreamBuilder<PlayerState>(
-                      stream: getItI<MyAudioHandler>().player.playerStateStream,
+                      stream: getIt<MyAudioHandler>().player.playerStateStream,
                       builder: (context, stream) {
                         final isPlaying = stream.data?.playing;
                         return IconButton(
                           onPressed: () {
-                            getItI<MyAudioHandler>().handlePlayPause();
+                            getIt<MyAudioHandler>().handlePlayPause();
                           },
                           icon: Icon(
                             isPlaying == true
@@ -87,7 +87,7 @@ class PlayerControls extends StatelessWidget {
                       }),
                   IconButton(
                     onPressed: () {
-                      getItI<MyAudioHandler>().seekForward();
+                      getIt<MyAudioHandler>().seekForward();
                     },
                     icon: const Icon(
                       Icons.fast_forward_rounded,

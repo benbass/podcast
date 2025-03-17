@@ -104,7 +104,7 @@ class EpisodeCard extends StatelessWidget {
             ),
           ),
           StreamBuilder<Duration>(
-            stream: getItI<MyAudioHandler>().player.positionStream,
+            stream: getIt<MyAudioHandler>().player.positionStream,
             builder: (context, snapshot) {
               if (snapshot.hasData &&
                   isCurrentlyPlaying &&

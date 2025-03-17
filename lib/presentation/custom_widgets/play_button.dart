@@ -64,10 +64,10 @@ class PlayButtonActive extends StatelessWidget {
       onPressed: () async {
         // source error?
         try {
-          await getItI<MyAudioHandler>()
+          await getIt<MyAudioHandler>()
               .player
               .setUrl(episode.enclosureUrl);
-          getItI<MyAudioHandler>().play();
+          getIt<MyAudioHandler>().play();
 
           if (context.mounted) {
             BlocProvider.of<EpisodePlaybackCubit>(context)

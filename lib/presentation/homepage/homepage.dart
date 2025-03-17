@@ -16,11 +16,11 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     // Listen for player state changes (e.g., playing, paused, buffering)
-    getItI<MyAudioHandler>().player.playerStateStream.listen((playerState) {
+    getIt<MyAudioHandler>().player.playerStateStream.listen((playerState) {
       final processingState = playerState.processingState;
 
       if( processingState == ProcessingState.completed){
-        getItI<MyAudioHandler>().stop();
+        getIt<MyAudioHandler>().stop();
         removeOverlay();
         BlocProvider.of<EpisodePlaybackCubit>(context)
             .setPlaybackEpisode(null);

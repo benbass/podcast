@@ -142,7 +142,7 @@ class FlexibleSpace extends StatelessWidget {
         IconButton(
           onPressed: () {
             if (episode != null) {
-              final audioHandler = getItI<MyAudioHandler>();
+              final audioHandler = getIt<MyAudioHandler>();
               if (audioHandler.player.processingState ==
                       ProcessingState.ready &&
                   overlayEntry == null) {
