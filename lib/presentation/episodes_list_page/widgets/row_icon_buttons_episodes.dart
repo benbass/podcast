@@ -55,8 +55,8 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                 },
                 icon: Icon(
                   state.areReadEpisodesVisible
-                      ? Icons.filter_alt_outlined
-                      : Icons.filter_alt_off_outlined,
+                      ? Icons.filter_alt_off_outlined
+                      : Icons.filter_alt_outlined,
                   size: 30,
                 ),
               ),
