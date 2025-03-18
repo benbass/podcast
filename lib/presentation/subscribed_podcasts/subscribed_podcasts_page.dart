@@ -98,7 +98,7 @@ class SubscribedPodcastsPage extends StatelessWidget {
     }
 
     // Build the grid based on the state
-    return state.loading
+    return state.status == PodcastStatus.loading
         ? buildCircularProgressIndicator()
         : state.subscribedPodcasts.isEmpty
             ? emptyStateWidget
