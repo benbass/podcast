@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../core/globals.dart';
 import '../../domain/entities/episode_entity.dart';
+import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/authorization/authorization.dart';
 import '../../injection.dart';
 import '../../objectbox.g.dart';
@@ -70,6 +71,9 @@ class EpisodeLocalDatasourceImpl implements EpisodeLocalDatasource {
 /// Remote data source = http requests
 abstract class EpisodeRemoteDataSource {
   Stream<List<EpisodeEntity>> fetchRemoteEpisodesByFeedId(int feedId);
+  Stream<List<EpisodeEntity>> refreshEpisodes({
+    required PodcastEntity podcast,
+  });
 }
 
 class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
@@ -98,5 +102,26 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
       // then throw an exception.
       throw Exception('Failed to load episodes');
     }
+  }
+
+  @override
+  Stream<List<EpisodeEntity>> refreshEpisodes({
+    required PodcastEntity podcast,
+  }) async* {
+    final List<EpisodeEntity> currentEpisodes = podcast.episodes;
+    final Set<int> currentEpisodeIds =
+        currentEpisodes.map((ep) => ep.eId).toSet();
+    final List<EpisodeEntity> allEpisodesOnRemote =
+        await fetchRemoteEpisodesByFeedId(podcast.pId).first;
+    final List<EpisodeEntity> newEpisodes = allEpisodesOnRemote
+        .where((episode) => !currentEpisodeIds.contains(episode.eId))
+        .toList()
+      ..sort((a, b) => a.datePublished.compareTo(b.datePublished));
+    podcast.episodes.insertAll(0, newEpisodes);
+    if (podcast.subscribed) {
+      podcast.episodes
+          .applyToDb(); // applyToDb() updates relation only which is more efficient than box.put(object)
+    }
+    yield podcast.episodes;
   }
 }
