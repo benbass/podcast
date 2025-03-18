@@ -82,24 +82,28 @@ class PodcastRepositoryImpl implements PodcastRepository {
   }
 
   @override
-  Future<PodcastEntity> refreshPodcastEpisodes(PodcastEntity podcast) async {
-    // Set current values
-    final List<EpisodeEntity> currentEpisodes = podcast.episodes;
-    final Set<int> episodeIds = currentEpisodes.map((ep) => ep.eId).toSet();
-    // Fetch episodes
-    final List<EpisodeEntity> episodesNowOnRemote =
-        await _fetchEpisodesFromRemote(podcast.pId);
-    // Filter new episodes based on PodcastIndex episode id
-    final List<EpisodeEntity> newEpisodes = episodesNowOnRemote
-        .where((episode) => !episodeIds.contains(episode.eId))
-        .toList()
-      ..sort((a, b) => a.datePublished.compareTo(b.datePublished));
-    //newEpisodes.insert(0, fakeEpisode);
-    podcast.episodes.insertAll(0, newEpisodes);
-    if (podcast.subscribed) {
-      podcast.episodes
-          .applyToDb(); // applyToDb() updates relation only which is more efficient than box.put(object)
+  Future<List<PodcastEntity>> updatedQueryResult(queryResult, currentPodcast) async {
+    List<PodcastEntity> currentQueryResult = queryResult;
+    if (currentQueryResult.isNotEmpty) {
+      // Create a map to store the API podcastIndex ids (pId) as keys
+      Map<int, int> map = {};
+      for (PodcastEntity podcast in currentQueryResult) {
+        map[podcast.pId] = 0;
+      }
+      // Check if object is in map
+      if (map.containsKey(currentPodcast.pId)) {
+        // find index of object in query result
+        final int index = currentQueryResult
+            .indexWhere((element) => element.pId == currentPodcast.pId);
+
+        // Remove old object from query result
+        currentQueryResult.removeAt(index);
+        // Insert new object in query result
+        // the state of the new object (subscribed or not) was already set in the SubscribeToPodcastEvent or UnSubscribeFromPodcastEvent
+        currentQueryResult.insert(index, currentPodcast);
+      }
     }
-    return podcast;
+    return currentQueryResult;
   }
 }
+
