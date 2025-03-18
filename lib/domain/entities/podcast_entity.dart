@@ -79,4 +79,24 @@ class PodcastEntity {
       unreadEpisodes: unreadEpisodes ?? this.unreadEpisodes,
     );
   }
+
+  factory PodcastEntity.emptyPodcast() => PodcastEntity(
+        pId: -1,
+        podcastGuid: '',
+        title: '',
+        url: '',
+        link: '',
+        description: '',
+        author: '',
+        ownerName: '',
+        artwork: '',
+        lastUpdateTime: 0,
+        language: '',
+        explicit: false,
+        medium: '',
+        episodeCount: 0,
+        categories: [],
+        subscribed: false,
+        unreadEpisodes: 0,
+      );
 }
