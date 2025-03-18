@@ -57,7 +57,7 @@ class SubscribedPodcastCard extends StatelessWidget {
                           width: 50,
                           height: 50,
                           child: StreamBuilder<int>(
-                            stream: getIt<EpisodeUseCases>().unreadLocalEpisodesCount(feedId: podcast.pId),//objectBox.unreadLocalEpisodesCount(feedId: podcast.pId),
+                            stream: getIt<EpisodeUseCases>().unreadLocalEpisodesCount(feedId: podcast.pId),
                             builder: (context, snapshot) {
                               return RoundedTextWidget(
                                 text: snapshot.data.toString()
