@@ -20,7 +20,7 @@ class EpisodesListPage extends StatelessWidget {
       body: BlocBuilder<PodcastBloc, PodcastState>(
         builder: (context, state) {
           return SafeArea(
-            child: state.loading
+            child: state.status == PodcastStatus.loading
                 ? const Center(child: CircularProgressIndicator())
                 : CustomScrollView(
                     physics: const BouncingScrollPhysics(),
@@ -38,7 +38,7 @@ class EpisodesListPage extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 80.0),
                                 child: Text(
-                                  state.podcast!.title,
+                                  state.currentPodcast.title,
                                   style:
                                       Theme.of(context).textTheme.displayLarge,
                                   maxLines: 1,
@@ -50,7 +50,7 @@ class EpisodesListPage extends StatelessWidget {
                                 children: [
                                   ElevatedButtonSubscribe(
                                     navigate: true,
-                                    podcast: state.podcast!,
+                                    podcast: state.currentPodcast,
                                   ),
                                   const SizedBox(
                                     width: 30,
@@ -81,10 +81,10 @@ class EpisodesListPage extends StatelessWidget {
                           // the podcast and returns the correct stream
                           // (from objectBox database or from the remote server)
                           stream: getIt<EpisodeUseCases>().getEpisodes(
-                            subscribed: state.podcast!.subscribed,
-                            feedId: state.podcast!.pId,
+                            subscribed: state.currentPodcast.subscribed,
+                            feedId: state.currentPodcast.pId,
                             onlyUnread: !state.areReadEpisodesVisible,
-                          ), //objectBox.getLocalEpisodes(podcast: state.podcast!, onlyUnread: !state.areReadEpisodesVisible),
+                          ),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
@@ -129,7 +129,7 @@ class EpisodesListPage extends StatelessWidget {
                                     final item = episodes[index];
                                     return EpisodeCard(
                                       episode: item,
-                                      podcast: state.podcast!,
+                                      podcast: state.currentPodcast,
                                     );
                                   },
                                 ),
