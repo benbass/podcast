@@ -24,11 +24,7 @@ class PodcastUseCases {
     return podcastRepository.getSubscribedPodcasts();
   }
 
-  Future<PodcastEntity> fillPodcastWithEpisodes(PodcastEntity podcast) async {
-    return podcastRepository.fillPodcastWithEpisodes(podcast);
-  }
-
-  Future<PodcastEntity> refreshPodcastEpisodes(PodcastEntity podcast) async {
-    return podcastRepository.refreshPodcastEpisodes(podcast);
+  Future<List<PodcastEntity>> updatedQueryResult(queryResult, currentPodcast){
+    return podcastRepository.updatedQueryResult(queryResult, currentPodcast);
   }
 }
