@@ -30,7 +30,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
       FocusScope.of(context).unfocus();
 
       BlocProvider.of<PodcastBloc>(context)
-          .add(SearchPodcastsByKeywordProcessingEvent(
+          .add(GetRemotePodcastsByKeywordEvent(
           keyword: _textEditingController.text));
 
       //_textEditingController.clear();
@@ -58,7 +58,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,
-            hintText: state.keyword ?? hintText,
+            hintText: state.keyword.isNotEmpty ? state.keyword : hintText,
             suffixIcon: IconButton(
               icon: const Icon(Icons.search),
               onPressed: () => _performSearch(context),
