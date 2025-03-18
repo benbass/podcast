@@ -62,7 +62,7 @@ class EpisodeCard extends StatelessWidget {
                         _buildEpisodeImage(imageProvider, isCurrentlyPlaying,
                             currentlyPlayingEpisodeState, themeData),
                         _buildEpisodeDetails(themeData),
-                        _buildEpisodeActions(context),
+                        podcast.subscribed ?_buildEpisodeActions(context) : const SizedBox(),
                       ],
                     ),
                   ),
@@ -189,23 +189,25 @@ class EpisodeCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          podcast.subscribed ? IconButton(
+          IconButton(
             onPressed: () => _showEpisodeActionsDialog(context),
             icon: const Icon(
               Icons.more_horiz_rounded,
             ),
-          ) : const SizedBox(),
+          ),
           Icon(
             episode.read ? Icons.check_rounded : null,
-            size: 16.0,
+            size: 20.0,
+            color: Theme.of(context).colorScheme.primary,
           ),
           Icon(
             episode.favorite && podcast.subscribed
                 ? Icons.favorite_rounded
                 : null,
-            size: 16.0,
+            size: 20.0,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ],
       ),
@@ -242,7 +244,7 @@ class EpisodeCard extends StatelessWidget {
         }
       },
       {
-        "title": episode.read ? "Mark as unread" : "Mark as read",
+        "title": episode.read ? "unmark as read" : "Mark as read",
         "onPressed": () {
           final bool isRead = episode.read;
           _performAction("read", isRead);
