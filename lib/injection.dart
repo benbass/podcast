@@ -18,6 +18,7 @@ Future<void> init() async {
   // State management
   getIt.registerFactory(() => PodcastBloc(
         podcastUseCases: getIt(),
+        episodeUseCases: getIt(),
       ));
 
   // Use cases
