@@ -21,9 +21,9 @@ class ElevatedButtonSubscribe extends StatelessWidget {
       onPressed: () {
         !podcast.subscribed
             ? BlocProvider.of<PodcastBloc>(context)
-                .add(SubscribeToPodcastEvent())
+                .add(SubscribeToPodcastEvent(podcast: podcast))
             : BlocProvider.of<PodcastBloc>(context)
-                .add(UnSubscribeFromPodcastEvent());
+                .add(UnSubscribeFromPodcastEvent(id: podcast.id));
         if (navigate) {
           Navigator.push(
             context,
@@ -35,7 +35,7 @@ class ElevatedButtonSubscribe extends StatelessWidget {
       },
       child: BlocBuilder<PodcastBloc, PodcastState>(
         builder: (context, state) {
-          return Text(state.podcast!.subscribed ? "Unsubscribe" : "Subscribe");
+          return Text(state.currentPodcast.subscribed ? "Unsubscribe" : "Subscribe");
         },
       ),
     );
