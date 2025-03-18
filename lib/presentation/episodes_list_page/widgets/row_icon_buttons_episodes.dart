@@ -36,15 +36,14 @@ class RowIconButtonsEpisodes extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                BlocProvider.of<PodcastBloc>(context)
-                    .add(RefreshPodcastEpisodesProcessingEvent());
+                BlocProvider.of<PodcastBloc>(context).add(RefreshEpisodesByFeedIdEvent(feedId: state.currentPodcast.pId));
               },
               icon: const Icon(
                 Icons.refresh_rounded,
                 size: 30,
               ),
             ),
-            if (state.podcast!.subscribed)
+            if (state.currentPodcast.subscribed)
               IconButton(
                 onPressed: () {
                   podcastBloc.add(
