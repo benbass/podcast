@@ -40,7 +40,7 @@ class PodcastsSearchPage extends StatelessWidget {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints.expand(),
-        child: state.loading
+        child: state.status == PodcastStatus.loading
             ? _buildLoadingIndicator(context)
             : _buildPodcastList(context, state),
       ),
@@ -54,11 +54,11 @@ class PodcastsSearchPage extends StatelessWidget {
   }
 
   Widget _buildPodcastList(BuildContext context, PodcastState state) {
-    if (state.keyword == null) {
+    if (state.keyword.isEmpty) {
       return _buildEmptyList(
           context, "Enter keyword(s) to\nsearch for podcasts");
     }
-    if (state.podcastsQueryResult.isEmpty && state.keyword != null) {
+    if (state.queryResultPodcasts.isEmpty && state.keyword.isNotEmpty) {
       return _buildEmptyList(context, "No podcasts found\nfor your keyword(s)");
     }
     return CarouselView(
@@ -77,7 +77,7 @@ class PodcastsSearchPage extends StatelessWidget {
       ),
       onTap: (index) {
         BlocProvider.of<PodcastBloc>(context)
-            .add(PodcastTappedEvent(podcast: state.podcastsQueryResult[index]));
+            .add(PodcastTappedEvent(podcast: state.queryResultPodcasts[index]));
         Navigator.push(
           context,
           ScaleRoute(
@@ -86,9 +86,9 @@ class PodcastsSearchPage extends StatelessWidget {
         );
       },
       children: List.generate(
-        state.podcastsQueryResult.length,
+        state.queryResultPodcasts.length,
         (index) {
-          final podcast = state.podcastsQueryResult[index];
+          final podcast = state.queryResultPodcasts[index];
           return PodcastCard(podcast: podcast);
         },
       ),
