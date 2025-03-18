@@ -1,61 +1,64 @@
 part of 'podcast_bloc.dart';
 
-class PodcastState {
-  final PodcastEntity? podcast;
-  final List<PodcastEntity> subscribedPodcasts;
-  final List<PodcastEntity> podcastsQueryResult;
-  final String? keyword;
-  final bool loading;
-  final String? message;
-  final bool areReadEpisodesVisible;
+enum PodcastStatus { initial, loading, success, failure }
 
+@immutable
+class PodcastState extends Equatable {
+  final PodcastStatus status;
+  final List<PodcastEntity> subscribedPodcasts;
+  final List<PodcastEntity> queryResultPodcasts;
+  final PodcastEntity currentPodcast;
+  final List<EpisodeEntity> episodes;
+  final bool areReadEpisodesVisible;
+  final String keyword;
   const PodcastState({
-    required this.podcast,
+    required this.status,
     required this.subscribedPodcasts,
-    required this.podcastsQueryResult,
-    required this.keyword,
-    required this.loading,
-    required this.message,
+    required this.queryResultPodcasts,
+    required this.currentPodcast,
+    required this.episodes,
     required this.areReadEpisodesVisible,
+    required this.keyword,
   });
 
-  factory PodcastState.initial() => const PodcastState(
-      podcast: null,
-      subscribedPodcasts: [],
-      podcastsQueryResult: [],
-      keyword: null,
-      loading: false,
-      message: null,
-      areReadEpisodesVisible: false,
-  );
-
-  factory PodcastState.error({required String message}) => PodcastState(
-        podcast: null,
-        subscribedPodcasts: const [],
-        podcastsQueryResult: const [],
-        keyword: null,
-        loading: false,
-        message: message,
-        areReadEpisodesVisible: false,
-      );
+  PodcastState.initial()
+      : status = PodcastStatus.initial,
+        subscribedPodcasts = const <PodcastEntity>[],
+        queryResultPodcasts = const <PodcastEntity>[],
+        currentPodcast = PodcastEntity.emptyPodcast(),
+        episodes = const <EpisodeEntity>[],
+        areReadEpisodesVisible = false,
+        keyword = '';
 
   PodcastState copyWith({
+    PodcastStatus? status,
     List<PodcastEntity>? subscribedPodcasts,
-    List<PodcastEntity>? podcastsQueryResult,
-    PodcastEntity? podcast,
-    String? keyword,
-    bool? loading,
-    String? message,
+    List<PodcastEntity>? queryResultPodcasts,
+    PodcastEntity? currentPodcast,
+    List<EpisodeEntity>? episodes,
     bool? areReadEpisodesVisible,
+    String? keyword,
   }) {
     return PodcastState(
-      podcast: podcast ?? this.podcast,
+      status: status ?? this.status,
       subscribedPodcasts: subscribedPodcasts ?? this.subscribedPodcasts,
-      podcastsQueryResult: podcastsQueryResult ?? this.podcastsQueryResult,
+      queryResultPodcasts: queryResultPodcasts ?? this.queryResultPodcasts,
+      currentPodcast: currentPodcast ?? this.currentPodcast,
+      episodes: episodes ?? this.episodes,
+      areReadEpisodesVisible:
+          areReadEpisodesVisible ?? this.areReadEpisodesVisible,
       keyword: keyword ?? this.keyword,
-      loading: loading ?? this.loading,
-      message: message ?? this.message,
-      areReadEpisodesVisible: areReadEpisodesVisible ?? this.areReadEpisodesVisible,
     );
   }
+
+  @override
+  List<Object> get props => [
+        status,
+        subscribedPodcasts,
+        queryResultPodcasts,
+        currentPodcast,
+        episodes,
+        areReadEpisodesVisible,
+        keyword,
+      ];
 }
