@@ -14,7 +14,7 @@ class PodcastDetailsPage extends StatelessWidget {
     return Scaffold(
       body: BlocBuilder<PodcastBloc, PodcastState>(
         builder: (context, state) {
-          return state.loading
+          return state.status == PodcastStatus.loading
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
@@ -22,9 +22,9 @@ class PodcastDetailsPage extends StatelessWidget {
                   child: CustomScrollView(
                     slivers: [
                       FlexibleSpace(
-                        podcast: state.podcast!,
+                        podcast: state.currentPodcast,
                         episode: null,
-                        title: state.podcast!.title,
+                        title: state.currentPodcast.title,
                       ),
                       SliverPadding(
                           padding:
@@ -34,7 +34,7 @@ class PodcastDetailsPage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                ...state.podcast!.categories
+                                ...state.currentPodcast.categories
                                     .map((value) => Categories(
                                           value: value,
                                         )),
@@ -46,7 +46,7 @@ class PodcastDetailsPage extends StatelessWidget {
                             const EdgeInsets.fromLTRB(40.0, 10.0, 40.0, 10.0),
                         sliver: SliverToBoxAdapter(
                           child:
-                              RowIconButtonsPodcasts(podcast: state.podcast!),
+                              RowIconButtonsPodcasts(podcast: state.currentPodcast),
                         ),
                       ),
                       SliverPadding(
@@ -54,7 +54,7 @@ class PodcastDetailsPage extends StatelessWidget {
                             const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
                         sliver: SliverToBoxAdapter(
                           child: Text(
-                            state.podcast!.description,
+                            state.currentPodcast.description,
                             style: const TextStyle(
                               fontSize: 16,
                             ),
@@ -69,7 +69,7 @@ class PodcastDetailsPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                state.podcast!.author,
+                                state.currentPodcast.author,
                                 style: const TextStyle(
                                   fontSize: 16,
                                 ),
@@ -86,7 +86,7 @@ class PodcastDetailsPage extends StatelessWidget {
                                       width: 10,
                                     ),
                                     Text(
-                                      state.podcast!.language.toUpperCase(),
+                                      state.currentPodcast.language.toUpperCase(),
                                       style: const TextStyle(
                                         fontSize: 16,
                                       ),
