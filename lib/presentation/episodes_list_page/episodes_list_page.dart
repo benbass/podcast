@@ -7,6 +7,7 @@ import 'package:podcast/injection.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../custom_widgets/failure_widget.dart';
 import '../custom_widgets/page_transition.dart';
 import '../podcast_details_page/podcast_details_page.dart';
 import 'widgets/row_icon_buttons_episodes.dart';
@@ -95,27 +96,7 @@ class EpisodesListPage extends StatelessWidget {
                               );
                             }
                             if (snapshot.hasError) {
-                              // Print the stack trace and show the error message.
-                              // An actual app would display a user-friendly error message
-                              // and report the error behind the scenes.
-                              debugPrintStack(stackTrace: snapshot.stackTrace);
-                              return SliverToBoxAdapter(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.error_outline,
-                                      color: Colors.red,
-                                      size: 60,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 16, left: 16, right: 16),
-                                      child: Text('Error: ${snapshot.error}'),
-                                    ),
-                                  ],
-                                ),
-                              );
+                              return buildFailureWidget(message: 'Error loading episodes. Please try again.');
                             } else {
                               return SliverPadding(
                                 padding: const EdgeInsets.only(bottom: 80.0),
