@@ -1,17 +1,16 @@
-
 import 'package:flutter/material.dart';
 
-class Categories extends StatelessWidget {
+class PodcastCategory extends StatelessWidget {
   final String value;
-  const Categories({
-    super.key, required this.value,
+  const PodcastCategory({
+    super.key,
+    required this.value,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:
-      const EdgeInsets.symmetric(horizontal: 4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: Text(
         value,
         style: const TextStyle(
