@@ -24,7 +24,6 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
         ) {
     /// LOCAL
     on<LoadSubscribedPodcastsEvent>(_onLoadSubscribedPodcastsEvent);
-    on<GetUnreadEpisodesByFeedIdEvent>(_onGetUnreadEpisodesByFeedIdEvent);
     on<ToggleUnreadEpisodesVisibilityEvent>(
         _onToggleUnreadEpisodesVisibilityEvent);
     on<SubscribeToPodcastEvent>(_onSubscribeToPodcastEvent);
@@ -56,48 +55,6 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
         status: PodcastStatus.success,
         subscribedPodcasts: subscribedPodcasts,
       ));
-      // Get the Stream from the use case
-      /* final stream = podcastUseCases.getSubscribedPodcasts();
-      // Listen to the Stream and update the state with the new data
-      await emit.forEach<List<PodcastEntity>>(
-        stream,
-        onData: (data) {
-          emit(state.copyWith(
-            status: PodcastStatus.success,
-            subscribedPodcasts: data,
-          ));
-        },
-        onError: (error, stackTrace) {
-          emit(state.copyWith(status: PodcastStatus.failure));
-        },
-      );*/
-    } catch (e) {
-      emit(state.copyWith(status: PodcastStatus.failure));
-    }
-  }
-
-  FutureOr<void> _onGetUnreadEpisodesByFeedIdEvent(event, emit) async {
-    emit(state.copyWith(status: PodcastStatus.loading));
-    try {
-      // Get the Stream from the use case
-      final stream = episodeUseCases.getEpisodes(
-        subscribed: true,
-        feedId: state.currentPodcast.pId,
-        onlyUnread: true,
-      );
-      // Listen to the Stream and update the state with the new data
-      await emit.forEach<List<EpisodeEntity>>(
-        stream,
-        onData: (data) {
-          emit(state.copyWith(
-            status: PodcastStatus.success,
-            episodes: data,
-          ));
-        },
-        onError: (error, stackTrace) {
-          emit(state.copyWith(status: PodcastStatus.failure));
-        },
-      );
     } catch (e) {
       emit(state.copyWith(status: PodcastStatus.failure));
     }
@@ -208,7 +165,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
       final stream = episodeUseCases.getEpisodes(
         subscribed: state.currentPodcast.subscribed,
         feedId: state.currentPodcast.pId,
-        onlyUnread: false,
+        showRead: false,
       );
       await emit.forEach<List<EpisodeEntity>>(stream, onData: (data) {
         emit(state.copyWith(
