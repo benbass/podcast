@@ -11,10 +11,10 @@ class EpisodeUseCases {
   Stream<List<EpisodeEntity>> getEpisodes({
     required bool subscribed,
     required int feedId,
-    required bool onlyUnread,
+    required bool showRead,
   }) {
     return episodeRepository.getEpisodes(
-        subscribed: subscribed, feedId: feedId, onlyUnread: onlyUnread);
+        subscribed: subscribed, feedId: feedId, showRead: showRead);
   }
 
   Stream<int> unreadLocalEpisodesCount({required int feedId}) {
