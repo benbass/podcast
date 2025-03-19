@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:podcast/injection.dart';
-import 'package:podcast/presentation/subscribed_podcasts/widgets/rounded_text_widget.dart';
-
+import 'package:podcast/presentation/subscribed_podcasts_homepage/widgets/rounded_text_widget.dart';
 import '../../../application/podcast_bloc/podcast_bloc.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/core/image_provider.dart';
