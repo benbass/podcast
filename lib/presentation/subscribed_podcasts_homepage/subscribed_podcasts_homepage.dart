@@ -1,18 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:just_audio/just_audio.dart';
 
+import '../../application/episode_playback/episode_playback_cubit.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../../helpers/player/audiohandler.dart';
+import '../../injection.dart';
+import '../audioplayer_overlays/audioplayer_overlays.dart';
 import '../custom_widgets/page_transition.dart';
 import 'widgets/subscribed_podcast_card.dart';
 import '../podcasts_search_page/podcasts_search_page.dart';
 
-class SubscribedPodcastsPage extends StatelessWidget {
-  const SubscribedPodcastsPage({super.key});
+class SubscribedPodcastsHomePage extends StatelessWidget {
+  const SubscribedPodcastsHomePage({super.key});
 
   static const double _spacing = 20.0;
 
   @override
   Widget build(BuildContext context) {
+
+    // Listen for player state changes (e.g., playing, paused, buffering)
+    getIt<MyAudioHandler>().player.playerStateStream.listen((playerState) {
+      final processingState = playerState.processingState;
+
+      if( processingState == ProcessingState.completed){
+        getIt<MyAudioHandler>().stop();
+        removeOverlay();
+        BlocProvider.of<EpisodePlaybackCubit>(context)
+            .setPlaybackEpisode(null);
+      }
+    });
+
     return Scaffold(
       body: SafeArea(
         child: BlocBuilder<PodcastBloc, PodcastState>(
@@ -91,8 +109,12 @@ class SubscribedPodcastsPage extends StatelessWidget {
           child: Builder(
               builder: (context) => SizedBox(
                     height: MediaQuery.of(context).size.height,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
+                    child: Center(
+                      ///TODO: Replace with app logo
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Image.asset("assets/placeholder.png"),
+                      ),
                     ),
                   )));
     }
