@@ -24,7 +24,12 @@ class PodcastCard extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(color: podcast.subscribed ? Theme.of(context).colorScheme.secondary : Colors.transparent, width: 3.0)
+            border: Border.all(
+              color: podcast.subscribed
+                  ? Theme.of(context).colorScheme.secondary
+                  : Colors.transparent,
+              width: 3.0,
+            ),
           ),
           child: Stack(
             fit: StackFit.expand,
@@ -38,16 +43,18 @@ class PodcastCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
-              imageProvider == const AssetImage('assets/placeholder.png') ? Center(
-                child: Text(
-                  podcast.title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white, // Adjust text color as needed
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ) : const SizedBox(),
+              imageProvider == const AssetImage('assets/placeholder.png')
+                  ? Center(
+                      child: Text(
+                        podcast.title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white, // Adjust text color as needed
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )
+                  : const SizedBox(),
             ],
           ),
         );
