@@ -16,10 +16,10 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   Stream<List<EpisodeEntity>> getEpisodes({
     required bool subscribed,
     required int feedId,
-    required bool onlyUnread,
+    required bool showRead,
   }) {
     return episodeLocalDatasource.getEpisodes(
-        subscribed: subscribed, feedId: feedId, onlyUnread: onlyUnread);
+        subscribed: subscribed, feedId: feedId, showRead: showRead);
   }
 
   @override
