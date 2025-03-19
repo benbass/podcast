@@ -11,6 +11,15 @@ sealed class PodcastEvent extends Equatable {
 // Podcast Local
 final class LoadSubscribedPodcastsEvent extends PodcastEvent {}
 
+final class ToggleUnreadEpisodesVisibilityEvent extends PodcastEvent {
+  final bool areReadEpisodesVisible;
+  const ToggleUnreadEpisodesVisibilityEvent({
+    required this.areReadEpisodesVisible,
+  });
+  @override
+  List<Object> get props => [areReadEpisodesVisible];
+}
+
 final class SubscribeToPodcastEvent extends PodcastEvent {
   final PodcastEntity podcast;
   const SubscribeToPodcastEvent({
@@ -29,23 +38,6 @@ final class UnSubscribeFromPodcastEvent extends PodcastEvent {
   List<Object> get props => [id];
 }
 
-class GetUnreadEpisodesByFeedIdEvent extends PodcastEvent {
-  final int feedId;
-  const GetUnreadEpisodesByFeedIdEvent({
-    required this.feedId,
-  });
-  @override
-  List<Object> get props => [feedId];
-}
-
-final class ToggleUnreadEpisodesVisibilityEvent extends PodcastEvent {
-  final bool areReadEpisodesVisible;
-  const ToggleUnreadEpisodesVisibilityEvent({
-    required this.areReadEpisodesVisible,
-  });
-  @override
-  List<Object> get props => [areReadEpisodesVisible];
-}
 
 /// REMOTE
 // Podcast Remote
