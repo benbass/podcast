@@ -21,9 +21,7 @@ class EpisodesListPage extends StatelessWidget {
       body: BlocBuilder<PodcastBloc, PodcastState>(
         builder: (context, state) {
           return SafeArea(
-            child: state.status == PodcastStatus.loading
-                ? const Center(child: CircularProgressIndicator())
-                : CustomScrollView(
+            child: CustomScrollView(
                     physics: const BouncingScrollPhysics(),
                     slivers: [
                       SliverAppBar(
@@ -84,7 +82,7 @@ class EpisodesListPage extends StatelessWidget {
                           stream: getIt<EpisodeUseCases>().getEpisodes(
                             subscribed: state.currentPodcast.subscribed,
                             feedId: state.currentPodcast.pId,
-                            onlyUnread: !state.areReadEpisodesVisible,
+                            showRead: state.areReadEpisodesVisible,
                           ),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
