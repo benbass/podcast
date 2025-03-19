@@ -141,11 +141,11 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
       List<EpisodeEntity> updatedEpisodes = await episodeUseCases
           .refreshEpisodes(podcast: state.currentPodcast)
           .first;
+      PodcastEntity updatedPodcast = state.currentPodcast.copyWith()..episodes.addAll(updatedEpisodes);
       emit(state.copyWith(
         status: PodcastStatus.success,
         episodes: updatedEpisodes,
-        currentPodcast: state.currentPodcast.copyWith()
-          ..episodes.addAll(updatedEpisodes),
+        currentPodcast: updatedPodcast,
       ));
     } catch (e) {
       emit(state.copyWith(status: PodcastStatus.failure));
