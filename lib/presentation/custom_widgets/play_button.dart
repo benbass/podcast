@@ -25,7 +25,7 @@ class PlayButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
       builder: (context, state) {
-        if (state != episode) {
+        if (state?.id != episode.id) {
           return PlayButtonActive(episode: episode);
         } else {
           return const PlayButtonInactive();
