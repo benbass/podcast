@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcast/presentation/custom_widgets/failure_widget.dart';
 import 'package:podcast/presentation/custom_widgets/home_button.dart';
 import 'package:podcast/presentation/podcasts_search_page/widgets/podcast_card.dart';
 
@@ -15,12 +16,13 @@ class PodcastsSearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final podcastBloc = BlocProvider.of<PodcastBloc>(context);
     return Scaffold(
       appBar: _buildAppBar(context),
       body: SafeArea(
         child: BlocBuilder<PodcastBloc, PodcastState>(
           builder: (context, state) {
-            return _buildBody(context, state);
+            return _buildBody(context, state, podcastBloc);
           },
         ),
       ),
@@ -36,13 +38,16 @@ class PodcastsSearchPage extends StatelessWidget {
         leading: const MyHomeButton());
   }
 
-  Widget _buildBody(BuildContext context, PodcastState state) {
+  Widget _buildBody(
+      BuildContext context, PodcastState state, Bloc podcastBloc) {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints.expand(),
         child: state.status == PodcastStatus.loading
             ? _buildLoadingIndicator(context)
-            : _buildPodcastList(context, state),
+            : state.status == PodcastStatus.failure
+                ? buildFailureWidget(message: "Error loading podcasts")
+                : _buildPodcastList(context, state, podcastBloc),
       ),
     );
   }
@@ -53,7 +58,8 @@ class PodcastsSearchPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPodcastList(BuildContext context, PodcastState state) {
+  Widget _buildPodcastList(
+      BuildContext context, PodcastState state, Bloc podcastBloc) {
     if (state.keyword.isEmpty) {
       return _buildEmptyList(
           context, "Enter keyword(s) to\nsearch for podcasts");
@@ -62,11 +68,12 @@ class PodcastsSearchPage extends StatelessWidget {
       return _buildEmptyList(context, "No podcasts found\nfor your keyword(s)");
     }
     return CarouselView(
-      itemExtent: MediaQuery.of(context).size.width ,
+      itemExtent: MediaQuery.of(context).size.width,
       scrollDirection: Axis.vertical,
       itemSnapping: true,
       padding: const EdgeInsets.all(10.0),
-      backgroundColor: Colors.transparent,//Theme.of(context).colorScheme.secondary,
+      backgroundColor:
+          Colors.transparent, //Theme.of(context).colorScheme.secondary,
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
@@ -76,7 +83,7 @@ class PodcastsSearchPage extends StatelessWidget {
         ),
       ),
       onTap: (index) {
-        BlocProvider.of<PodcastBloc>(context)
+        podcastBloc
             .add(PodcastTappedEvent(podcast: state.queryResultPodcasts[index]));
         Navigator.push(
           context,
