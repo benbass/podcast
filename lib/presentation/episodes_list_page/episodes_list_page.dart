@@ -22,101 +22,101 @@ class EpisodesListPage extends StatelessWidget {
         builder: (context, state) {
           return SafeArea(
             child: CustomScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    slivers: [
-                      SliverAppBar(
-                        collapsedHeight: 60,
-                        expandedHeight: 170,
-                        pinned: true,
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            spacing: 12,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 80.0),
-                                child: Text(
-                                  state.currentPodcast.title,
-                                  style:
-                                      Theme.of(context).textTheme.displayLarge,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ElevatedButtonSubscribe(
-                                    navigate: true,
-                                    podcast: state.currentPodcast,
-                                  ),
-                                  const SizedBox(
-                                    width: 30,
-                                  ),
-                                  IconButton(
-                                    onPressed: () => Navigator.push(
-                                        context,
-                                        ScaleRoute(
-                                          page: const PodcastDetailsPage(),
-                                        )),
-                                    icon: const Icon(
-                                      Icons.info_outline_rounded,
-                                      size: 30,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const RowIconButtonsEpisodes(),
-                              const SizedBox(
-                                height: 12,
-                              ),
-                            ],
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverAppBar(
+                  collapsedHeight: 60,
+                  expandedHeight: 170,
+                  pinned: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      spacing: 12,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 80.0),
+                          child: Text(
+                            state.currentPodcast.title,
+                            style: Theme.of(context).textTheme.displayLarge,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ),
-                      StreamBuilder<List<EpisodeEntity>>(
-                          // The method getEpisodes checks the subscribed flag of
-                          // the podcast and returns the correct stream
-                          // (from objectBox database or from the remote server)
-                          stream: getIt<EpisodeUseCases>().getEpisodes(
-                            subscribed: state.currentPodcast.subscribed,
-                            feedId: state.currentPodcast.pId,
-                            showRead: state.areReadEpisodesVisible,
-                          ),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const SliverFillRemaining(
-                                child: Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            }
-                            if (snapshot.hasError) {
-                              return buildFailureWidget(message: 'Error loading episodes. Please try again.');
-                            } else {
-                              return SliverPadding(
-                                padding: const EdgeInsets.only(bottom: 80.0),
-                                sliver: SliverList.builder(
-                                  itemCount: snapshot.hasData
-                                      ? snapshot.data!.length
-                                      : 0,
-                                  itemBuilder: (context, index) {
-                                    List<EpisodeEntity> episodes =
-                                        snapshot.data ?? [];
-                                    final item = episodes[index];
-                                    return EpisodeCard(
-                                      episode: item,
-                                      podcast: state.currentPodcast,
-                                    );
-                                  },
-                                ),
-                              );
-                            }
-                          }),
-                    ],
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButtonSubscribe(
+                              navigate: true,
+                              podcast: state.currentPodcast,
+                            ),
+                            const SizedBox(
+                              width: 30,
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.push(
+                                  context,
+                                  ScaleRoute(
+                                    page: const PodcastDetailsPage(),
+                                  )),
+                              icon: const Icon(
+                                Icons.info_outline_rounded,
+                                size: 30,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const RowIconButtonsEpisodes(),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                      ],
+                    ),
                   ),
+                ),
+                StreamBuilder<List<EpisodeEntity>>(
+                    // The method getEpisodes checks the subscribed flag of
+                    // the podcast and returns the correct stream
+                    // (from objectBox database or from the remote server)
+                    stream: getIt<EpisodeUseCases>().getEpisodes(
+                      subscribed: state.currentPodcast.subscribed,
+                      feedId: state.currentPodcast.pId,
+                      showRead: state.areReadEpisodesVisible,
+                    ),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SliverFillRemaining(
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+                      if (snapshot.hasError) {
+                        return SliverToBoxAdapter(
+                          child: buildFailureWidget(
+                              message:
+                                  'Error loading episodes. Please try again.'),
+                        );
+                      } else {
+                        return SliverPadding(
+                          padding: const EdgeInsets.only(bottom: 80.0),
+                          sliver: SliverList.builder(
+                            itemCount:
+                                snapshot.hasData ? snapshot.data!.length : 0,
+                            itemBuilder: (context, index) {
+                              List<EpisodeEntity> episodes =
+                                  snapshot.data ?? [];
+                              final item = episodes[index];
+                              return EpisodeCard(
+                                episode: item,
+                                podcast: state.currentPodcast,
+                              );
+                            },
+                          ),
+                        );
+                      }
+                    }),
+              ],
+            ),
           );
         },
       ),
