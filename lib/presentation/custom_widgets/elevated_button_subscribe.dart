@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/page_transition.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
-import '../subscribed_podcasts/subscribed_podcasts_page.dart';
+import '../subscribed_podcasts_homepage/subscribed_podcasts_homepage.dart';
 
 class ElevatedButtonSubscribe extends StatelessWidget {
   final PodcastEntity podcast;
@@ -28,7 +28,7 @@ class ElevatedButtonSubscribe extends StatelessWidget {
           Navigator.push(
             context,
             ScaleRoute(
-              page: const SubscribedPodcastsPage(),
+              page: const SubscribedPodcastsHomePage(),
             ),
           );
         }
