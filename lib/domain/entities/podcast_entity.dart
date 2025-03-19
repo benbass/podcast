@@ -29,7 +29,7 @@ class PodcastEntity {
 
   /// User parameter
   bool subscribed;
-  int? unreadEpisodes;
+  int? unreadEpisodes; // we will delete this one. Using StreamBuilder instead.
 
   /// ObjectBox relation
   @Backlink('podcast')
