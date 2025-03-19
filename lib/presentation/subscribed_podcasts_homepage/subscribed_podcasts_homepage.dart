@@ -18,16 +18,14 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     // Listen for player state changes (e.g., playing, paused, buffering)
     getIt<MyAudioHandler>().player.playerStateStream.listen((playerState) {
       final processingState = playerState.processingState;
 
-      if( processingState == ProcessingState.completed){
+      if (processingState == ProcessingState.completed) {
         getIt<MyAudioHandler>().stop();
         removeOverlay();
-        BlocProvider.of<EpisodePlaybackCubit>(context)
-            .setPlaybackEpisode(null);
+        BlocProvider.of<EpisodePlaybackCubit>(context).setPlaybackEpisode(null);
       }
     });
 
@@ -119,11 +117,33 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
                   )));
     }
 
+    Widget buildFailureWidget() {
+      return const SliverToBoxAdapter(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 60,
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 16, left: 16, right: 16),
+              child: Text('Unexpected error. Please restart the app.'),
+            ),
+          ],
+        ),
+      );
+    }
+
     // Build the grid based on the state
     return state.status == PodcastStatus.loading
         ? buildCircularProgressIndicator()
-        : state.subscribedPodcasts.isEmpty
-            ? emptyStateWidget
-            : buildGrid(state.subscribedPodcasts);
+        : state.status == PodcastStatus.failure
+            ? buildFailureWidget()
+            : state.subscribedPodcasts.isEmpty
+                ? emptyStateWidget
+                : buildGrid(state.subscribedPodcasts);
   }
 }
