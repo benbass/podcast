@@ -11,50 +11,43 @@ import '../../objectbox.g.dart';
 import '../models/episode_model.dart';
 
 /// Local data source = objectBox database
-abstract class EpisodeLocalDatasource {
+abstract class _BaseEpisodeLocalDatasource {
+  Stream<List<EpisodeEntity>> _getEpisodesByFeedId(int feedId,
+      {required bool showRead}) {
+    // If showRead is true (initial is false), we show all episodes, otherwise only unread ones
+    final queryBuilder = episodeBox.query(EpisodeEntity_.feedId
+        .equals(feedId)
+        .and(showRead
+            ? EpisodeEntity_.read.notNull()
+            : EpisodeEntity_.read.equals(false)))
+      ..order(EpisodeEntity_.datePublished, flags: Order.descending);
+    return queryBuilder
+        .watch(triggerImmediately: true)
+        .map((query) => query.find());
+  }
+}
+
+abstract class EpisodeLocalDatasource extends _BaseEpisodeLocalDatasource {
   Stream<List<EpisodeEntity>> getEpisodes({
     required bool subscribed,
     required int feedId,
-    required bool onlyUnread,
+    required bool showRead,
   });
-  Stream<int> unreadLocalEpisodesCount({required int feedId});
+  Stream<int> unreadLocalEpisodesCount(
+      {required int feedId}); // this is only needed for subscribed = true
 }
 
-class EpisodeLocalDatasourceImpl implements EpisodeLocalDatasource {
+class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
+    implements EpisodeLocalDatasource {
   @override
   Stream<List<EpisodeEntity>> getEpisodes({
     required bool subscribed,
     required int feedId,
-    required bool onlyUnread,
+    required bool showRead,
   }) {
-    if (subscribed) {
-      if (onlyUnread) {
-        return _getUnreadLocalEpisodesByFeedId(feedId);
-      } else {
-        return _getLocalEpisodesByFeedId(feedId);
-      }
-    } else {
-      return getIt<EpisodeRemoteDataSource>()
-          .fetchRemoteEpisodesByFeedId(feedId);
-    }
-  }
-
-  Stream<List<EpisodeEntity>> _getLocalEpisodesByFeedId(int feedId) {
-    final queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId))
-      ..order(EpisodeEntity_.datePublished, flags: Order.descending);
-    return queryBuilder
-        .watch(triggerImmediately: true)
-        .map((query) => query.find());
-  }
-
-  Stream<List<EpisodeEntity>> _getUnreadLocalEpisodesByFeedId(int feedId) {
-    final queryBuilder = episodeBox.query(EpisodeEntity_.feedId
-        .equals(feedId)
-        .and(EpisodeEntity_.read.equals(false)))
-      ..order(EpisodeEntity_.datePublished, flags: Order.descending);
-    return queryBuilder
-        .watch(triggerImmediately: true)
-        .map((query) => query.find());
+    return subscribed
+        ? _getEpisodesByFeedId(feedId, showRead: showRead)
+        : getIt<EpisodeRemoteDataSource>().fetchRemoteEpisodesByFeedId(feedId);
   }
 
   @override
