@@ -7,6 +7,7 @@ import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
+import '../custom_widgets/failure_widget.dart';
 import '../custom_widgets/page_transition.dart';
 import 'widgets/subscribed_podcast_card.dart';
 import '../podcasts_search_page/podcasts_search_page.dart';
@@ -117,31 +118,11 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
                   )));
     }
 
-    Widget buildFailureWidget() {
-      return const SliverToBoxAdapter(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              color: Colors.red,
-              size: 60,
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 16, left: 16, right: 16),
-              child: Text('Unexpected error. Please restart the app.'),
-            ),
-          ],
-        ),
-      );
-    }
-
     // Build the grid based on the state
     return state.status == PodcastStatus.loading
         ? buildCircularProgressIndicator()
         : state.status == PodcastStatus.failure
-            ? buildFailureWidget()
+            ? buildFailureWidget(message: 'Unexpected error. Please restart the app.')
             : state.subscribedPodcasts.isEmpty
                 ? emptyStateWidget
                 : buildGrid(state.subscribedPodcasts);
