@@ -26,7 +26,9 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
       if (processingState == ProcessingState.completed) {
         getIt<MyAudioHandler>().stop();
         removeOverlay();
-        BlocProvider.of<EpisodePlaybackCubit>(context).setPlaybackEpisode(null);
+        if(context.mounted) {
+          BlocProvider.of<EpisodePlaybackCubit>(context).setPlaybackEpisode(null);
+        }
       }
     });
 
@@ -122,7 +124,10 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
     return state.status == PodcastStatus.loading
         ? buildCircularProgressIndicator()
         : state.status == PodcastStatus.failure
-            ? buildFailureWidget(message: 'Unexpected error. Please restart the app.')
+            ? SliverToBoxAdapter(
+                child: buildFailureWidget(
+                    message: 'Unexpected error. Please restart the app.'),
+              )
             : state.subscribedPodcasts.isEmpty
                 ? emptyStateWidget
                 : buildGrid(state.subscribedPodcasts);
