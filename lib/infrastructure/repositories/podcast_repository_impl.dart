@@ -50,13 +50,15 @@ class PodcastRepositoryImpl implements PodcastRepository {
   PodcastEntity _markPodcastAsSubscribed(PodcastEntity podcast) {
     final PodcastEntity subscribedPodcast = podcast.copyWith(
       subscribed: true,
-      unreadEpisodes: podcast.episodes.length,
     )..episodes.addAll(podcast.episodes);
     return subscribedPodcast;
   }
 
   @override
   Future<void> unsubscribeFromPodcast(PodcastEntity podcast) async {
+    for(var episode in podcast.episodes){
+      episodeBox.remove(episode.id);
+    }
     podcastBox.remove(podcast.id);
   }
 
@@ -75,9 +77,7 @@ class PodcastRepositoryImpl implements PodcastRepository {
   Future<PodcastEntity> fillPodcastWithEpisodes(PodcastEntity podcast) async {
     final List<EpisodeEntity> episodes =
         await _fetchEpisodesFromRemote(podcast.pId);
-    for (EpisodeEntity episode in episodes) {
-      podcast.episodes.add(episode);
-    }
+    podcast.episodes.addAll(episodes);
     return podcast;
   }
 
@@ -97,10 +97,13 @@ class PodcastRepositoryImpl implements PodcastRepository {
             .indexWhere((element) => element.pId == currentPodcast.pId);
 
         // Remove old object from query result
-        currentQueryResult.removeAt(index);
+        //currentQueryResult.removeAt(index);
         // Insert new object in query result
         // the state of the new object (subscribed or not) was already set in the SubscribeToPodcastEvent or UnSubscribeFromPodcastEvent
-        currentQueryResult.insert(index, currentPodcast);
+        //currentQueryResult.insert(index, currentPodcast);
+
+        // Replace
+        currentQueryResult[index] = currentPodcast;
       }
     }
     return currentQueryResult;
