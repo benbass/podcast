@@ -50,15 +50,7 @@ final class GetRemotePodcastsByKeywordEvent extends PodcastEvent {
   List<Object> get props => [keyword];
 }
 
-final class UpdateQueryEvent extends PodcastEvent {
-  final int feedId;
-
-  const UpdateQueryEvent({
-    required this.feedId,
-  });
-  @override
-  List<Object> get props => [feedId];
-}
+final class UpdateQueryEvent extends PodcastEvent {}
 
 final class RefreshEpisodesByFeedIdEvent extends PodcastEvent {
   final int feedId;
@@ -72,14 +64,7 @@ final class RefreshEpisodesByFeedIdEvent extends PodcastEvent {
 
 /// LOCAL and REMOTE
 // Episodes Local or remote
-class GetEpisodesByFeedIdEvent extends PodcastEvent {
-  final int feedId;
-  const GetEpisodesByFeedIdEvent({
-    required this.feedId,
-  });
-  @override
-  List<Object> get props => [feedId];
-}
+class GetEpisodesByFeedIdEvent extends PodcastEvent {}
 
 
 /// None
