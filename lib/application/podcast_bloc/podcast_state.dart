@@ -11,6 +11,7 @@ class PodcastState extends Equatable {
   final List<EpisodeEntity> episodes;
   final bool areReadEpisodesVisible;
   final String keyword;
+  final bool refreshEpisodes;
   const PodcastState({
     required this.status,
     required this.subscribedPodcasts,
@@ -19,6 +20,7 @@ class PodcastState extends Equatable {
     required this.episodes,
     required this.areReadEpisodesVisible,
     required this.keyword,
+    required this.refreshEpisodes,
   });
 
   PodcastState.initial()
@@ -28,7 +30,8 @@ class PodcastState extends Equatable {
         currentPodcast = PodcastEntity.emptyPodcast(),
         episodes = const <EpisodeEntity>[],
         areReadEpisodesVisible = false,
-        keyword = '';
+        keyword = '',
+        refreshEpisodes = false;
 
   PodcastState copyWith({
     PodcastStatus? status,
@@ -38,6 +41,7 @@ class PodcastState extends Equatable {
     List<EpisodeEntity>? episodes,
     bool? areReadEpisodesVisible,
     String? keyword,
+    bool? refreshEpisodes,
   }) {
     return PodcastState(
       status: status ?? this.status,
@@ -48,6 +52,7 @@ class PodcastState extends Equatable {
       areReadEpisodesVisible:
           areReadEpisodesVisible ?? this.areReadEpisodesVisible,
       keyword: keyword ?? this.keyword,
+      refreshEpisodes: refreshEpisodes ?? this.refreshEpisodes,
     );
   }
 
@@ -60,5 +65,6 @@ class PodcastState extends Equatable {
         episodes,
         areReadEpisodesVisible,
         keyword,
+        refreshEpisodes,
       ];
 }
