@@ -73,14 +73,14 @@ class PodcastDataSourceImpl implements PodcastDataSource {
       // Create a map to efficiently find subscribed podcasts.
       final Map<int, PodcastEntity> podcastMap = {};
       // Add found podcasts to the map.
-      for (PodcastEntity podcast in foundPodcasts) {
-        podcastMap[podcast.pId] = podcast;
+      for (PodcastEntity fPodcast in foundPodcasts) {
+        podcastMap[fPodcast.pId] = fPodcast;
       }
       // Replace found podcasts with subscribed podcasts if they exist.
-      for (PodcastEntity podcast in subscribedPodcasts) {
+      for (PodcastEntity sPodcast in subscribedPodcasts) {
         // Replace found podcasts with subscribed podcasts
-        if (podcastMap.containsKey(podcast.pId)) {
-          podcastMap[podcast.pId] = podcast;
+        if (podcastMap.containsKey(sPodcast.pId)) {
+          podcastMap[sPodcast.pId] = sPodcast;
         }
       }
       return podcastMap.values.toList();
