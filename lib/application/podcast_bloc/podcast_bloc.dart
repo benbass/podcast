@@ -69,20 +69,26 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   FutureOr<void> _onSubscribeToPodcastEvent(event, emit) async {
     emit(state.copyWith(status: PodcastStatus.loading));
     try {
+      // Save to db
       await podcastUseCases.subscribeToPodcast(event.podcast);
+      // update subscribed podcasts list with latest db version
       List<PodcastEntity> subscribedPodcasts =
           await podcastUseCases.getSubscribedPodcasts();
-      // Current podcast (emitted by prior PodcastTappedEvent is from query result.
+
+      // Current podcast (emitted by prior PodcastTappedEvent) is from query result.
       // Its id is 0 since this object is not in the database.
-      // Now that podcast has been added to the database with an id != 0 and saved episodes
+      // Now that podcast has been added to the database with an id != 0,
       // we replace the current podcast with the one from the database:
       PodcastEntity currentPodcast =
           podcastBox.get(subscribedPodcasts.last.id)!;
+
       emit(state.copyWith(
         status: PodcastStatus.success,
         subscribedPodcasts: subscribedPodcasts,
         currentPodcast: currentPodcast,
       ));
+      // We also need to update the query result with the podcast from db that will be displayed as subscribed
+      add(UpdateQueryEvent());
     } catch (e) {
       emit(state.copyWith(status: PodcastStatus.failure));
     }
@@ -105,7 +111,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
         currentPodcast: unsubscribedPodcast,
         status: PodcastStatus.success,
       ));
-      add(UpdateQueryEvent(feedId: state.currentPodcast.pId));
+      add(UpdateQueryEvent());
     } catch (e) {
       emit(state.copyWith(status: PodcastStatus.failure));
     }
@@ -138,15 +144,29 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   FutureOr<void> _onRefreshEpisodesByFeedIdEvent(event, emit) async {
     emit(state.copyWith(status: PodcastStatus.loading));
     try {
-      List<EpisodeEntity> updatedEpisodes = await episodeUseCases
-          .refreshEpisodes(podcast: state.currentPodcast)
-          .first;
-      PodcastEntity updatedPodcast = state.currentPodcast.copyWith()..episodes.addAll(updatedEpisodes);
-      emit(state.copyWith(
-        status: PodcastStatus.success,
-        episodes: updatedEpisodes,
-        currentPodcast: updatedPodcast,
-      ));
+      final List<EpisodeEntity> newEpisodes = await episodeUseCases
+          .newEpisodesList(feedId: state.currentPodcast.pId);
+      if (newEpisodes.isNotEmpty) {
+        PodcastEntity podcast = podcastBox.get(state.currentPodcast.id)!;
+        podcast.episodes.insertAll(0, newEpisodes);
+        podcast.episodes.applyToDb();
+        final List<EpisodeEntity> updatedLocalEpisodes = await episodeUseCases
+            .getEpisodes(
+              subscribed: true,
+              feedId: podcast.pId,
+              showRead: state.areReadEpisodesVisible,
+            )
+            .first;
+        emit(state.copyWith(
+          status: PodcastStatus.success,
+          episodes: updatedLocalEpisodes,
+          //currentPodcast: podcast,
+        ));
+      } else {
+        emit(state.copyWith(
+          status: PodcastStatus.success,
+        ));
+      }
     } catch (e) {
       emit(state.copyWith(status: PodcastStatus.failure));
     }
@@ -162,19 +182,17 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   FutureOr<void> _onGetEpisodesByFeedIdEvent(event, emit) async {
     emit(state.copyWith(status: PodcastStatus.loading));
     try {
-      final stream = episodeUseCases.getEpisodes(
-        subscribed: state.currentPodcast.subscribed,
-        feedId: state.currentPodcast.pId,
-        showRead: false,
-      );
-      await emit.forEach<List<EpisodeEntity>>(stream, onData: (data) {
-        emit(state.copyWith(
-          status: PodcastStatus.success,
-          episodes: data,
-        ));
-      }, onError: (error, stackTrace) {
-        emit(state.copyWith(status: PodcastStatus.failure));
-      });
+      final List<EpisodeEntity> stream = await episodeUseCases
+          .getEpisodes(
+            subscribed: state.currentPodcast.subscribed,
+            feedId: state.currentPodcast.pId,
+            showRead: false,
+          )
+          .first;
+      emit(state.copyWith(
+        status: PodcastStatus.success,
+        episodes: stream,
+      ));
     } catch (e) {
       emit(state.copyWith(status: PodcastStatus.failure));
     }
