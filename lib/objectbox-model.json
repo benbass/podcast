@@ -147,7 +147,7 @@
     },
     {
       "id": "2:6590084371707452549",
-      "lastPropertyId": "18:945864541081495901",
+      "lastPropertyId": "19:2968814174583946096",
       "name": "PodcastEntity",
       "properties": [
         {
@@ -237,9 +237,9 @@
           "type": 1
         },
         {
-          "id": "18:945864541081495901",
-          "name": "artworkBytes",
-          "type": 23
+          "id": "19:2968814174583946096",
+          "name": "artworkFilePath",
+          "type": 9
         }
       ],
       "relations": []
@@ -253,7 +253,9 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    945864541081495901
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

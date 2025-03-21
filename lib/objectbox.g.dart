@@ -164,7 +164,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(2, 6590084371707452549),
       name: 'PodcastEntity',
-      lastPropertyId: const obx_int.IdUid(18, 945864541081495901),
+      lastPropertyId: const obx_int.IdUid(19, 2968814174583946096),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -253,9 +253,9 @@ final _entities = <obx_int.ModelEntity>[
             type: 1,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(18, 945864541081495901),
-            name: 'artworkBytes',
-            type: 23,
+            id: const obx_int.IdUid(19, 2968814174583946096),
+            name: 'artworkFilePath',
+            type: 9,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -306,7 +306,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [],
       retiredIndexUids: const [],
-      retiredPropertyUids: const [],
+      retiredPropertyUids: const [945864541081495901],
       retiredRelationUids: const [],
       modelVersion: 5,
       modelVersionParserMinimum: 5,
@@ -481,10 +481,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final mediumOffset = fbb.writeString(object.medium);
           final categoriesOffset = fbb.writeList(
               object.categories.map(fbb.writeString).toList(growable: false));
-          final artworkBytesOffset = object.artworkBytes == null
+          final artworkFilePathOffset = object.artworkFilePath == null
               ? null
-              : fbb.writeListInt8(object.artworkBytes!);
-          fbb.startTable(19);
+              : fbb.writeString(object.artworkFilePath!);
+          fbb.startTable(20);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.pId);
           fbb.addOffset(2, podcastGuidOffset);
@@ -502,7 +502,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addInt64(14, object.episodeCount);
           fbb.addOffset(15, categoriesOffset);
           fbb.addBool(16, object.subscribed);
-          fbb.addOffset(17, artworkBytesOffset);
+          fbb.addOffset(18, artworkFilePathOffset);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -545,8 +545,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
               .vTableGet(buffer, rootOffset, 34, []);
           final subscribedParam =
               const fb.BoolReader().vTableGet(buffer, rootOffset, 36, false);
-          final artworkBytesParam = const fb.Uint8ListReader(lazy: false)
-              .vTableGetNullable(buffer, rootOffset, 38) as Uint8List?;
+          final artworkFilePathParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 40);
           final object = PodcastEntity(
               pId: pIdParam,
               podcastGuid: podcastGuidParam,
@@ -564,7 +565,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
               episodeCount: episodeCountParam,
               categories: categoriesParam,
               subscribed: subscribedParam,
-              artworkBytes: artworkBytesParam)
+              artworkFilePath: artworkFilePathParam)
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
           obx_int.InternalToManyAccess.setRelInfo<PodcastEntity>(
               object.episodes,
@@ -755,9 +756,9 @@ class PodcastEntity_ {
   static final subscribed =
       obx.QueryBooleanProperty<PodcastEntity>(_entities[1].properties[16]);
 
-  /// See [PodcastEntity.artworkBytes].
-  static final artworkBytes =
-      obx.QueryByteVectorProperty<PodcastEntity>(_entities[1].properties[17]);
+  /// See [PodcastEntity.artworkFilePath].
+  static final artworkFilePath =
+      obx.QueryStringProperty<PodcastEntity>(_entities[1].properties[17]);
 
   /// see [PodcastEntity.episodes]
   static final episodes = obx.QueryBacklinkToMany<EpisodeEntity, PodcastEntity>(
