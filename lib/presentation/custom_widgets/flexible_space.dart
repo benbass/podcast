@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -51,7 +52,8 @@ class FlexibleSpace extends StatelessWidget {
                   top: 12,
                   right: 12,
                   child: ElevatedButtonSubscribe(
-                    navigate: false, podcast: podcast,
+                    navigate: false,
+                    podcast: podcast,
                   ),
                 ),
               if (episode != null)
@@ -79,7 +81,7 @@ class FlexibleSpace extends StatelessWidget {
     if (episode != null) {
       return episode!.image;
     } else if (episode == null) {
-      return podcast.artwork;
+      return podcast.artworkFilePath ?? podcast.artwork;
     } else {
       return '';
     }
@@ -97,7 +99,11 @@ class FlexibleSpace extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: imageProvider,
+              image: episode == null && podcast.subscribed
+                  ? podcast.artworkFilePath != null
+                      ? FileImage(File(podcast.artworkFilePath!))
+                      : const AssetImage('assets/placeholder.png')
+                  : imageProvider,
               fit: BoxFit.fitWidth,
             ),
           ),
@@ -108,7 +114,11 @@ class FlexibleSpace extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: imageProvider,
+                      image: episode == null && podcast.subscribed
+                          ? podcast.artworkFilePath != null
+                          ? FileImage(File(podcast.artworkFilePath!))
+                          : const AssetImage('assets/placeholder.png')
+                          : imageProvider,
                       fit: BoxFit.fitHeight,
                     ),
                   ),
