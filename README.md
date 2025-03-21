@@ -22,12 +22,16 @@ API key:
 You need an account to obtain your own API keys, which must be inserted in the apikey and apiSecret variables in the authorisation.dart file.
 
 I use an .env file (included in gitignore) for hardcoded values and envied + envied_generator packages for obfuscation: https://pub.dev/packages/envied
+This file exists in my project root folder. 
 
 My gitignore:
 
 *.env
 
 /lib/env/env.g.dart
+
+Run "dart run build_runner build --delete-conflicting-outputs" to generate the .env.g.dart file.
+Run it also to generate the objectbox.g.dart and the objectbox-model.json files!
 
 ## Current state
 Done: Search for podcasts and view description and episodes, view episode descriptions and listen to episodes, open podcast urls in a webview.
@@ -39,4 +43,5 @@ Done: Search for podcasts and view description and episodes, view episode descri
     - Player (skip to previous and skip to next episode: playlists must be implemented first)
     - Share on social media or as link
     - Unit tests
+    - Perform actions on episodes for subscribed podcaast and save to database
     - ...
