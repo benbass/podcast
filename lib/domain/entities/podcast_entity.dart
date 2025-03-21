@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:objectbox/objectbox.dart';
 
 import 'episode_entity.dart';
@@ -29,7 +31,9 @@ class PodcastEntity {
 
   /// User parameter
   bool subscribed;
-  int? unreadEpisodes; // we will delete this one. Using StreamBuilder instead.
+
+  @Property(type: PropertyType.byteVector)
+  Uint8List? artworkBytes;
 
   /// ObjectBox relation
   @Backlink('podcast')
@@ -52,12 +56,13 @@ class PodcastEntity {
     required this.episodeCount,
     required this.categories,
     required this.subscribed,
-    required this.unreadEpisodes,
+    required this.artworkBytes,
   });
 
   PodcastEntity copyWith({
     bool? subscribed,
     int? unreadEpisodes,
+    Uint8List? artworkBytes,
   }) {
     return PodcastEntity(
       pId: pId,
@@ -76,7 +81,7 @@ class PodcastEntity {
       episodeCount: episodeCount,
       categories: categories,
       subscribed: subscribed ?? this.subscribed,
-      unreadEpisodes: unreadEpisodes ?? this.unreadEpisodes,
+      artworkBytes: artworkBytes ?? this.artworkBytes,
     );
   }
 
@@ -97,6 +102,6 @@ class PodcastEntity {
         episodeCount: 0,
         categories: [],
         subscribed: false,
-        unreadEpisodes: 0,
+        artworkBytes: null,
       );
 }
