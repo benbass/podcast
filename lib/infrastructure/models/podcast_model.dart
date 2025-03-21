@@ -19,7 +19,7 @@ class PodcastModel extends PodcastEntity {
     required super.episodeCount,
     required super.categories,
     required super.subscribed,
-    required super.artworkBytes,
+    required super.artworkFilePath,
     required episodes,
   });
 
@@ -63,7 +63,7 @@ class PodcastModel extends PodcastEntity {
           ? _categoryValuesToList(json['categories'])
           : [],
       subscribed: false,
-      artworkBytes: null,
+      artworkFilePath: null,
       episodes: [],
     );
   }
@@ -88,7 +88,7 @@ class PodcastModel extends PodcastEntity {
       episodeCount: episodeCount,
       categories: categories,
       subscribed: subscribed,
-      artworkBytes: artworkBytes,
+      artworkFilePath: artworkFilePath,
     );
   }
 }
