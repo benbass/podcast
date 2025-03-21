@@ -2,7 +2,7 @@ import 'package:envied/envied.dart';
 
 part 'env.g.dart';
 
-@envied
+@Envied()
 abstract class Env {
   @EnviedField(varName: 'apiKey', obfuscate: true)
   static final String apiKey = _Env.apiKey;
