@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:objectbox/objectbox.dart';
 
 import 'episode_entity.dart';
@@ -20,7 +18,7 @@ class PodcastEntity {
   final String description;
   final String author;
   final String ownerName;
-  final String artwork;
+  final String artwork; //
   final int lastUpdateTime;
   final String language;
   final bool explicit;
@@ -32,8 +30,8 @@ class PodcastEntity {
   /// User parameter
   bool subscribed;
 
-  @Property(type: PropertyType.byteVector)
-  Uint8List? artworkBytes;
+  // will be used for subscribed podcasts: artworkFilePath is artwork url file saved to device
+  String? artworkFilePath;
 
   /// ObjectBox relation
   @Backlink('podcast')
@@ -56,13 +54,13 @@ class PodcastEntity {
     required this.episodeCount,
     required this.categories,
     required this.subscribed,
-    required this.artworkBytes,
+    required this.artworkFilePath,
   });
 
   PodcastEntity copyWith({
     bool? subscribed,
     int? unreadEpisodes,
-    Uint8List? artworkBytes,
+    String? artworkFilePath,
   }) {
     return PodcastEntity(
       pId: pId,
@@ -81,7 +79,7 @@ class PodcastEntity {
       episodeCount: episodeCount,
       categories: categories,
       subscribed: subscribed ?? this.subscribed,
-      artworkBytes: artworkBytes ?? this.artworkBytes,
+      artworkFilePath: artworkFilePath ?? this.artworkFilePath,
     );
   }
 
@@ -102,6 +100,6 @@ class PodcastEntity {
         episodeCount: 0,
         categories: [],
         subscribed: false,
-        artworkBytes: null,
+        artworkFilePath: null,
       );
 }
