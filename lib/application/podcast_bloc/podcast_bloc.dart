@@ -44,6 +44,8 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     /// END LOCAL and REMOTE
 
     on<PodcastTappedEvent>(_onPodcastTappedEvent);
+    on<ToggleStateToSuccessAfterFailureEvent>(
+        _onToggleStateToSuccessAfterFailureEvent);
   }
 
   FutureOr<void> _onLoadSubscribedPodcastsEvent(event, emit) async {
@@ -196,5 +198,10 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     } catch (e) {
       emit(state.copyWith(status: PodcastStatus.failure));
     }
+  }
+
+  FutureOr<void> _onToggleStateToSuccessAfterFailureEvent(event, emit) async {
+    emit(state.copyWith(
+      status: PodcastStatus.success));
   }
 }
