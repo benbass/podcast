@@ -19,7 +19,7 @@ class PodcastDetailsPage extends StatelessWidget {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : state.status == PodcastStatus.failure
+              : state.status == PodcastStatus.failure && !state.currentPodcast.subscribed
                   ? buildFailureWidget(
                       message: "Error loading podcast details.")
                   : SafeArea(
