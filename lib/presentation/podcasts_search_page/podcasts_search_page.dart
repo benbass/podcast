@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:podcast/presentation/custom_widgets/failure_widget.dart';
 import 'package:podcast/presentation/custom_widgets/home_button.dart';
 import 'package:podcast/presentation/podcasts_search_page/widgets/podcast_card.dart';
 
 import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../custom_widgets/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
 import '../podcast_details_page/podcast_details_page.dart';
 import 'widgets/search_textfield.dart';
@@ -46,7 +46,9 @@ class PodcastsSearchPage extends StatelessWidget {
         child: state.status == PodcastStatus.loading
             ? _buildLoadingIndicator(context)
             : state.status == PodcastStatus.failure
-                ? buildFailureWidget(message: "Error loading podcasts")
+                ? const FailureDialog(
+                    message: "Error loading podcasts",
+                  )
                 : _buildPodcastList(context, state, podcastBloc),
       ),
     );
@@ -63,43 +65,46 @@ class PodcastsSearchPage extends StatelessWidget {
     if (state.keyword.isEmpty) {
       return _buildEmptyList(
           context, "Enter keyword(s) to\nsearch for podcasts");
-    }
-    if (state.queryResultPodcasts.isEmpty && state.keyword.isNotEmpty) {
-      return _buildEmptyList(context, "No podcasts found\nfor your keyword(s)");
-    }
-    return CarouselView(
-      itemExtent: MediaQuery.of(context).size.width,
-      scrollDirection: Axis.vertical,
-      itemSnapping: true,
-      padding: const EdgeInsets.all(10.0),
-      backgroundColor:
-          Colors.transparent, //Theme.of(context).colorScheme.secondary,
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-        side: const BorderSide(
-          color: Colors.transparent,
-          width: 0.0,
-        ),
-      ),
-      onTap: (index) {
-        podcastBloc
-            .add(PodcastTappedEvent(podcast: state.queryResultPodcasts[index]));
-        Navigator.push(
-          context,
-          ScaleRoute(
-            page: const PodcastDetailsPage(),
+    } else {
+      if (state.queryResultPodcasts.isEmpty && state.keyword.isNotEmpty) {
+        return _buildEmptyList(
+            context, "No podcasts found\nfor your keyword(s)");
+      } else {
+        return CarouselView(
+          itemExtent: MediaQuery.of(context).size.width,
+          scrollDirection: Axis.vertical,
+          itemSnapping: true,
+          padding: const EdgeInsets.all(10.0),
+          backgroundColor:
+              Colors.transparent, //Theme.of(context).colorScheme.secondary,
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            side: const BorderSide(
+              color: Colors.transparent,
+              width: 0.0,
+            ),
+          ),
+          onTap: (index) {
+            podcastBloc.add(
+                PodcastTappedEvent(podcast: state.queryResultPodcasts[index]));
+            Navigator.push(
+              context,
+              ScaleRoute(
+                page: const PodcastDetailsPage(),
+              ),
+            );
+          },
+          children: List.generate(
+            state.queryResultPodcasts.length,
+            (index) {
+              final podcast = state.queryResultPodcasts[index];
+              return PodcastCard(podcast: podcast);
+            },
           ),
         );
-      },
-      children: List.generate(
-        state.queryResultPodcasts.length,
-        (index) {
-          final podcast = state.queryResultPodcasts[index];
-          return PodcastCard(podcast: podcast);
-        },
-      ),
-    );
+      }
+    }
   }
 
   Widget _buildEmptyList(BuildContext context, String text) {
