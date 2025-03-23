@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/podcast_bloc/podcast_bloc.dart';
-import '../../custom_widgets/page_transition.dart';
-import '../podcasts_search_page.dart';
 
 class SearchTextField extends StatefulWidget {
   const SearchTextField({super.key});
@@ -16,15 +14,6 @@ class _SearchTextFieldState extends State<SearchTextField> {
   final TextEditingController _textEditingController = TextEditingController();
   String hintText = "Search";
 
-  void _navigateToResultsPage(BuildContext context) {
-    Navigator.push(
-      context,
-      ScaleRoute(
-        page: const PodcastsSearchPage(),
-      ),
-    );
-  }
-
   Future<void> _performSearch(BuildContext context) async {
     if (_textEditingController.text.isNotEmpty) {
       FocusScope.of(context).unfocus();
@@ -33,8 +22,6 @@ class _SearchTextFieldState extends State<SearchTextField> {
           .add(GetRemotePodcastsByKeywordEvent(
           keyword: _textEditingController.text));
 
-      //_textEditingController.clear();
-      _navigateToResultsPage(context);
     } else {
       hintText = "Please enter a keyword";
     }
