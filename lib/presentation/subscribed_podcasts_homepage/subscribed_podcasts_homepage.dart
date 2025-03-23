@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart';
 
 import '../../application/episode_playback/episode_playback_cubit.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../../helpers/core/connectivity_manager.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
@@ -26,8 +27,53 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
       if (processingState == ProcessingState.completed) {
         getIt<MyAudioHandler>().stop();
         removeOverlay();
-        if(context.mounted) {
-          BlocProvider.of<EpisodePlaybackCubit>(context).setPlaybackEpisode(null);
+        if (context.mounted) {
+          BlocProvider.of<EpisodePlaybackCubit>(context)
+              .setPlaybackEpisode(null);
+        }
+      }
+    });
+
+    ConnectivityManager().connectionType.listen((type) {
+      if (type == ConnectionType.none) {
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              title: const Text('No Internet Connection'),
+              content: const Text('Please check your internet connection.'),
+              actions: [
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            ),
+          );
+        }
+      }
+      if (type == ConnectionType.mobile) {
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              title: const Text('Mobile Data Detected'),
+              content: const Text(
+                  'You are currently using mobile data. Downloading may incur costs.'),
+              actions: [
+                TextButton(
+                  child: const Text('Ok'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            ),
+          );
         }
       }
     });
