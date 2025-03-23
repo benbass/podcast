@@ -76,3 +76,5 @@ final class PodcastTappedEvent extends PodcastEvent {
   @override
   List<Object> get props => [podcast];
 }
+
+final class ToggleStateToSuccessAfterFailureEvent extends PodcastEvent {}
