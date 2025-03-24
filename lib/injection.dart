@@ -5,9 +5,12 @@ import 'package:podcast/domain/usecases/podcast_usecases.dart';
 import 'package:podcast/helpers/player/audiohandler.dart';
 import 'package:podcast/infrastructure/repositories/podcast_repository_impl.dart';
 
+import 'application/episode_playback_cubit/episode_playback_cubit.dart';
 import 'application/podcast_bloc/podcast_bloc.dart';
+import 'application/textfield_cubit/text_field_cubit.dart';
 import 'domain/repositories/episode_repository.dart';
 import 'domain/usecases/episode_usecases.dart';
+import 'helpers/core/connectivity_manager.dart';
 import 'infrastructure/datasources/episode_datasources.dart';
 import 'infrastructure/datasources/podcast_datasources.dart';
 import 'infrastructure/repositories/episode_repository_impl.dart';
@@ -20,6 +23,8 @@ Future<void> init() async {
         podcastUseCases: getIt(),
         episodeUseCases: getIt(),
       ));
+  getIt.registerFactory(() => TextFieldCubit());
+  getIt.registerFactory(() => EpisodePlaybackCubit());
 
   // Use cases
   getIt
@@ -49,5 +54,6 @@ Future<void> init() async {
   getIt.registerLazySingleton(() => http.Client());
 
   // Core
+  getIt.registerLazySingleton(() => ConnectivityManager());
   getIt.registerLazySingleton<MyAudioHandler>(() => MyAudioHandler());
 }
