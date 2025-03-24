@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 
-import '../../application/episode_playback/episode_playback_cubit.dart';
+import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../helpers/core/connectivity_manager.dart';
 import '../../helpers/player/audiohandler.dart';
@@ -34,7 +34,7 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
       }
     });
 
-    ConnectivityManager().connectionType.listen((type) {
+    getIt<ConnectivityManager>().connectionType.listen((type) {
       if (type == ConnectionType.none) {
         if (context.mounted) {
           showDialog(
