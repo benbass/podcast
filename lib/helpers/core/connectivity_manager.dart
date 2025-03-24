@@ -4,25 +4,26 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 enum ConnectionType {
   wifi,
   mobile,
+  vpn,
+  bluetooth,
+  other,
   none,
 }
 
+// Note for iOS and macOS:
+// There is no separate network interface type for [vpn].
+// It returns [other] on any device (also simulator)
+
 class ConnectivityManager {
-  static final ConnectivityManager _connectivityManager = ConnectivityManager._internal();
-  ConnectivityManager._internal() {
+  ConnectivityManager() {
     _connectivitySubscription =
         Connectivity().onConnectivityChanged.listen(_updateConnectionStatus);
   }
 
-  factory ConnectivityManager() {
-    return _connectivityManager;
-  }
-
   final _connectionTypeController =
-  StreamController<ConnectionType>.broadcast();
+      StreamController<ConnectionType>.broadcast();
 
-  Stream<ConnectionType> get connectionType =>
-      _connectionTypeController.stream;
+  Stream<ConnectionType> get connectionType => _connectionTypeController.stream;
 
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
@@ -34,6 +35,23 @@ class ConnectivityManager {
     } else {
       _connectionTypeController.sink.add(ConnectionType.none);
     }
+  }
+
+  Future<String> getConnectionTypeAsString() async {
+    final connectivityResult = await (Connectivity().checkConnectivity());
+
+    if (connectivityResult.contains(ConnectivityResult.mobile)) {
+      return 'mobile';
+    } else if (connectivityResult.contains(ConnectivityResult.wifi)) {
+      return 'wifi';
+    } else if (connectivityResult.contains(ConnectivityResult.vpn)) {
+      return 'vpn';
+    } else if (connectivityResult.contains(ConnectivityResult.bluetooth)) {
+      return 'bluetooth';
+    } else if (connectivityResult.contains(ConnectivityResult.other)) {
+      return 'other';
+    }
+    return 'none';
   }
 
   void dispose() {
