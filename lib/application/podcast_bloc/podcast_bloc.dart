@@ -130,7 +130,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   }
 
   FutureOr<void> _onGetRemotePodcastsByKeywordEvent(event, emit) async {
-    emit(state.copyWith(status: PodcastStatus.loading, keyword: event.keyword));
+    emit(state.copyWith(status: PodcastStatus.loading));
     try {
       List<PodcastEntity> queryResult =
           await podcastUseCases.fetchPodcasts(event.keyword);
