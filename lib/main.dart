@@ -8,11 +8,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcast/application/textfield_cubit/text_field_cubit.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/subscribed_podcasts_homepage/subscribed_podcasts_homepage.dart';
 import 'package:podcast/theme.dart';
-import 'application/episode_playback/episode_playback_cubit.dart';
+import 'application/episode_playback_cubit/episode_playback_cubit.dart';
 import 'application/podcast_bloc/podcast_bloc.dart';
 import 'core/globals.dart';
 import 'core/objectbox.dart';
@@ -55,7 +56,9 @@ void main() async {
       MultiBlocProvider(
         providers: [
           BlocProvider(
-              create: (BuildContext context) => EpisodePlaybackCubit()),
+              create: (BuildContext context) => getIt<EpisodePlaybackCubit>()),
+          BlocProvider(
+              create: (BuildContext context) => getIt<TextFieldCubit>()),
           BlocProvider(create: (BuildContext context) => getIt<PodcastBloc>()..add(LoadSubscribedPodcastsEvent())),
           //BlocProvider(create: (BuildContext context) => getItI<EpisodesBloc>()),
         ],
