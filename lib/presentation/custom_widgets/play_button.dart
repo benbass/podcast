@@ -5,9 +5,11 @@ import 'package:just_audio/just_audio.dart';
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/entities/podcast_entity.dart';
+import '../../helpers/core/connectivity_manager.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
+import 'failure_dialog.dart';
 
 class PlayButton extends StatelessWidget {
   const PlayButton({
@@ -62,20 +64,33 @@ class PlayButtonActive extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () async {
-        // source error?
-        try {
-          await getIt<MyAudioHandler>().player.setUrl(episode.enclosureUrl);
-          getIt<MyAudioHandler>().play();
-
+        final String connectionType =
+            await getIt<ConnectivityManager>().getConnectionTypeAsString();
+        String filePath = episode.filePath ?? episode.enclosureUrl;
+        if (connectionType == 'none' && filePath == episode.enclosureUrl) {
           if (context.mounted) {
-            BlocProvider.of<EpisodePlaybackCubit>(context)
-                .setPlaybackEpisode(episode);
-            //showOverlayPlayerMin(context, episode, podcast, podcastTitle);
+            showDialog(
+              context: context,
+              builder: (context) =>
+                  const FailureDialog(message: "No internet connection!"),
+            );
           }
-        } on PlayerException {
-          if (context.mounted) {
-            showOverlayError(context,
-                "Error: No valid file exists under the requested url.");
+        } else {
+          // source error?
+          try {
+            await getIt<MyAudioHandler>().player.setUrl(filePath);
+            getIt<MyAudioHandler>().play();
+
+            if (context.mounted) {
+              BlocProvider.of<EpisodePlaybackCubit>(context)
+                  .setPlaybackEpisode(episode);
+              //showOverlayPlayerMin(context, episode, podcast, podcastTitle);
+            }
+          } on PlayerException {
+            if (context.mounted) {
+              showOverlayError(context,
+                  "Error: No valid file exists under the requested url.");
+            }
           }
         }
       },
