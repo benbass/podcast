@@ -4,6 +4,7 @@ import 'package:podcast/presentation/custom_widgets/home_button.dart';
 import 'package:podcast/presentation/podcasts_search_page/widgets/podcast_card.dart';
 
 import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../../application/textfield_cubit/text_field_cubit.dart';
 import '../custom_widgets/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
 import '../podcast_details_page/podcast_details_page.dart';
@@ -62,11 +63,11 @@ class PodcastsSearchPage extends StatelessWidget {
 
   Widget _buildPodcastList(
       BuildContext context, PodcastState state, Bloc podcastBloc) {
-    if (state.keyword.isEmpty) {
+    if (context.read<TextFieldCubit>().state == null) {
       return _buildEmptyList(
           context, "Enter keyword(s) to\nsearch for podcasts");
     } else {
-      if (state.queryResultPodcasts.isEmpty && state.keyword.isNotEmpty) {
+      if (state.queryResultPodcasts.isEmpty && context.read<TextFieldCubit>().state != null) {
         return _buildEmptyList(
             context, "No podcasts found\nfor your keyword(s)");
       } else {
