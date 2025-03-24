@@ -5,7 +5,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/presentation/episode_details_page/widgets/player_controls.dart';
 
-import '../../application/episode_playback/episode_playback_cubit.dart';
+import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/core/format_duration.dart';
 import '../../helpers/core/format_pubdate_string.dart';

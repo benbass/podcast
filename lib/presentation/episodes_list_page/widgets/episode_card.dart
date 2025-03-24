@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:podcast/application/episode_playback/episode_playback_cubit.dart';
 import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 
+import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/format_pubdate_string.dart';
 import '../../../helpers/core/image_provider.dart';

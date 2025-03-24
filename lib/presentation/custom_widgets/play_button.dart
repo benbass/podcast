@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 
-import '../../application/episode_playback/episode_playback_cubit.dart';
+import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/player/audiohandler.dart';
@@ -64,9 +64,7 @@ class PlayButtonActive extends StatelessWidget {
       onPressed: () async {
         // source error?
         try {
-          await getIt<MyAudioHandler>()
-              .player
-              .setUrl(episode.enclosureUrl);
+          await getIt<MyAudioHandler>().player.setUrl(episode.enclosureUrl);
           getIt<MyAudioHandler>().play();
 
           if (context.mounted) {
