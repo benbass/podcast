@@ -29,6 +29,7 @@ class FlexibleSpace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var themeData = Theme.of(context);
     final String imageUrl = _getImageUrl();
 
     return SliverAppBar(
@@ -58,13 +59,57 @@ class FlexibleSpace extends StatelessWidget {
                 ),
               if (episode != null)
                 Positioned(
-                  bottom: 0,
+                  bottom: 20,
                   right: 12,
                   child: PlayButton(
                     episode: episode!,
                     podcast: podcast,
                     podcastTitle: title,
                   ),
+                ),
+              if (episode != null)
+                StreamBuilder<Duration>(
+                  stream: getIt<MyAudioHandler>().player.positionStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final currentDuration = snapshot.data!;
+                      final totalDuration =
+                      Duration(seconds: episode!.duration!);
+                      final progress = currentDuration.inMilliseconds /
+                          totalDuration.inMilliseconds;
+                      return Positioned(
+                        bottom: 0,
+                        left: 0,
+                        child: SizedBox(
+                          height: 7,
+                          width: MediaQuery.of(context).size.width,
+                          child: LinearProgressIndicator(
+                            value: progress.clamp(0.0, 1.0),
+                            color: themeData.colorScheme.secondary
+                                .withValues(alpha: 0.4),
+                            backgroundColor: Colors.transparent,
+                          ),
+                        ),
+                      );
+                    } else {
+                      return Positioned(
+                        bottom: 0,
+                        left: 0,
+                        child: SizedBox(
+                          height: 7,
+                          width: MediaQuery.of(context).size.width,
+                          child: LinearProgressIndicator(
+                            value: (episode!.position.toDouble() /
+                                episode!.duration!.toDouble())
+                                .clamp(0.0, 1.0),
+                            color: themeData.colorScheme.secondary
+                                .withValues(alpha: 0.4),
+                            backgroundColor: Colors.transparent,
+                          ),
+                        ),
+                      );
+                    }
+                  },
                 ),
             ],
           ),
