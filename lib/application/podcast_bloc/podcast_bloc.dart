@@ -146,28 +146,30 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   FutureOr<void> _onRefreshEpisodesByFeedIdEvent(event, emit) async {
     emit(state.copyWith(status: PodcastStatus.loading));
     try {
-      final List<EpisodeEntity> newEpisodes = await episodeUseCases
-          .newEpisodesList(feedId: state.currentPodcast.pId);
+      final List<EpisodeEntity> newEpisodes =
+          await episodeUseCases.getNewEpisodesByFeedId(
+        feedId: state.currentPodcast.pId,
+      );
       if (newEpisodes.isNotEmpty) {
+        // Get list of current podcast from db
         PodcastEntity podcast = podcastBox.get(state.currentPodcast.id)!;
+        // Insert new episodes into podcast episodes list
         podcast.episodes.insertAll(0, newEpisodes);
+        // Save list to db
         podcast.episodes.applyToDb();
-        final List<EpisodeEntity> updatedLocalEpisodes = await episodeUseCases
+        // Get episodes from db now that they have been assigned an id
+        final List<EpisodeEntity> updatedEpisodes = await episodeUseCases
             .getEpisodes(
-              subscribed: true,
-              feedId: podcast.pId,
-              showRead: state.areReadEpisodesVisible,
-            )
+                feedId: state.currentPodcast.pId,
+                subscribed: true,
+                showRead: true)
             .first;
         emit(state.copyWith(
           status: PodcastStatus.success,
-          episodes: updatedLocalEpisodes,
-          //currentPodcast: podcast,
+          episodes: updatedEpisodes,
         ));
       } else {
-        emit(state.copyWith(
-          status: PodcastStatus.success,
-        ));
+        emit(state.copyWith(status: PodcastStatus.success));
       }
     } catch (e) {
       emit(state.copyWith(status: PodcastStatus.failure));
@@ -188,7 +190,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
           .getEpisodes(
             subscribed: state.currentPodcast.subscribed,
             feedId: state.currentPodcast.pId,
-            showRead: false,
+            showRead: true,
           )
           .first;
       emit(state.copyWith(
@@ -201,7 +203,6 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   }
 
   FutureOr<void> _onToggleStateToSuccessAfterFailureEvent(event, emit) async {
-    emit(state.copyWith(
-      status: PodcastStatus.success));
+    emit(state.copyWith(status: PodcastStatus.success));
   }
 }
