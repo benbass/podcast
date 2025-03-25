@@ -6,5 +6,6 @@ abstract class EpisodeRepository {
     required int feedId,
     required bool showRead,
   });
+  Future<List<EpisodeEntity>> getNewEpisodesByFeedId({required int feedId});
   Stream<int> unreadLocalEpisodesCount({required int feedId});
 }
