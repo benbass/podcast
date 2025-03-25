@@ -99,7 +99,7 @@ class PodcastRepositoryImpl implements PodcastRepository {
 
   Future<List<EpisodeEntity>> _fetchEpisodesFromRemote(int feedId) {
     final Stream<List<EpisodeEntity>> episodes =
-        episodeDataSources.fetchRemoteEpisodesByFeedId(feedId);
+        episodeDataSources.fetchRemoteEpisodesByFeedId(feedId: feedId);
     return episodes.first;
   }
 
