@@ -25,4 +25,9 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   Stream<int> unreadLocalEpisodesCount({required int feedId}) {
     return episodeLocalDatasource.unreadLocalEpisodesCount(feedId: feedId);
   }
+
+  @override
+  Future<List<EpisodeEntity>> getNewEpisodesByFeedId({required int feedId}) async {
+    return await episodeLocalDatasource.getNewEpisodesByFeedId(feedId: feedId);
+  }
 }
