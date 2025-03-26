@@ -7,7 +7,7 @@ import 'package:podcast/injection.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
-import '../custom_widgets/failure_widget.dart';
+import '../custom_widgets/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
 import '../podcast_details_page/podcast_details_page.dart';
 import 'widgets/row_icon_buttons_episodes.dart';
@@ -17,6 +17,25 @@ class EpisodesListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocListener<PodcastBloc, PodcastState>(
+      listener: (context, state) {
+        if (state.status == PodcastStatus.failure) {
+          showDialog(
+            context: context,
+            builder: (context) => const FailureDialog(
+                message: "Error loading episodes. Please try again."),
+          ).whenComplete(() {
+            if (context.mounted) {
+              Navigator.pop(context);
+            }
+          });
+        }
+      },
+      child: _buildPage(context),
+    );
+  }
+
+  Scaffold _buildPage(BuildContext context) {
     PodcastState state = context.watch<PodcastBloc>().state;
     return Scaffold(
       body: SafeArea(
@@ -87,12 +106,6 @@ class EpisodesListPage extends StatelessWidget {
                       child: Center(
                         child: CircularProgressIndicator(),
                       ),
-                    );
-                  }
-                  if (state.status == PodcastStatus.failure) {
-                    return SliverToBoxAdapter(
-                      child: buildFailureWidget(
-                          message: 'Error loading episodes. Please try again.'),
                     );
                   } else {
                     return SliverPadding(
