@@ -59,7 +59,7 @@ class FlexibleSpace extends StatelessWidget {
                 ),
               if (episode != null)
                 Positioned(
-                  bottom: 20,
+                  bottom: 12,
                   right: 12,
                   child: PlayButton(
                     episode: episode!,
@@ -124,7 +124,7 @@ class FlexibleSpace extends StatelessWidget {
   /// Determines the image URL based on whether an episode or podcast is provided.
   String _getImageUrl() {
     if (episode != null) {
-      return episode!.image;
+      return episode!.image.isNotEmpty ? episode!.image : podcast.artworkFilePath != null ? podcast.artworkFilePath! : podcast.artwork;
     } else if (episode == null) {
       return podcast.artworkFilePath ?? podcast.artwork;
     } else {
@@ -188,40 +188,43 @@ class FlexibleSpace extends StatelessWidget {
 
   /// Builds the title content with back button and title text.
   Widget _buildTitleContent(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Spacer(),
-        IconButton(
-          onPressed: () {
-            if (episode != null) {
-              final audioHandler = getIt<MyAudioHandler>();
-              if (audioHandler.player.processingState ==
-                      ProcessingState.ready &&
-                  overlayEntry == null) {
-                showOverlayPlayerMin(context, episode!, podcast, title);
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Spacer(flex: 3,),
+          IconButton(
+            onPressed: () {
+              if (episode != null) {
+                final audioHandler = getIt<MyAudioHandler>();
+                if (audioHandler.player.processingState ==
+                        ProcessingState.ready &&
+                    overlayEntry == null) {
+                  showOverlayPlayerMin(context, episode!, podcast, title);
+                }
               }
-            }
-            Navigator.of(context).pop();
-          },
-          icon: const BackButtonIcon(),
-        ),
-        const Spacer(),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            title,
-            style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                  fontSize: 14,
-                ),
-            overflow: TextOverflow.ellipsis,
-            softWrap: true,
-            maxLines: 2,
+              Navigator.of(context).pop();
+            },
+            icon: const BackButtonIcon(),
           ),
-        ),
-      ],
+          const Spacer(flex: 4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                    fontSize: 14,
+                  ),
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
+              maxLines: 2,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
