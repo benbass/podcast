@@ -25,8 +25,9 @@ class EpisodeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var themeData = Theme.of(context);
+    double dimension = 120.0;
     return FutureBuilder<ImageProvider>(
-        future: MyImageProvider(url: episode.image).imageProvider,
+        future: MyImageProvider(url: episode.image.isNotEmpty ? episode.image : podcast.artworkFilePath != null ? podcast.artworkFilePath! : podcast.artwork).imageProvider,
         builder: (BuildContext context, AsyncSnapshot<ImageProvider> snapshot) {
           final ImageProvider imageProvider = snapshot.hasData
               ? snapshot.data!
@@ -51,7 +52,7 @@ class EpisodeCard extends StatelessWidget {
                 margin: const EdgeInsets.all(8.0),
                 clipBehavior: Clip.antiAlias,
                 child: SizedBox(
-                  height: 90.0,
+                  height: dimension,
                   child: InkWell(
                     splashColor: Colors.black87,
                     onTap: () => _navigateToEpisodeDetails(context),
@@ -59,10 +60,38 @@ class EpisodeCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildEpisodeImage(imageProvider, isCurrentlyPlaying,
-                            currentlyPlayingEpisodeState, themeData),
-                        _buildEpisodeDetails(themeData),
-                        podcast.subscribed ?_buildEpisodeActions(context) : const SizedBox(),
+                        _buildEpisodeImage(
+                          imageProvider,
+                          isCurrentlyPlaying,
+                          currentlyPlayingEpisodeState,
+                          themeData,
+                          dimension,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width - 150,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildEpisodeDetails(themeData),
+                                  if (podcast.subscribed)
+                                    IconButton(
+                                      onPressed: () =>
+                                          _showEpisodeActionsDialog(context),
+                                      icon: const Icon(
+                                        Icons.more_horiz_rounded,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            if (podcast.subscribed)
+                              _buildEpisodeUserActions(context),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -89,13 +118,14 @@ class EpisodeCard extends StatelessWidget {
       ImageProvider imageProvider,
       bool isCurrentlyPlaying,
       EpisodeEntity? currentlyPlayingEpisode,
-      ThemeData themeData) {
+      ThemeData themeData,
+      double dimension) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: Stack(
         children: [
           Container(
-            width: 90,
+            width: dimension,
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: imageProvider,
@@ -118,8 +148,8 @@ class EpisodeCard extends StatelessWidget {
                   top: 0,
                   left: 0,
                   child: SizedBox(
-                    height: 90,
-                    width: 90,
+                    height: dimension,
+                    width: dimension,
                     child: LinearProgressIndicator(
                       value: progress.clamp(0.0, 1.0),
                       color: themeData.colorScheme.secondary
@@ -133,8 +163,8 @@ class EpisodeCard extends StatelessWidget {
                   top: 0,
                   left: 0,
                   child: SizedBox(
-                    height: 90,
-                    width: 90,
+                    height: dimension,
+                    width: dimension,
                     child: LinearProgressIndicator(
                       value: (episode.position.toDouble() /
                               episode.duration!.toDouble())
@@ -162,54 +192,65 @@ class EpisodeCard extends StatelessWidget {
           8.0,
           10.0,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              episode.title,
-              overflow: TextOverflow.ellipsis,
-              softWrap: true,
-              maxLines: 2,
-              style: themeData.textTheme.displayMedium,
-            ),
-            Text(
-              formatTimestamp(
-                episode.datePublished,
+        child: SizedBox(
+          height: podcast.subscribed ? 62.0 : 100.0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                episode.title,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+                maxLines: 2,
+                style: themeData.textTheme.displayMedium,
               ),
-              style: themeData.textTheme.displayMedium,
-            ),
-          ],
+              Text(
+                formatTimestamp(
+                  episode.datePublished,
+                ),
+                style: themeData.textTheme.bodyMedium,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildEpisodeActions(BuildContext context) {
+  Widget _buildEpisodeUserActions(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          IconButton(
-            onPressed: () => _showEpisodeActionsDialog(context),
-            icon: const Icon(
-              Icons.more_horiz_rounded,
+      padding: const EdgeInsets.only(bottom: 8.0, right: 8.0),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width - 160,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          spacing: 40,
+          children: [
+            Icon(
+              episode.read ? Icons.check_rounded : null,
+              size: 30.0,
+              color: Theme.of(context).colorScheme.primary,
             ),
-          ),
-          Icon(
-            episode.read ? Icons.check_rounded : null,
-            size: 20.0,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          Icon(
-            episode.favorite && podcast.subscribed
-                ? Icons.favorite_rounded
-                : null,
-            size: 20.0,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ],
+            const Spacer(),
+            Icon(
+              episode.favorite && podcast.subscribed
+                  ? Icons.star_rounded
+                  : Icons.star_border_rounded,
+              size: 30.0,
+              color: episode.favorite
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.white12,
+            ),
+            Icon(
+              podcast.subscribed ? Icons.save_alt_rounded : null,
+              size: 30.0,
+              color: episode.filePath != null
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.white12,
+            ),
+          ],
+        ),
       ),
     );
   }
