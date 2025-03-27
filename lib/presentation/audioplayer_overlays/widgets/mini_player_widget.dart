@@ -49,7 +49,7 @@ class MiniPlayerWidget extends StatelessWidget {
               child: Row(
                 children: [
                   FutureBuilder<ImageProvider>(
-                      future: MyImageProvider(url: episode.image).imageProvider,
+                      future: MyImageProvider(url: episode.image.isNotEmpty ? episode.image : podcast.artworkFilePath != null ? podcast.artworkFilePath! : podcast.artwork).imageProvider,
                       builder: (BuildContext context, AsyncSnapshot<ImageProvider> snapshot) {
                         final ImageProvider imageProvider = snapshot.hasData
                             ? snapshot.data!
