@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart' as path;
+import 'package:uuid/uuid.dart';
 import 'package:image/image.dart' as img;
 
 Future<String?> saveArtworkToFile(String artworkUrl) async {
@@ -11,8 +11,9 @@ Future<String?> saveArtworkToFile(String artworkUrl) async {
   }
 
   // 2. Define file name
-  final uri = Uri.parse(artworkUrl);
-  final filename = path.basename(uri.path);
+  final filename = const Uuid().v4();
+  final fileExtension = artworkUrl.split('.').last;
+  final filenameWithExtension = '$filename.$fileExtension';
 
   // 3. Define app directory
   final appDir = await getApplicationDocumentsDirectory();
@@ -23,9 +24,9 @@ Future<String?> saveArtworkToFile(String artworkUrl) async {
   }
 
   // 5. Define the full path for the file
-  final file = File('${artworksDir.path}/$filename');
+  final file = File('${artworksDir.path}/$filenameWithExtension');
 
-  // 6. Download the file
+  final uri = Uri.parse(artworkUrl);
   final response = await http.get(uri);
   if (response.statusCode == 200) {
     // 7. Resize the image
