@@ -14,7 +14,7 @@ class PodcastCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<ImageProvider>(
-      future: MyImageProvider(url: podcast.artwork).imageProvider,
+      future: MyImageProvider(url: podcast.artworkFilePath ?? podcast.artwork).imageProvider,
       builder: (BuildContext context, AsyncSnapshot<ImageProvider> snapshot) {
         final ImageProvider imageProvider = snapshot.hasData
             ? snapshot.data!
