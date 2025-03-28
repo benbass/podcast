@@ -44,7 +44,7 @@ class RowIconButtonsEpisodes extends StatelessWidget {
               size: 30,
             ),
           ),
-        if (state.currentPodcast.subscribed)
+        //if (state.currentPodcast.subscribed)
           IconButton(
             onPressed: () {
               podcastBloc.add(
