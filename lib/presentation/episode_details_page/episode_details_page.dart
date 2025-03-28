@@ -69,20 +69,22 @@ class EpisodeDetailsPage extends StatelessWidget {
                             children: [
                               Text(formatTimestamp(episode.datePublished)),
                               Icon(
-                                episode.read
-                                    ? Icons.check_circle_outline_rounded
-                                    : null,
-                                //color: Colors.black,
-                              ),
-                              Icon(
-                                episode.filePath != null
-                                    ? Icons.file_download
-                                    : null,
+                                episode.read && podcast.subscribed ? Icons.check_rounded : null,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                               Icon(
                                 episode.favorite
-                                    ? Icons.favorite_rounded
-                                    : null,
+                                    ? Icons.star_rounded
+                                    : Icons.star_border_rounded,
+                                color: episode.favorite
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.white12,
+                              ),
+                              Icon(
+                                Icons.save_alt_rounded,
+                                color: episode.filePath != null
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.white12,
                               ),
                               Text(
                                 episode.duration! == 0
