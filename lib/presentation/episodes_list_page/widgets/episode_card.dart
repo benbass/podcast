@@ -27,7 +27,13 @@ class EpisodeCard extends StatelessWidget {
     var themeData = Theme.of(context);
     double dimension = 120.0;
     return FutureBuilder<ImageProvider>(
-        future: MyImageProvider(url: episode.image.isNotEmpty ? episode.image : podcast.artworkFilePath != null ? podcast.artworkFilePath! : podcast.artwork).imageProvider,
+        future: MyImageProvider(
+                url: episode.image.isNotEmpty
+                    ? episode.image
+                    : podcast.artworkFilePath != null
+                        ? podcast.artworkFilePath!
+                        : podcast.artwork)
+            .imageProvider,
         builder: (BuildContext context, AsyncSnapshot<ImageProvider> snapshot) {
           final ImageProvider imageProvider = snapshot.hasData
               ? snapshot.data!
@@ -77,19 +83,17 @@ class EpisodeCard extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   _buildEpisodeDetails(themeData),
-                                  if (podcast.subscribed)
-                                    IconButton(
-                                      onPressed: () =>
-                                          _showEpisodeActionsDialog(context),
-                                      icon: const Icon(
-                                        Icons.more_horiz_rounded,
-                                      ),
+                                  IconButton(
+                                    onPressed: () =>
+                                        _showEpisodeActionsDialog(context),
+                                    icon: const Icon(
+                                      Icons.more_horiz_rounded,
                                     ),
+                                  ),
                                 ],
                               ),
                             ),
-                            if (podcast.subscribed)
-                              _buildEpisodeUserActions(context),
+                            _buildEpisodeUserActions(context),
                           ],
                         ),
                       ],
@@ -193,7 +197,7 @@ class EpisodeCard extends StatelessWidget {
           10.0,
         ),
         child: SizedBox(
-          height: podcast.subscribed ? 62.0 : 100.0,
+          height: podcast.subscribed ? 62.0 : 62.0,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -234,16 +238,14 @@ class EpisodeCard extends StatelessWidget {
             ),
             const Spacer(),
             Icon(
-              episode.favorite && podcast.subscribed
-                  ? Icons.star_rounded
-                  : Icons.star_border_rounded,
+              episode.favorite ? Icons.star_rounded : Icons.star_border_rounded,
               size: 30.0,
               color: episode.favorite
                   ? Theme.of(context).colorScheme.primary
                   : Colors.white12,
             ),
             Icon(
-              podcast.subscribed ? Icons.save_alt_rounded : null,
+              Icons.save_alt_rounded,
               size: 30.0,
               color: episode.filePath != null
                   ? Theme.of(context).colorScheme.primary
@@ -284,14 +286,15 @@ class EpisodeCard extends StatelessWidget {
           Navigator.pop(context);
         }
       },
-      {
-        "title": episode.read ? "unmark as read" : "Mark as read",
-        "onPressed": () {
-          final bool isRead = episode.read;
-          _performAction("read", isRead);
-          Navigator.pop(context);
-        }
-      },
+      if(podcast.subscribed)
+          {
+              "title": episode.read ? "unmark as read" : "Mark as read",
+              "onPressed": () {
+                final bool isRead = episode.read;
+                _performAction("read", isRead);
+                Navigator.pop(context);
+              }
+            },
       {"title": "Download", "onPressed": () {}},
       {"title": "Share", "onPressed": () {}}
     ];
