@@ -30,6 +30,8 @@ class EpisodeEntity {
   final String feedImage; // = image of podcast entity
   final int feedId; // = id of podcast entity
   final String podcastGuid; // = podcastGuid of podcast entity
+  // Manually added info:
+  final String podcastTitle;
 
   /// Additional data for user prefs and info (mostly for subscribed podcasts)
   bool favorite;
@@ -61,6 +63,7 @@ class EpisodeEntity {
     required this.feedImage,
     required this.feedId,
     required this.podcastGuid,
+    required this.podcastTitle,
     required this.favorite,
     required this.read,
     required this.completed,
@@ -74,6 +77,7 @@ class EpisodeEntity {
     bool? completed,
     int? position,
     String? filePath,
+    String? podcastTitle
   }) {
     return EpisodeEntity(
       eId: eId,
@@ -100,6 +104,7 @@ class EpisodeEntity {
       completed: completed ?? this.completed,
       position: position ?? this.position,
       filePath: filePath ?? this.filePath,
+      podcastTitle: podcastTitle ?? this.podcastTitle,
     );
   }
 }
