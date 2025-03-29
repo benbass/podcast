@@ -32,6 +32,7 @@ EpisodeEntity fakeEpisode = EpisodeEntity(
   feedImage: "",
   feedId: 202500000000, // podcast.pId,
   podcastGuid: "abcdefghFake", // podcast.podcastGuid,
+  podcastTitle: "Podcast for TEST",
   favorite: true,
   read: false,
   completed: false,
