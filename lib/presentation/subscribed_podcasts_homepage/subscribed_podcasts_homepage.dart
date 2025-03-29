@@ -65,11 +65,32 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
                 ],
               ),
             ),
+            _buildButtons(),
             _buildMainContent(context),
           ],
         ),
       ),
     ));
+  }
+
+  Widget _buildButtons() {
+    return SliverPadding(
+        padding: const EdgeInsets.symmetric(vertical: _spacing*2),
+        sliver: SliverToBoxAdapter(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(
+                onPressed: () {},
+                child: const Text("Favourites"),
+              ),
+              ElevatedButton(
+                onPressed: () {},
+                child: const Text("Downloads"),
+              ),
+            ],
+          ),
+        ));
   }
 
   Widget _buildMainContent(BuildContext context) {
