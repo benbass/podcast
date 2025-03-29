@@ -98,6 +98,7 @@ class EpisodesListPage extends StatelessWidget {
                 stream: getIt<EpisodeUseCases>().getEpisodes(
                   subscribed: state.currentPodcast.subscribed,
                   feedId: state.currentPodcast.pId,
+                  podcastTitle: state.currentPodcast.title,
                   showRead: state.areReadEpisodesVisible,
                 ),
                 builder: (context, snapshot) {
