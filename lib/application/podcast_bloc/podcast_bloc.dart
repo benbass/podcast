@@ -26,6 +26,8 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     on<LoadSubscribedPodcastsEvent>(_onLoadSubscribedPodcastsEvent);
     on<ToggleUnreadEpisodesVisibilityEvent>(
         _onToggleUnreadEpisodesVisibilityEvent);
+    on<ToggleEpisodesIconsAfterActionEvent>(
+        _onToggleEpisodesIconsAfterActionEvent);
     on<SubscribeToPodcastEvent>(_onSubscribeToPodcastEvent);
     on<UnSubscribeFromPodcastEvent>(_onUnSubscribeToPodcastEvent);
     on<UpdateQueryEvent>(_onUpdateQueryEvent);
@@ -64,6 +66,10 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
 
   void _onToggleUnreadEpisodesVisibilityEvent(event, emit) {
     emit(state.copyWith(areReadEpisodesVisible: event.areReadEpisodesVisible));
+  }
+
+  void _onToggleEpisodesIconsAfterActionEvent(event, emit) {
+    emit(state.copyWith(refreshEpisodes: event.someBool));
   }
 
   // FutureOr here because subscribing also fetches the episodes from remote
@@ -149,6 +155,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
       final List<EpisodeEntity> newEpisodes =
           await episodeUseCases.getNewEpisodesByFeedId(
         feedId: state.currentPodcast.pId,
+        podcastTitle: state.currentPodcast.title,
       );
       if (newEpisodes.isNotEmpty) {
         // Get list of current podcast from db
@@ -161,6 +168,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
         final List<EpisodeEntity> updatedEpisodes = await episodeUseCases
             .getEpisodes(
                 feedId: state.currentPodcast.pId,
+                podcastTitle: state.currentPodcast.title,
                 subscribed: true,
                 showRead: true)
             .first;
@@ -190,6 +198,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
           .getEpisodes(
             subscribed: state.currentPodcast.subscribed,
             feedId: state.currentPodcast.pId,
+            podcastTitle: state.currentPodcast.title,
             showRead: true,
           )
           .first;
