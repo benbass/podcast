@@ -9,4 +9,5 @@ abstract class EpisodeRepository {
   });
   Future<List<EpisodeEntity>> getNewEpisodesByFeedId({required int feedId, required String podcastTitle});
   Stream<int> unreadLocalEpisodesCount({required int feedId});
+  Stream<Map<String, List<EpisodeEntity>>> getFlaggedEpisodes({required String flag});
 }
