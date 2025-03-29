@@ -61,6 +61,15 @@ final class RefreshEpisodesByFeedIdEvent extends PodcastEvent {
   List<Object> get props => [feedId];
 }
 
+final class ToggleEpisodesIconsAfterActionEvent extends PodcastEvent {
+  final bool someBool;
+  const ToggleEpisodesIconsAfterActionEvent({
+    required this.someBool,
+  });
+  @override
+  List<Object> get props => [someBool];
+}
+
 
 /// LOCAL and REMOTE
 // Episodes Local or remote
