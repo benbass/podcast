@@ -97,16 +97,16 @@ class PodcastRepositoryImpl implements PodcastRepository {
     return await podcastDataSources.getSubscribedPodcasts() ?? [];
   }
 
-  Future<List<EpisodeEntity>> _fetchEpisodesFromRemote(int feedId) {
+  Future<List<EpisodeEntity>> _fetchEpisodesFromRemote(int feedId, String podcastTitle) {
     final Stream<List<EpisodeEntity>> episodes =
-        episodeDataSources.fetchRemoteEpisodesByFeedId(feedId: feedId);
+        episodeDataSources.fetchRemoteEpisodesByFeedId(feedId: feedId, podcastTitle: podcastTitle);
     return episodes.first;
   }
 
   @override
   Future<PodcastEntity> fillPodcastWithEpisodes(PodcastEntity podcast) async {
     final List<EpisodeEntity> episodes =
-        await _fetchEpisodesFromRemote(podcast.pId);
+        await _fetchEpisodesFromRemote(podcast.pId, podcast.title);
     podcast.episodes.addAll(episodes);
     return podcast;
   }
