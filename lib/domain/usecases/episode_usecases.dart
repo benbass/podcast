@@ -12,11 +12,13 @@ class EpisodeUseCases {
   Stream<List<EpisodeEntity>> getEpisodes({
     required bool subscribed,
     required int feedId,
+    required String podcastTitle,
     required bool showRead,
   }) {
     return episodeRepository.getEpisodes(
       subscribed: subscribed,
       feedId: feedId,
+      podcastTitle: podcastTitle,
       showRead: showRead,
     );
   }
@@ -25,7 +27,7 @@ class EpisodeUseCases {
     return episodeRepository.unreadLocalEpisodesCount(feedId: feedId);
   }
 
-  Future<List<EpisodeEntity>> getNewEpisodesByFeedId({required int feedId}) {
-    return episodeRepository.getNewEpisodesByFeedId(feedId: feedId);
+  Future<List<EpisodeEntity>> getNewEpisodesByFeedId({required int feedId, required String podcastTitle}) {
+    return episodeRepository.getNewEpisodesByFeedId(feedId: feedId, podcastTitle: podcastTitle);
   }
 }
