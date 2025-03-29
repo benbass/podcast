@@ -59,10 +59,10 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
   Stream<Map<String, List<EpisodeEntity>>> getFlaggedEpisodes(
       {required String flag}) {
     late QueryBuilder<EpisodeEntity> queryBuilder;
-    if (flag == "favorite") {
+    if (flag == "Favorites") {
       queryBuilder = episodeBox.query(EpisodeEntity_.favorite.equals(true))
         ..order(EpisodeEntity_.datePublished, flags: Order.descending);
-    } else if (flag == "downloaded") {
+    } else if (flag == "Downloads") {
       queryBuilder = episodeBox.query(EpisodeEntity_.filePath.notNull())
         ..order(EpisodeEntity_.datePublished, flags: Order.descending);
     } else {
@@ -117,13 +117,8 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     required int feedId,
     required String podcastTitle,
     required bool showRead,
-  }) async* {
-    Map<String, List<EpisodeEntity>> groupedEpisodes =
-        await getFlaggedEpisodes(flag: "favorite").first;
-    for (final podcastTitle in groupedEpisodes.keys) {
-      print(podcastTitle);
-    }
-    yield* subscribed
+  }) {
+    return subscribed
         ? _getEpisodesByFeedId(feedId, showRead: showRead)
         : _fetchRemoteEpisodes(feedId: feedId, podcastTitle: podcastTitle);
   }
