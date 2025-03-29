@@ -15,10 +15,11 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   Stream<List<EpisodeEntity>> getEpisodes({
     required bool subscribed,
     required int feedId,
+    required String podcastTitle,
     required bool showRead,
   }) {
     return episodeLocalDatasource.getEpisodes(
-        subscribed: subscribed, feedId: feedId, showRead: showRead);
+        subscribed: subscribed, feedId: feedId, podcastTitle: podcastTitle, showRead: showRead);
   }
 
   @override
@@ -27,7 +28,7 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   }
 
   @override
-  Future<List<EpisodeEntity>> getNewEpisodesByFeedId({required int feedId}) async {
-    return await episodeLocalDatasource.getNewEpisodesByFeedId(feedId: feedId);
+  Future<List<EpisodeEntity>> getNewEpisodesByFeedId({required int feedId, required String podcastTitle}) async {
+    return await episodeLocalDatasource.getNewEpisodesByFeedId(feedId: feedId, podcastTitle: podcastTitle);
   }
 }
