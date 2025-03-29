@@ -23,7 +23,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(1, 1565139607905705435),
       name: 'EpisodeEntity',
-      lastPropertyId: const obx_int.IdUid(26, 1886093547491996978),
+      lastPropertyId: const obx_int.IdUid(27, 783881693732996932),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -157,7 +157,12 @@ final _entities = <obx_int.ModelEntity>[
             type: 11,
             flags: 520,
             indexId: const obx_int.IdUid(1, 1126246801486907936),
-            relationTarget: 'PodcastEntity')
+            relationTarget: 'PodcastEntity'),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(27, 783881693732996932),
+            name: 'podcastTitle',
+            type: 9,
+            flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
@@ -339,7 +344,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final filePathOffset = object.filePath == null
               ? null
               : fbb.writeString(object.filePath!);
-          fbb.startTable(27);
+          final podcastTitleOffset = fbb.writeString(object.podcastTitle);
+          fbb.startTable(28);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.eId);
           fbb.addOffset(2, titleOffset);
@@ -366,6 +372,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addInt64(23, object.position);
           fbb.addOffset(24, filePathOffset);
           fbb.addInt64(25, object.podcast.targetId);
+          fbb.addOffset(26, podcastTitleOffset);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -415,6 +422,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final podcastGuidParam =
               const fb.StringReader(asciiOptimization: true)
                   .vTableGet(buffer, rootOffset, 42, '');
+          final podcastTitleParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 56, '');
           final favoriteParam =
               const fb.BoolReader().vTableGet(buffer, rootOffset, 44, false);
           final readParam =
@@ -445,6 +455,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
               feedImage: feedImageParam,
               feedId: feedIdParam,
               podcastGuid: podcastGuidParam,
+              podcastTitle: podcastTitleParam,
               favorite: favoriteParam,
               read: readParam,
               completed: completedParam,
@@ -684,6 +695,10 @@ class EpisodeEntity_ {
   /// See [EpisodeEntity.podcast].
   static final podcast = obx.QueryRelationToOne<EpisodeEntity, PodcastEntity>(
       _entities[0].properties[25]);
+
+  /// See [EpisodeEntity.podcastTitle].
+  static final podcastTitle =
+      obx.QueryStringProperty<EpisodeEntity>(_entities[0].properties[26]);
 }
 
 /// [PodcastEntity] entity fields to define ObjectBox queries.
