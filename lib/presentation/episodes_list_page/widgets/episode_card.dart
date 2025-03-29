@@ -4,6 +4,7 @@ import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../../application/podcast_bloc/podcast_bloc.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/format_pubdate_string.dart';
 import '../../../helpers/core/image_provider.dart';
@@ -257,12 +258,37 @@ class EpisodeCard extends StatelessWidget {
     );
   }
 
-  void _performAction(String flag, dynamic value) {
-    EpisodeEntity episodeToUpdate = episodeBox.get(episode.id)!;
+  void _performAction(String flag, dynamic value, BuildContext context) {
+    final podcastBloc = BlocProvider.of<PodcastBloc>(context);
+
+    // Check if episode is already in db. If not, we need to add it
+    int id = episode.id != 0 ? episode.id : episodeBox.put(episode);
+    // Then we get the episode from db so it can be updated in there
+    EpisodeEntity episodeToUpdate = episodeBox.get(id)!;
+
+    /*
+    List episodeList = episodeBox.getAll();
+    for (var episode in episodeList) {
+      if (episode.favorite == true) {
+        print(episode.title);
+        if (episode.title == "Klaas hat keine Lust mehr") {
+          episodeBox.remove(episode.id);
+        }
+      }
+    }
+    */
+
     switch (flag) {
       case "favorite":
         episodeToUpdate.favorite = !value;
         episodeBox.put(episodeToUpdate);
+        if (!podcast.subscribed) {
+          // This is not needed when podcast is subscribed because that stream updates automatically
+          // Stream for not subscribed podcast needs bloc for updates
+          podcastBloc.add(
+            ToggleEpisodesIconsAfterActionEvent(someBool: value),
+          );
+        }
         break;
       case "read":
         episodeToUpdate.read = !value;
@@ -282,19 +308,19 @@ class EpisodeCard extends StatelessWidget {
         "title": episode.favorite ? "Unmark as favorite" : "Mark as favorite",
         "onPressed": () {
           final bool isFavorite = episode.favorite;
-          _performAction("favorite", isFavorite);
+          _performAction("favorite", isFavorite, context);
           Navigator.pop(context);
         }
       },
-      if(podcast.subscribed)
-          {
-              "title": episode.read ? "unmark as read" : "Mark as read",
-              "onPressed": () {
-                final bool isRead = episode.read;
-                _performAction("read", isRead);
-                Navigator.pop(context);
-              }
-            },
+      if (podcast.subscribed)
+        {
+          "title": episode.read ? "unmark as read" : "Mark as read",
+          "onPressed": () {
+            final bool isRead = episode.read;
+            _performAction("read", isRead, context);
+            Navigator.pop(context);
+          }
+        },
       {"title": "Download", "onPressed": () {}},
       {"title": "Share", "onPressed": () {}}
     ];
