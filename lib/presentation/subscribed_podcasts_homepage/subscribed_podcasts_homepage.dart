@@ -6,6 +6,7 @@ import '../../helpers/listeners/connectivity_listener.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../custom_widgets/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
+import '../flagged_episodes_page/flagged_episodes_page.dart';
 import 'widgets/subscribed_podcast_card.dart';
 import '../podcasts_search_page/podcasts_search_page.dart';
 
@@ -65,7 +66,7 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
                 ],
               ),
             ),
-            _buildButtons(),
+            _buildButtons(context),
             _buildMainContent(context),
           ],
         ),
@@ -73,7 +74,7 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
     ));
   }
 
-  Widget _buildButtons() {
+  Widget _buildButtons(BuildContext context) {
     return SliverPadding(
         padding: const EdgeInsets.symmetric(vertical: _spacing*2),
         sliver: SliverToBoxAdapter(
@@ -81,7 +82,14 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    ScaleRoute(
+                      page: const FlaggedEpisodesPage(flag: "Favorites")
+                    ),
+                  );
+                },
                 child: const Text("Favourites"),
               ),
               ElevatedButton(
