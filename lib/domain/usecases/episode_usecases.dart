@@ -30,4 +30,6 @@ class EpisodeUseCases {
   Future<List<EpisodeEntity>> getNewEpisodesByFeedId({required int feedId, required String podcastTitle}) {
     return episodeRepository.getNewEpisodesByFeedId(feedId: feedId, podcastTitle: podcastTitle);
   }
+
+  Stream<Map<String, List<EpisodeEntity>>> getFlaggedEpisodes({required String flag}) => episodeRepository.getFlaggedEpisodes(flag: flag);
 }
