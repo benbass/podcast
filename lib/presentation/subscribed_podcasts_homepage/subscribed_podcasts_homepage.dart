@@ -93,7 +93,14 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
                 child: const Text("Favourites"),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    ScaleRoute(
+                        page: const FlaggedEpisodesPage(flag: "Downloads")
+                    ),
+                  );
+                },
                 child: const Text("Downloads"),
               ),
             ],
