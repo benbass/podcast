@@ -31,4 +31,9 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   Future<List<EpisodeEntity>> getNewEpisodesByFeedId({required int feedId, required String podcastTitle}) async {
     return await episodeLocalDatasource.getNewEpisodesByFeedId(feedId: feedId, podcastTitle: podcastTitle);
   }
+
+  @override
+  Stream<Map<String, List<EpisodeEntity>>> getFlaggedEpisodes({required String flag}) {
+    return episodeLocalDatasource.getFlaggedEpisodes(flag: flag);
+  }
 }
