@@ -61,13 +61,13 @@ final class RefreshEpisodesByFeedIdEvent extends PodcastEvent {
   List<Object> get props => [feedId];
 }
 
-final class ToggleEpisodesIconsAfterActionEvent extends PodcastEvent {
-  final bool someBool;
-  const ToggleEpisodesIconsAfterActionEvent({
-    required this.someBool,
+final class EpisodeFlagChangedEvent extends PodcastEvent {
+  final String uid;
+  const EpisodeFlagChangedEvent({
+    required this.uid,
   });
   @override
-  List<Object> get props => [someBool];
+  List<Object> get props => [uid];
 }
 
 
