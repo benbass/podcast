@@ -1,12 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../core/globals.dart';
 import '../../domain/entities/episode_entity.dart';
+import '../../domain/entities/podcast_entity.dart';
 import '../../domain/usecases/episode_usecases.dart';
+import '../../domain/usecases/podcast_usecases.dart';
 import '../../helpers/core/format_pubdate_string.dart';
+import '../../helpers/core/image_provider.dart';
+import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
+import '../custom_widgets/page_transition.dart';
+import '../episode_details_page/episode_details_page.dart';
 
 class FlaggedEpisodesPage extends StatelessWidget {
   final String flag;
@@ -15,9 +23,27 @@ class FlaggedEpisodesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
+    double dimension = 120.0;
+    List<PodcastEntity> podcasts = podcastBox.getAll();
+
+    Future<PodcastEntity> podcastForEpisode(EpisodeEntity episode) async {
+      // Does podcast exist in db?
+      PodcastEntity podcast = podcasts.firstWhere(
+        (podcast) => podcast.pId == episode.feedId,
+        orElse: () => PodcastEntity.emptyPodcast(),
+      );
+      // If not, fetch it from remote.
+      if (podcast.pId == -1) {
+        // emptyPodcast
+        return await getIt<PodcastUseCases>()
+            .fetchPodcastByFeedId(episode.feedId);
+      }
+      return podcast;
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(flag,style: themeData.textTheme.displayLarge!),
+        title: Text(flag, style: themeData.textTheme.displayLarge!),
       ),
       body: StreamBuilder(
         stream: getIt<EpisodeUseCases>().getFlaggedEpisodes(flag: flag),
@@ -25,7 +51,7 @@ class FlaggedEpisodesPage extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return const Center(child: Text('An error occurred while fetching your favorite episodes\nPlease try again.'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('No ${flag.toLowerCase()} found'));
           } else {
@@ -54,58 +80,125 @@ class FlaggedEpisodesPage extends StatelessWidget {
                     initiallyExpanded: index == 0,
                     shape: const RoundedRectangleBorder(),
                     children: episodes.map((episode) {
-                      return Card(
-                        key: ValueKey(episode.eId),
-                        color: themeData.colorScheme.primaryContainer,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            side: BorderSide.none),
-                        elevation: 5.0,
-                        shadowColor: Colors.black,
-                        margin: const EdgeInsets.all(8.0),
-                        clipBehavior: Clip.antiAlias,
-                        child: SizedBox(
-                          height: 120,
-                          child: InkWell(
-                            splashColor: Colors.black87,
-                            onTap: () {},
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    SizedBox(
-                                      width:
-                                          MediaQuery.of(context).size.width - 150,
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _buildEpisodeDetails(
-                                              themeData, episode),
-                                          IconButton(
-                                            onPressed: () =>
-                                                _showEpisodeActionsDialog(
-                                                    context, episode),
-                                            icon: const Icon(
-                                              Icons.more_horiz_rounded,
+                      return FutureBuilder<PodcastEntity>(
+                          future: podcastForEpisode(episode),
+                          builder: (context, snapshot) {
+                            late PodcastEntity podcast;
+                            if (snapshot.hasData) {
+                              podcast = snapshot.data!;
+                            } else {
+                              podcast = PodcastEntity.emptyPodcast();
+                            }
+                            return FutureBuilder<ImageProvider>(
+                                future: MyImageProvider(
+                                        url: episode.image.isNotEmpty
+                                            ? episode.image
+                                            : podcast.artworkFilePath != null
+                                                ? podcast.artworkFilePath!
+                                                : podcast.artwork)
+                                    .imageProvider,
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<ImageProvider> snapshot) {
+                                  final ImageProvider imageProvider =
+                                      snapshot.hasData
+                                          ? snapshot.data!
+                                          : const AssetImage(
+                                              'assets/placeholder.png');
+                                  return BlocBuilder<EpisodePlaybackCubit,
+                                      EpisodeEntity?>(
+                                    builder: (context,
+                                        currentlyPlayingEpisodeState) {
+                                      final isCurrentlyPlaying =
+                                          currentlyPlayingEpisodeState?.eId ==
+                                              episode.eId;
+                                      return Card(
+                                        key: ValueKey(episode.eId),
+                                        color: themeData
+                                            .colorScheme.primaryContainer,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                            side: isCurrentlyPlaying
+                                                ? BorderSide(
+                                                    color: themeData
+                                                        .colorScheme.secondary,
+                                                    width: 2.0,
+                                                  )
+                                                : BorderSide.none),
+                                        elevation: 5.0,
+                                        shadowColor: Colors.black,
+                                        margin: const EdgeInsets.all(8.0),
+                                        clipBehavior: Clip.antiAlias,
+                                        child: SizedBox(
+                                          height: dimension,
+                                          child: InkWell(
+                                            splashColor: Colors.black87,
+                                            onTap: () {
+                                              _navigateToEpisodeDetails(
+                                                  context, episode, podcast);
+                                            },
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                _buildEpisodeImage(
+                                                  episode,
+                                                  imageProvider,
+                                                  isCurrentlyPlaying,
+                                                  currentlyPlayingEpisodeState,
+                                                  themeData,
+                                                  dimension,
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    SizedBox(
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width -
+                                                              150,
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          _buildEpisodeDetails(
+                                                              themeData,
+                                                              episode),
+                                                          IconButton(
+                                                            onPressed: () =>
+                                                                _showEpisodeActionsDialog(
+                                                                    context,
+                                                                    episode),
+                                                            icon: const Icon(
+                                                              Icons
+                                                                  .more_horiz_rounded,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    _buildEpisodeUserActions(
+                                                        context, episode),
+                                                  ],
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                    _buildEpisodeUserActions(context, episode),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
+                                        ),
+                                      );
+                                    },
+                                  );
+                                });
+                          });
                     }).toList(),
                   ),
                 );
@@ -113,6 +206,76 @@ class FlaggedEpisodesPage extends StatelessWidget {
             );
           }
         },
+      ),
+    );
+  }
+
+  Widget _buildEpisodeImage(
+      EpisodeEntity episode,
+      ImageProvider imageProvider,
+      bool isCurrentlyPlaying,
+      EpisodeEntity? currentlyPlayingEpisode,
+      ThemeData themeData,
+      double dimension) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: Stack(
+        children: [
+          Container(
+            width: dimension,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: imageProvider,
+                fit: BoxFit.fitWidth,
+              ),
+            ),
+          ),
+          StreamBuilder<Duration>(
+            stream: getIt<MyAudioHandler>().player.positionStream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData &&
+                  isCurrentlyPlaying &&
+                  currentlyPlayingEpisode != null) {
+                final currentDuration = snapshot.data!;
+                final totalDuration =
+                    Duration(seconds: currentlyPlayingEpisode.duration!);
+                final progress = currentDuration.inMilliseconds /
+                    totalDuration.inMilliseconds;
+                return Positioned(
+                  top: 0,
+                  left: 0,
+                  child: SizedBox(
+                    height: dimension,
+                    width: dimension,
+                    child: LinearProgressIndicator(
+                      value: progress.clamp(0.0, 1.0),
+                      color: themeData.colorScheme.secondary
+                          .withValues(alpha: 0.4),
+                      backgroundColor: Colors.transparent,
+                    ),
+                  ),
+                );
+              } else {
+                return Positioned(
+                  top: 0,
+                  left: 0,
+                  child: SizedBox(
+                    height: dimension,
+                    width: dimension,
+                    child: LinearProgressIndicator(
+                      value: (episode.position.toDouble() /
+                              episode.duration!.toDouble())
+                          .clamp(0.0, 1.0),
+                      color: themeData.colorScheme.secondary
+                          .withValues(alpha: 0.4),
+                      backgroundColor: Colors.transparent,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
       ),
     );
   }
@@ -168,13 +331,6 @@ class FlaggedEpisodesPage extends StatelessWidget {
             ),
             const Spacer(),
             Icon(
-              episode.favorite ? Icons.star_rounded : Icons.star_border_rounded,
-              size: 30.0,
-              color: episode.favorite
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.white12,
-            ),
-            Icon(
               Icons.save_alt_rounded,
               size: 30.0,
               color: episode.filePath != null
@@ -189,7 +345,6 @@ class FlaggedEpisodesPage extends StatelessWidget {
 
   void _performAction(
       dynamic value, BuildContext context, EpisodeEntity episode) {
-    final podcastBloc = BlocProvider.of<PodcastBloc>(context);
 
     // Check if episode is already in db. If not, we need to add it
     int id = episode.id != 0 ? episode.id : episodeBox.put(episode);
@@ -198,9 +353,6 @@ class FlaggedEpisodesPage extends StatelessWidget {
 
     episodeToUpdate.favorite = !value;
     episodeBox.put(episodeToUpdate);
-    podcastBloc.add(
-      ToggleEpisodesIconsAfterActionEvent(someBool: value),
-    );
   }
 
   void _showEpisodeActionsDialog(BuildContext context, EpisodeEntity episode) {
@@ -232,6 +384,19 @@ class FlaggedEpisodesPage extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _navigateToEpisodeDetails(
+      BuildContext context, EpisodeEntity episode, PodcastEntity podcast) {
+    Navigator.push(
+      context,
+      ScaleRoute(
+        page: EpisodeDetailsPage(
+          episode: episode,
+          podcast: podcast,
+        ),
+      ),
     );
   }
 }
