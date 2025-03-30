@@ -22,6 +22,12 @@ class PodcastRepositoryImpl implements PodcastRepository {
   }
 
   @override
+  Future<PodcastEntity> fetchPodcastByFeedId(int feedId) async {
+    final PodcastEntity podcast = await podcastDataSources.fetchPodcastByFeedId(feedId);
+    return podcast;
+  }
+
+  @override
   Future<bool> subscribeToPodcast(PodcastEntity podcast) async {
     try {
       // Save artwork to file.
