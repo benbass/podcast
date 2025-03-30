@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../../application/podcast_bloc/podcast_bloc.dart';
@@ -228,31 +229,39 @@ class EpisodeCard extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8.0, right: 8.0),
       child: SizedBox(
         width: MediaQuery.of(context).size.width - 160,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          spacing: 40,
-          children: [
-            Icon(
-              episode.read ? Icons.check_rounded : null,
-              size: 30.0,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const Spacer(),
-            Icon(
-              episode.favorite ? Icons.star_rounded : Icons.star_border_rounded,
-              size: 30.0,
-              color: episode.favorite
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.white12,
-            ),
-            Icon(
-              Icons.save_alt_rounded,
-              size: 30.0,
-              color: episode.filePath != null
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.white12,
-            ),
-          ],
+        child: BlocListener<PodcastBloc, PodcastState>(
+          listenWhen: (previous, current) =>
+              (previous.episodeToRefresh != current.episodeToRefresh) &&
+              !podcast.subscribed,
+          listener: (context, state) {},
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            spacing: 40,
+            children: [
+              Icon(
+                episode.read ? Icons.check_rounded : null,
+                size: 30.0,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const Spacer(),
+              Icon(
+                episode.favorite
+                    ? Icons.star_rounded
+                    : Icons.star_border_rounded,
+                size: 30.0,
+                color: episode.favorite
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.white12,
+              ),
+              Icon(
+                Icons.save_alt_rounded,
+                size: 30.0,
+                color: episode.filePath != null
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.white12,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -266,28 +275,33 @@ class EpisodeCard extends StatelessWidget {
     // Then we get the episode from db so it can be updated in there
     EpisodeEntity episodeToUpdate = episodeBox.get(id)!;
 
-    /*
+/*
+// Delete specific episode from db (just for testing)
     List episodeList = episodeBox.getAll();
     for (var episode in episodeList) {
       if (episode.favorite == true) {
         print(episode.title);
-        if (episode.title == "Klaas hat keine Lust mehr") {
+        if (episode.title == "...enter title here...") {
           episodeBox.remove(episode.id);
         }
       }
     }
-    */
+*/
+
 
     switch (flag) {
       case "favorite":
         episodeToUpdate.favorite = !value;
         episodeBox.put(episodeToUpdate);
         if (!podcast.subscribed) {
-          // This is not needed when podcast is subscribed because that stream updates automatically
-          // Stream for not subscribed podcast needs bloc for updates
-          podcastBloc.add(
-            ToggleEpisodesIconsAfterActionEvent(someBool: value),
-          );
+          // Not needed by subscribed podcasts because icons update
+          // automatically when stream data from db changes.
+          // This Bloc event is needed only when podcast is not subscribed since
+          // stream doesn't change anymore after episodes were fetched from remote.
+
+          // We use a Uuid for each tap so BlocListener always receives a different value
+          podcastBloc
+              .add(EpisodeFlagChangedEvent(uid: const Uuid().v4()));
         }
         break;
       case "read":
