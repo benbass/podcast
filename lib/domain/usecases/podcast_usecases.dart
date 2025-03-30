@@ -12,6 +12,10 @@ class PodcastUseCases {
     return podcastRepository.fetchPodcastsByKeywords(keyword);
   }
 
+  Future<PodcastEntity> fetchPodcastByFeedId(int feedId) async {
+    return podcastRepository.fetchPodcastByFeedId(feedId);
+  }
+
   Future<bool> subscribeToPodcast(PodcastEntity podcast) async {
     return await podcastRepository.subscribeToPodcast(podcast);
   }
