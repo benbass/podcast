@@ -26,8 +26,8 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     on<LoadSubscribedPodcastsEvent>(_onLoadSubscribedPodcastsEvent);
     on<ToggleUnreadEpisodesVisibilityEvent>(
         _onToggleUnreadEpisodesVisibilityEvent);
-    on<ToggleEpisodesIconsAfterActionEvent>(
-        _onToggleEpisodesIconsAfterActionEvent);
+    on<EpisodeFlagChangedEvent>(
+        _onEpisodeFlagChangedEvent);
     on<SubscribeToPodcastEvent>(_onSubscribeToPodcastEvent);
     on<UnSubscribeFromPodcastEvent>(_onUnSubscribeToPodcastEvent);
     on<UpdateQueryEvent>(_onUpdateQueryEvent);
@@ -68,8 +68,8 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     emit(state.copyWith(areReadEpisodesVisible: event.areReadEpisodesVisible));
   }
 
-  void _onToggleEpisodesIconsAfterActionEvent(event, emit) {
-    emit(state.copyWith(refreshEpisodes: event.someBool));
+  void _onEpisodeFlagChangedEvent(event, emit) {
+    emit(state.copyWith(episodeToRefresh: event.uid));
   }
 
   // FutureOr here because subscribing also fetches the episodes from remote
