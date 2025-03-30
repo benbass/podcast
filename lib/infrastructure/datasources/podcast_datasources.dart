@@ -10,6 +10,8 @@ abstract class PodcastDataSource {
   /// Fetches podcasts based on a keyword, considering subscribed podcasts.
   Future<List<PodcastEntity>> fetchPodcastsByKeyword(
       String keyword);
+  /// Fetch a podcast by its known feedId
+  Future<PodcastEntity> fetchPodcastByFeedId(int feedId);
   /// Retrieves the list of subscribed podcasts.
   Future<List<PodcastEntity>?> getSubscribedPodcasts();
 }
@@ -49,7 +51,33 @@ class PodcastDataSourceImpl implements PodcastDataSource {
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
-      throw Exception('Failed to load podcasts: Status code ${response.statusCode}');
+      throw Exception('Failed to load podcasts by keyword: Status code ${response.statusCode}');
+    }
+  }
+
+  /// Fetch a podcast by its known feedId
+  @override
+  Future<PodcastEntity> fetchPodcastByFeedId(int feedId) async {
+    // Authorization headers
+    Map<String, String> headers = headersForAuth();
+    final Uri uri = Uri.parse('$baseUrl/podcasts/byfeedid?id=$feedId&pretty');
+
+    final response = await httpClient.get(
+        uri,
+        headers: headers);
+
+    if (response.statusCode == 200) {
+      // Parse the JSON response if the server returns a 200 OK status code.
+      final Map<String, dynamic> jsonFeed = json.decode(response.body);
+      final feed = jsonFeed['feed'];
+      // Convert the JSON feed to PodcastModel object: lookup by feed id returns only one podcast within "feed"
+      final PodcastEntity podcast = PodcastModel.fromJson(feed).toPodcastEntity();
+      // Merge the found podcasts with subscribed podcasts, giving precedence to subscribed ones.
+      return podcast;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load podcast by feed id: Status code ${response.statusCode}');
     }
   }
 
