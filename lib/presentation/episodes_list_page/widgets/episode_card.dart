@@ -9,8 +9,7 @@ import '../../../application/podcast_bloc/podcast_bloc.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/format_pubdate_string.dart';
 import '../../../helpers/core/image_provider.dart';
-import '../../../helpers/player/audiohandler.dart';
-import '../../../injection.dart';
+import '../../custom_widgets/episode_progress_indicator_overlay.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../../episode_details_page/episode_details_page.dart';
 
@@ -95,7 +94,7 @@ class EpisodeCard extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            _buildEpisodeUserActions(context),
+                            _buildEpisodeIconsRow(context),
                           ],
                         ),
                       ],
@@ -139,50 +138,13 @@ class EpisodeCard extends StatelessWidget {
               ),
             ),
           ),
-          StreamBuilder<Duration>(
-            stream: getIt<MyAudioHandler>().player.positionStream,
-            builder: (context, snapshot) {
-              if (snapshot.hasData &&
-                  isCurrentlyPlaying &&
-                  currentlyPlayingEpisode != null) {
-                final currentDuration = snapshot.data!;
-                final totalDuration =
-                    Duration(seconds: currentlyPlayingEpisode.duration!);
-                final progress = currentDuration.inMilliseconds /
-                    totalDuration.inMilliseconds;
-                return Positioned(
-                  top: 0,
-                  left: 0,
-                  child: SizedBox(
-                    height: dimension,
-                    width: dimension,
-                    child: LinearProgressIndicator(
-                      value: progress.clamp(0.0, 1.0),
-                      color: themeData.colorScheme.secondary
-                          .withValues(alpha: 0.4),
-                      backgroundColor: Colors.transparent,
-                    ),
-                  ),
-                );
-              } else {
-                return Positioned(
-                  top: 0,
-                  left: 0,
-                  child: SizedBox(
-                    height: dimension,
-                    width: dimension,
-                    child: LinearProgressIndicator(
-                      value: (episode.position.toDouble() /
-                              episode.duration!.toDouble())
-                          .clamp(0.0, 1.0),
-                      color: themeData.colorScheme.secondary
-                          .withValues(alpha: 0.4),
-                      backgroundColor: Colors.transparent,
-                    ),
-                  ),
-                );
-              }
-            },
+          EpisodeProgressIndicatorOverlay(
+            themeData: themeData,
+            episode: episode,
+            isCurrentlyPlaying: isCurrentlyPlaying,
+            currentlyPlayingEpisode: currentlyPlayingEpisode,
+            overlayHeight: dimension,
+            overlayWidth: dimension,
           ),
         ],
       ),
@@ -224,7 +186,7 @@ class EpisodeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEpisodeUserActions(BuildContext context) {
+  Widget _buildEpisodeIconsRow(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, right: 8.0),
       child: SizedBox(
@@ -288,7 +250,6 @@ class EpisodeCard extends StatelessWidget {
     }
 */
 
-
     switch (flag) {
       case "favorite":
         episodeToUpdate.favorite = !value;
@@ -300,8 +261,7 @@ class EpisodeCard extends StatelessWidget {
           // stream doesn't change anymore after episodes were fetched from remote.
 
           // We use a Uuid for each tap so BlocListener always receives a different value
-          podcastBloc
-              .add(EpisodeFlagChangedEvent(uid: const Uuid().v4()));
+          podcastBloc.add(EpisodeFlagChangedEvent(uid: const Uuid().v4()));
         }
         break;
       case "read":
