@@ -11,8 +11,8 @@ import '../../domain/usecases/episode_usecases.dart';
 import '../../domain/usecases/podcast_usecases.dart';
 import '../../helpers/core/format_pubdate_string.dart';
 import '../../helpers/core/image_provider.dart';
-import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
+import '../custom_widgets/episode_progress_indicator_overlay.dart';
 import '../custom_widgets/page_transition.dart';
 import '../episode_details_page/episode_details_page.dart';
 
@@ -51,162 +51,165 @@ class FlaggedEpisodesPage extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return const Center(child: Text('An error occurred while fetching your favorite episodes\nPlease try again.'));
+            return const Center(
+                child: Text(
+                    'An error occurred while fetching your favorite episodes\nPlease try again.'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('No ${flag.toLowerCase()} found'));
           } else {
             final groupedEpisodes = snapshot.data!;
-            return ListView.builder(
-              itemCount: groupedEpisodes.length,
-              itemBuilder: (context, index) {
-                final podcastTitle = groupedEpisodes.keys.elementAt(index);
-                final episodes = groupedEpisodes[podcastTitle]!;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 18.0),
-                  child: ExpansionTile(
-                    title: Container(
-                      decoration: BoxDecoration(
-                        color: themeData.colorScheme.secondary,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        podcastTitle,
-                        style: themeData.textTheme.displayLarge!.copyWith(
-                          color: themeData.colorScheme.primaryContainer,
-                        ),
-                      ),
-                    ),
-                    initiallyExpanded: index == 0,
-                    shape: const RoundedRectangleBorder(),
-                    children: episodes.map((episode) {
-                      return FutureBuilder<PodcastEntity>(
-                          future: podcastForEpisode(episode),
-                          builder: (context, snapshot) {
-                            late PodcastEntity podcast;
-                            if (snapshot.hasData) {
-                              podcast = snapshot.data!;
-                            } else {
-                              podcast = PodcastEntity.emptyPodcast();
-                            }
-                            return FutureBuilder<ImageProvider>(
-                                future: MyImageProvider(
-                                        url: episode.image.isNotEmpty
-                                            ? episode.image
-                                            : podcast.artworkFilePath != null
-                                                ? podcast.artworkFilePath!
-                                                : podcast.artwork)
-                                    .imageProvider,
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<ImageProvider> snapshot) {
-                                  final ImageProvider imageProvider =
-                                      snapshot.hasData
-                                          ? snapshot.data!
-                                          : const AssetImage(
-                                              'assets/placeholder.png');
-                                  return BlocBuilder<EpisodePlaybackCubit,
-                                      EpisodeEntity?>(
-                                    builder: (context,
-                                        currentlyPlayingEpisodeState) {
-                                      final isCurrentlyPlaying =
-                                          currentlyPlayingEpisodeState?.eId ==
-                                              episode.eId;
-                                      return Card(
-                                        key: ValueKey(episode.eId),
-                                        color: themeData
-                                            .colorScheme.primaryContainer,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
-                                            side: isCurrentlyPlaying
-                                                ? BorderSide(
-                                                    color: themeData
-                                                        .colorScheme.secondary,
-                                                    width: 2.0,
-                                                  )
-                                                : BorderSide.none),
-                                        elevation: 5.0,
-                                        shadowColor: Colors.black,
-                                        margin: const EdgeInsets.all(8.0),
-                                        clipBehavior: Clip.antiAlias,
-                                        child: SizedBox(
-                                          height: dimension,
-                                          child: InkWell(
-                                            splashColor: Colors.black87,
-                                            onTap: () {
-                                              _navigateToEpisodeDetails(
-                                                  context, episode, podcast);
-                                            },
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                _buildEpisodeImage(
-                                                  episode,
-                                                  imageProvider,
-                                                  isCurrentlyPlaying,
-                                                  currentlyPlayingEpisodeState,
-                                                  themeData,
-                                                  dimension,
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    SizedBox(
-                                                      width:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .width -
-                                                              150,
-                                                      child: Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          _buildEpisodeDetails(
-                                                              themeData,
-                                                              episode),
-                                                          IconButton(
-                                                            onPressed: () =>
-                                                                _showEpisodeActionsDialog(
-                                                                    context,
-                                                                    episode),
-                                                            icon: const Icon(
-                                                              Icons
-                                                                  .more_horiz_rounded,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    _buildEpisodeUserActions(
-                                                        context, episode),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                });
-                          });
-                    }).toList(),
-                  ),
-                );
-              },
-            );
+            return buildListView(
+                groupedEpisodes, themeData, podcastForEpisode, dimension);
           }
         },
       ),
+    );
+  }
+
+  ListView buildListView(
+    Map<String, List<EpisodeEntity>> groupedEpisodes,
+    ThemeData themeData,
+    Future<PodcastEntity> Function(EpisodeEntity episode) podcastForEpisode,
+    double dimension,
+  ) {
+    return ListView.builder(
+      itemCount: groupedEpisodes.length,
+      itemBuilder: (context, index) {
+        final podcastTitle = groupedEpisodes.keys.elementAt(index);
+        final episodes = groupedEpisodes[podcastTitle]!;
+        return Theme(
+          // prevents splash effect on expansion tile when color is overridden to transparent
+          data: Theme.of(context).copyWith(splashColor: Colors.transparent),
+          child: ExpansionTile(
+            showTrailingIcon: false,
+            tilePadding: const EdgeInsets.all(20.0),
+            title: Container(
+              decoration: BoxDecoration(
+                color: themeData.colorScheme.secondary,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                podcastTitle,
+                style: themeData.textTheme.displayLarge!.copyWith(
+                  color: themeData.colorScheme.primaryContainer,
+                ),
+              ),
+            ),
+            initiallyExpanded: index == 0,
+            shape: const RoundedRectangleBorder(),
+            children: episodes.map((episode) {
+              return FutureBuilder<PodcastEntity>(
+                  future: podcastForEpisode(episode),
+                  builder: (context, snapshot) {
+                    late PodcastEntity podcast;
+                    if (snapshot.hasData) {
+                      podcast = snapshot.data!;
+                    } else {
+                      podcast = PodcastEntity.emptyPodcast();
+                    }
+                    return FutureBuilder<ImageProvider>(
+                        future: MyImageProvider(
+                                url: episode.image.isNotEmpty
+                                    ? episode.image
+                                    : podcast.artworkFilePath != null
+                                        ? podcast.artworkFilePath!
+                                        : podcast.artwork)
+                            .imageProvider,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<ImageProvider> snapshot) {
+                          final ImageProvider imageProvider = snapshot.hasData
+                              ? snapshot.data!
+                              : const AssetImage('assets/placeholder.png');
+                          return BlocBuilder<EpisodePlaybackCubit,
+                              EpisodeEntity?>(
+                            builder: (context, currentlyPlayingEpisodeState) {
+                              final isCurrentlyPlaying =
+                                  currentlyPlayingEpisodeState?.eId ==
+                                      episode.eId;
+                              return Card(
+                                key: ValueKey(episode.eId),
+                                color: themeData.colorScheme.primaryContainer,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    side: isCurrentlyPlaying
+                                        ? BorderSide(
+                                            color:
+                                                themeData.colorScheme.secondary,
+                                            width: 2.0,
+                                          )
+                                        : BorderSide.none),
+                                elevation: 5.0,
+                                shadowColor: Colors.black,
+                                margin: const EdgeInsets.all(8.0),
+                                clipBehavior: Clip.antiAlias,
+                                child: SizedBox(
+                                  height: dimension,
+                                  child: InkWell(
+                                    splashColor: Colors.black87,
+                                    onTap: () {
+                                      _navigateToEpisodeDetails(
+                                          context, episode, podcast);
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _buildEpisodeImage(
+                                          episode,
+                                          imageProvider,
+                                          isCurrentlyPlaying,
+                                          currentlyPlayingEpisodeState,
+                                          themeData,
+                                          dimension,
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            SizedBox(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width -
+                                                  150,
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  _buildEpisodeDetails(
+                                                      themeData, episode),
+                                                  IconButton(
+                                                    onPressed: () =>
+                                                        _showEpisodeActionsDialog(
+                                                            context, episode),
+                                                    icon: const Icon(
+                                                      Icons.more_horiz_rounded,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            _buildEpisodeUserActions(
+                                                context, episode),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        });
+                  });
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 
@@ -230,50 +233,13 @@ class FlaggedEpisodesPage extends StatelessWidget {
               ),
             ),
           ),
-          StreamBuilder<Duration>(
-            stream: getIt<MyAudioHandler>().player.positionStream,
-            builder: (context, snapshot) {
-              if (snapshot.hasData &&
-                  isCurrentlyPlaying &&
-                  currentlyPlayingEpisode != null) {
-                final currentDuration = snapshot.data!;
-                final totalDuration =
-                    Duration(seconds: currentlyPlayingEpisode.duration!);
-                final progress = currentDuration.inMilliseconds /
-                    totalDuration.inMilliseconds;
-                return Positioned(
-                  top: 0,
-                  left: 0,
-                  child: SizedBox(
-                    height: dimension,
-                    width: dimension,
-                    child: LinearProgressIndicator(
-                      value: progress.clamp(0.0, 1.0),
-                      color: themeData.colorScheme.secondary
-                          .withValues(alpha: 0.4),
-                      backgroundColor: Colors.transparent,
-                    ),
-                  ),
-                );
-              } else {
-                return Positioned(
-                  top: 0,
-                  left: 0,
-                  child: SizedBox(
-                    height: dimension,
-                    width: dimension,
-                    child: LinearProgressIndicator(
-                      value: (episode.position.toDouble() /
-                              episode.duration!.toDouble())
-                          .clamp(0.0, 1.0),
-                      color: themeData.colorScheme.secondary
-                          .withValues(alpha: 0.4),
-                      backgroundColor: Colors.transparent,
-                    ),
-                  ),
-                );
-              }
-            },
+          EpisodeProgressIndicatorOverlay(
+            themeData: themeData,
+            episode: episode,
+            isCurrentlyPlaying: isCurrentlyPlaying,
+            currentlyPlayingEpisode: currentlyPlayingEpisode,
+            overlayHeight: dimension,
+            overlayWidth: dimension,
           ),
         ],
       ),
@@ -345,7 +311,6 @@ class FlaggedEpisodesPage extends StatelessWidget {
 
   void _performAction(
       dynamic value, BuildContext context, EpisodeEntity episode) {
-
     // Check if episode is already in db. If not, we need to add it
     int id = episode.id != 0 ? episode.id : episodeBox.put(episode);
     // Then we get the episode from db so it can be updated in there
