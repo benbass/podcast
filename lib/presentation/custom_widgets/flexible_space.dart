@@ -2,16 +2,19 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/custom_widgets/play_button.dart';
 
+import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../helpers/core/image_provider.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
+import 'episode_progress_indicator_overlay.dart';
 
 /// This widget displays details about a selected podcast or episode,
 /// depending on which entity (podcast or episode) is provided.
@@ -68,47 +71,18 @@ class FlexibleSpace extends StatelessWidget {
                   ),
                 ),
               if (episode != null)
-                StreamBuilder<Duration>(
-                  stream: getIt<MyAudioHandler>().player.positionStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      final currentDuration = snapshot.data!;
-                      final totalDuration =
-                      Duration(seconds: episode!.duration!);
-                      final progress = currentDuration.inMilliseconds /
-                          totalDuration.inMilliseconds;
-                      return Positioned(
-                        bottom: 0,
-                        left: 0,
-                        child: SizedBox(
-                          height: 7,
-                          width: MediaQuery.of(context).size.width,
-                          child: LinearProgressIndicator(
-                            value: progress.clamp(0.0, 1.0),
-                            color: themeData.colorScheme.secondary
-                                .withValues(alpha: 0.4),
-                            backgroundColor: Colors.transparent,
-                          ),
-                        ),
-                      );
-                    } else {
-                      return Positioned(
-                        bottom: 0,
-                        left: 0,
-                        child: SizedBox(
-                          height: 7,
-                          width: MediaQuery.of(context).size.width,
-                          child: LinearProgressIndicator(
-                            value: (episode!.position.toDouble() /
-                                episode!.duration!.toDouble())
-                                .clamp(0.0, 1.0),
-                            color: themeData.colorScheme.secondary
-                                .withValues(alpha: 0.4),
-                            backgroundColor: Colors.transparent,
-                          ),
-                        ),
-                      );
-                    }
+                BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
+                  builder: (context, currentlyPlayingEpisodeState) {
+                    final isCurrentlyPlaying =
+                        currentlyPlayingEpisodeState?.eId == episode!.eId;
+                    return EpisodeProgressIndicatorOverlay(
+                      themeData: themeData,
+                      episode: episode!,
+                      isCurrentlyPlaying: isCurrentlyPlaying,
+                      overlayHeight: 7,
+                      overlayWidth: MediaQuery.of(context).size.width,
+                      currentlyPlayingEpisode: currentlyPlayingEpisodeState,
+                    );
                   },
                 ),
             ],
@@ -124,7 +98,11 @@ class FlexibleSpace extends StatelessWidget {
   /// Determines the image URL based on whether an episode or podcast is provided.
   String _getImageUrl() {
     if (episode != null) {
-      return episode!.image.isNotEmpty ? episode!.image : podcast.artworkFilePath != null ? podcast.artworkFilePath! : podcast.artwork;
+      return episode!.image.isNotEmpty
+          ? episode!.image
+          : podcast.artworkFilePath != null
+              ? podcast.artworkFilePath!
+              : podcast.artwork;
     } else if (episode == null) {
       return podcast.artworkFilePath ?? podcast.artwork;
     } else {
@@ -161,8 +139,8 @@ class FlexibleSpace extends StatelessWidget {
                     image: DecorationImage(
                       image: episode == null && podcast.subscribed
                           ? podcast.artworkFilePath != null
-                          ? FileImage(File(podcast.artworkFilePath!))
-                          : const AssetImage('assets/placeholder.png')
+                              ? FileImage(File(podcast.artworkFilePath!))
+                              : const AssetImage('assets/placeholder.png')
                           : imageProvider,
                       fit: BoxFit.fitHeight,
                     ),
@@ -195,7 +173,9 @@ class FlexibleSpace extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Spacer(flex: 3,),
+          const Spacer(
+            flex: 3,
+          ),
           IconButton(
             onPressed: () {
               if (episode != null) {
