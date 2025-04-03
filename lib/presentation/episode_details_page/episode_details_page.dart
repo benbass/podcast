@@ -9,7 +9,7 @@ import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/core/format_duration.dart';
 import '../../helpers/core/format_pubdate_string.dart';
-import '../../helpers/player/audiohandler.dart';
+import '../../helpers/listeners/player_listener.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
 import '../custom_widgets/flexible_space.dart';
@@ -35,10 +35,14 @@ class EpisodeDetailsPage extends StatelessWidget {
         if (didPop) {
           return;
         }
-        if (getIt<MyAudioHandler>().player.processingState ==
+        if (getIt<PlayerStatesListener>().player.processingState ==
                 ProcessingState.ready &&
             overlayEntry == null) {
           showOverlayPlayerMin(context, episode, podcast, podcast.title);
+        }
+        if (getIt<PlayerStatesListener>().player.processingState ==
+            ProcessingState.completed) {
+          Navigator.of(context).pop();
         }
         // We don't pop immediately (it causes an exception): we use a scheduler
         SchedulerBinding.instance.addPostFrameCallback((_) {
