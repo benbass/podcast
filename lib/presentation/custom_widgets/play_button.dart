@@ -80,6 +80,9 @@ class PlayButtonActive extends StatelessWidget {
           try {
             await getIt<MyAudioHandler>().player.setUrl(filePath);
             getIt<MyAudioHandler>().play();
+            if(episode.position > 0) {
+              getIt<MyAudioHandler>().player.seek(Duration(seconds: episode.position));
+            }
 
             if (context.mounted) {
               BlocProvider.of<EpisodePlaybackCubit>(context)
