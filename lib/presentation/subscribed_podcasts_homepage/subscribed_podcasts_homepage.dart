@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../helpers/listeners/player_listener.dart';
 import '../../helpers/listeners/connectivity_listener.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../../injection.dart';
 import '../custom_widgets/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
 import '../flagged_episodes_page/flagged_episodes_page.dart';
@@ -17,8 +19,15 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Listen for player state changes (e.g., playing, paused, buffering)
-    listenToPlayer(context);
+    // Init listener for player states and Listen for changes (e.g., playing, paused, buffering)
+    PlayerStatesListener playerStatesListener = getIt<PlayerStatesListener>();
+    // Inject methods to this listener
+    // Episode is set to null when and only when player state is completed
+    playerStatesListener.setResetPlaybackEpisodeCallback(
+        () => context.read<EpisodePlaybackCubit>().setPlaybackEpisode(null));
+    // listener needs current playback episode from cubit (initially null)
+    playerStatesListener.setGetCurrentEpisode(() => context.read<EpisodePlaybackCubit>().state);
+
     // Listen for connectivity changes
     listenToConnectivity(context);
 
@@ -76,7 +85,7 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
 
   Widget _buildButtons(BuildContext context) {
     return SliverPadding(
-        padding: const EdgeInsets.symmetric(vertical: _spacing*2),
+        padding: const EdgeInsets.symmetric(vertical: _spacing * 2),
         sliver: SliverToBoxAdapter(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -86,8 +95,7 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
                   Navigator.push(
                     context,
                     ScaleRoute(
-                      page: const FlaggedEpisodesPage(flag: "Favorites")
-                    ),
+                        page: const FlaggedEpisodesPage(flag: "Favorites")),
                   );
                 },
                 child: const Text("Favourites"),
@@ -97,8 +105,7 @@ class SubscribedPodcastsHomePage extends StatelessWidget {
                   Navigator.push(
                     context,
                     ScaleRoute(
-                        page: const FlaggedEpisodesPage(flag: "Downloads")
-                    ),
+                        page: const FlaggedEpisodesPage(flag: "Downloads")),
                   );
                 },
                 child: const Text("Downloads"),
