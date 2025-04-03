@@ -181,24 +181,52 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
     // Authorization:
     Map<String, String> headers = headersForAuth(); // this is the real auth
 
+
+    // The following code allows to check some podcasts that actually have live episodes:
+    // uri is specific!
+    /*
+    final Uri uriLive = Uri.parse('$baseUrl/episodes/live?pretty&max=20');
+    final responseLive = await httpClient.get(uriLive, headers: headers);
+    if(responseLive.statusCode == 200) {
+      var jsonItems = json.decode(responseLive.body);
+      Map<String, dynamic> myData = {'items': jsonItems['items']};
+      final encoder = JsonEncoder.withIndent('  ');
+      String prettyJson = encoder.convert(myData);
+      debugPrint(prettyJson);
+    }
+    */
+
+
+
     final Uri uri =
-        Uri.parse('$baseUrl/episodes/byfeedid?id=$feedId&pretty&max=1000');
+      Uri.parse('$baseUrl/episodes/byfeedid?id=$feedId&pretty&max=1000');
 
-    final response = await httpClient.get(uri, headers: headers);
-    if (response.statusCode == 200) {
-      var jsonItems = json.decode(response.body);
-      List<EpisodeEntity> episodes = List<EpisodeEntity>.from(
-              jsonItems['items'].map((x) => EpisodeModel.fromJson(x)))
-          .map((e) => e.copyWith(podcastTitle: podcastTitle))
-          .toList();
+      final response = await httpClient.get(uri, headers: headers);
+      if (response.statusCode == 200) {
+        var jsonItems = json.decode(response.body);
+        List<EpisodeEntity> episodes = List<EpisodeEntity>.from(
+            jsonItems['items'].map((x) => EpisodeModel.fromJson(x)))
+            .map((e) => e.copyWith(podcastTitle: podcastTitle))
+            .toList();
 
-      yield episodes;
-    } else {
-      print(
-          "Error Episode datasource fetchEpisodesAsStreamByFeedId: ${response.statusCode}");
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load episodes');
+      /*
+      // Test for retrieving live items from current podcast (for future feature).
+      // the feature doesn't seem to be supported yet by many podcast providers:
+      // jsonItems['liveItems'] is too often an empty list!
+      Map<String, dynamic> myData = {'liveItems': jsonItems['liveItems']};
+      final encoder = JsonEncoder.withIndent('  ');
+      String prettyJson = encoder.convert(myData);
+      debugPrint(prettyJson);
+      */
+
+        yield episodes;
+      } else {
+        print(
+            "Error Episode datasource fetchEpisodesAsStreamByFeedId: ${response.statusCode}");
+        // If the server did not return a 200 OK response,
+        // then throw an exception.
+        throw Exception('Failed to load episodes');
+      }
     }
   }
-}
+
