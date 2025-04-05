@@ -5,7 +5,7 @@ import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:podcast/injection.dart';
 
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
-import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
+import 'package:podcast/presentation/episodes_list_page/widgets/episode_card_for_list.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../custom_widgets/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
@@ -116,7 +116,7 @@ class EpisodesListPage extends StatelessWidget {
                         itemBuilder: (context, index) {
                           List<EpisodeEntity> episodes = snapshot.data ?? [];
                           final item = episodes[index];
-                          return EpisodeCard(
+                          return EpisodeCardForList(
                             episode: item,
                             podcast: state.currentPodcast,
                           );
