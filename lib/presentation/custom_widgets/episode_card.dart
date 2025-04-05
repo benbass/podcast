@@ -4,14 +4,14 @@ import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
-import '../../../application/podcast_bloc/podcast_bloc.dart';
-import '../../../domain/entities/episode_entity.dart';
-import '../../../helpers/core/format_pubdate_string.dart';
-import '../../../helpers/core/image_provider.dart';
-import '../../custom_widgets/episode_progress_indicator_overlay.dart';
-import '../../custom_widgets/page_transition.dart';
-import '../../episode_details_page/episode_details_page.dart';
+import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../../domain/entities/episode_entity.dart';
+import '../../helpers/core/format_pubdate_string.dart';
+import '../../helpers/core/image_provider.dart';
+import 'episode_progress_indicator_overlay.dart';
+import 'page_transition.dart';
+import '../episode_details_page/episode_details_page.dart';
 
 class EpisodeCard extends StatelessWidget {
   const EpisodeCard({
@@ -56,15 +56,16 @@ class EpisodeCard extends StatelessWidget {
                         : BorderSide.none),
                 elevation: 5.0,
                 shadowColor: Colors.black,
-                margin: const EdgeInsets.all(8.0),
+                //margin: const EdgeInsets.all(8.0),
                 clipBehavior: Clip.antiAlias,
                 child: SizedBox(
                   height: dimension,
+                  width: MediaQuery.of(context).size.width,
                   child: InkWell(
                     splashColor: Colors.black87,
                     onTap: () => _navigateToEpisodeDetails(context),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildEpisodeImage(
@@ -74,16 +75,36 @@ class EpisodeCard extends StatelessWidget {
                           themeData,
                           dimension,
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width - 150,
-                              child: Row(
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            6.0,
+                            10.0,
+                            0.0,
+                            2.0,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  _buildEpisodeDetails(themeData),
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                        maxWidth: MediaQuery.of(context)
+                                                .size
+                                                .width /
+                                            2,
+                                        minWidth: MediaQuery.of(context)
+                                                .size
+                                                .width /
+                                            2),
+                                    child: _buildEpisodeDetails(themeData),
+                                  ),
+                                  const SizedBox(
+                                    width: 40,
+                                  ),
                                   IconButton(
                                     onPressed: () =>
                                         _showEpisodeActionsDialog(context),
@@ -93,9 +114,23 @@ class EpisodeCard extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                            ),
-                            _buildEpisodeIconsRow(context),
-                          ],
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  EpisodeProgressIndicatorOverlay(
+                                    themeData: themeData,
+                                    episode: episode,
+                                    isCurrentlyPlaying: isCurrentlyPlaying,
+                                    currentlyPlayingEpisode:
+                                        currentlyPlayingEpisodeState,
+                                  ),
+                                  _buildEpisodeIconsRow(context),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -125,105 +160,73 @@ class EpisodeCard extends StatelessWidget {
       EpisodeEntity? currentlyPlayingEpisode,
       ThemeData themeData,
       double dimension) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: Stack(
-        children: [
-          Container(
-            width: dimension,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: imageProvider,
-                fit: BoxFit.fitWidth,
-              ),
-            ),
-          ),
-          EpisodeProgressIndicatorOverlay(
-            themeData: themeData,
-            episode: episode,
-            isCurrentlyPlaying: isCurrentlyPlaying,
-            currentlyPlayingEpisode: currentlyPlayingEpisode,
-            overlayHeight: dimension,
-            overlayWidth: dimension,
-          ),
-        ],
+    return Container(
+      width: dimension,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: imageProvider,
+          fit: BoxFit.fitWidth,
+        ),
       ),
     );
   }
 
   Widget _buildEpisodeDetails(ThemeData themeData) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          6.0,
-          10.0,
-          8.0,
-          10.0,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          episode.title,
+          overflow: TextOverflow.ellipsis,
+          softWrap: true,
+          maxLines: 2,
+          style: themeData.textTheme.displayMedium,
         ),
-        child: SizedBox(
-          height: podcast.subscribed ? 62.0 : 62.0,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                episode.title,
-                overflow: TextOverflow.ellipsis,
-                softWrap: true,
-                maxLines: 2,
-                style: themeData.textTheme.displayMedium,
-              ),
-              Text(
-                formatTimestamp(
-                  episode.datePublished,
-                ),
-                style: themeData.textTheme.bodyMedium,
-              ),
-            ],
+        Text(
+          formatTimestamp(
+            episode.datePublished,
           ),
+          style: themeData.textTheme.bodyMedium,
         ),
-      ),
+      ],
     );
   }
 
   Widget _buildEpisodeIconsRow(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0, right: 8.0),
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width - 160,
-        child: BlocListener<PodcastBloc, PodcastState>(
-          listenWhen: (previous, current) =>
-              (previous.episodeToRefresh != current.episodeToRefresh) &&
-              !podcast.subscribed,
-          listener: (context, state) {},
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            spacing: 40,
-            children: [
-              Icon(
-                episode.read ? Icons.check_rounded : null,
-                size: 30.0,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const Spacer(),
-              Icon(
-                episode.favorite
-                    ? Icons.star_rounded
-                    : Icons.star_border_rounded,
-                size: 30.0,
-                color: episode.favorite
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.white12,
-              ),
-              Icon(
-                Icons.save_alt_rounded,
-                size: 30.0,
-                color: episode.filePath != null
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.white12,
-              ),
-            ],
-          ),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.6,
+      child: BlocListener<PodcastBloc, PodcastState>(
+        listenWhen: (previous, current) =>
+            (previous.episodeToRefresh != current.episodeToRefresh) &&
+            !podcast.subscribed,
+        listener: (context, state) {},
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          spacing: 40,
+          children: [
+            const Spacer(),
+            Icon(
+              episode.read ? Icons.check_rounded : null,
+              size: 30.0,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const Spacer(),
+            Icon(
+              episode.favorite ? Icons.star_rounded : Icons.star_border_rounded,
+              size: 30.0,
+              color: episode.favorite
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.white12,
+            ),
+            Icon(
+              Icons.save_alt_rounded,
+              size: 30.0,
+              color: episode.filePath != null
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.white12,
+            ),
+          ],
         ),
       ),
     );
