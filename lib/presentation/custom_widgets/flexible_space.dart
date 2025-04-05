@@ -75,13 +75,19 @@ class FlexibleSpace extends StatelessWidget {
                   builder: (context, currentlyPlayingEpisodeState) {
                     final isCurrentlyPlaying =
                         currentlyPlayingEpisodeState?.eId == episode!.eId;
-                    return EpisodeProgressIndicatorOverlay(
-                      themeData: themeData,
-                      episode: episode!,
-                      isCurrentlyPlaying: isCurrentlyPlaying,
-                      overlayHeight: 7,
-                      overlayWidth: MediaQuery.of(context).size.width,
-                      currentlyPlayingEpisode: currentlyPlayingEpisodeState,
+                    return Positioned(
+                      bottom: 20,
+                      left: 12,
+                      child: EpisodeProgressIndicatorOverlay(
+                        themeData: themeData,
+                        episode: episode!,
+                        isCurrentlyPlaying: isCurrentlyPlaying,
+                        currentlyPlayingEpisode: currentlyPlayingEpisodeState,
+                        dimension: 70,
+                        paddingHoriz: 0,
+                        paddingVert: 0,
+                        strokeWidth: 6,
+                      ),
                     );
                   },
                 ),
