@@ -10,7 +10,7 @@ class AppTheme {
   static const Color _appbarColor = Color(0xFF202531);
   static const Color _textColor = Color(0xFFCBD4C2);
   static const Color _iconColor = Color(0xFFB2E92E);
-  static const Color _accentColor = Color(0xFFB2E92E);
+  static const Color _accentColor = Color(0xFFFF8100); //Color(0xFFB2E92E);
 
   // https://fonts.google.com/specimen/Montserrat
   static const TextStyle _headingText = TextStyle(
