@@ -14,7 +14,7 @@ import '../../helpers/core/image_provider.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
-import 'episode_progress_indicator_overlay.dart';
+import 'episode_progress_indicator.dart';
 
 /// This widget displays details about a selected podcast or episode,
 /// depending on which entity (podcast or episode) is provided.
@@ -78,7 +78,7 @@ class FlexibleSpace extends StatelessWidget {
                     return Positioned(
                       bottom: 20,
                       left: 12,
-                      child: EpisodeProgressIndicatorOverlay(
+                      child: EpisodeProgressIndicator(
                         themeData: themeData,
                         episode: episode!,
                         isCurrentlyPlaying: isCurrentlyPlaying,

@@ -4,7 +4,7 @@ import '../../domain/entities/episode_entity.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 
-class EpisodeProgressIndicatorOverlay extends StatelessWidget {
+class EpisodeProgressIndicator extends StatelessWidget {
   final ThemeData themeData;
   final EpisodeEntity episode;
   final bool isCurrentlyPlaying;
@@ -13,7 +13,7 @@ class EpisodeProgressIndicatorOverlay extends StatelessWidget {
   final double? paddingVert;
   final double? dimension;
   final double? strokeWidth;
-  const EpisodeProgressIndicatorOverlay({
+  const EpisodeProgressIndicator({
     super.key,
     required this.themeData,
     required this.episode,

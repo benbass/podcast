@@ -9,7 +9,7 @@ import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../helpers/core/format_pubdate_string.dart';
 import '../../helpers/core/image_provider.dart';
-import 'episode_progress_indicator_overlay.dart';
+import 'episode_progress_indicator.dart';
 import 'page_transition.dart';
 import '../episode_details_page/episode_details_page.dart';
 
@@ -119,7 +119,7 @@ class EpisodeCard extends StatelessWidget {
                                     MainAxisAlignment.spaceAround,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  EpisodeProgressIndicatorOverlay(
+                                  EpisodeProgressIndicator(
                                     themeData: themeData,
                                     episode: episode,
                                     isCurrentlyPlaying: isCurrentlyPlaying,
