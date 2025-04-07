@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:1565139607905705435",
-      "lastPropertyId": "27:783881693732996932",
+      "lastPropertyId": "28:5180667781003373211",
       "name": "EpisodeEntity",
       "properties": [
         {
@@ -259,7 +259,8 @@
   "retiredEntityUids": [],
   "retiredIndexUids": [],
   "retiredPropertyUids": [
-    945864541081495901
+    945864541081495901,
+    5180667781003373211
   ],
   "retiredRelationUids": [],
   "version": 1
