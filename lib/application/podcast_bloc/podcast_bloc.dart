@@ -187,7 +187,6 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   Future<void> _onPodcastTappedEvent(event, emit) async {
     emit(state.copyWith(
       currentPodcast: event.podcast,
-      episodes: event.podcast.episodes,
     ));
   }
 
