@@ -23,7 +23,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(1, 1565139607905705435),
       name: 'EpisodeEntity',
-      lastPropertyId: const obx_int.IdUid(27, 783881693732996932),
+      lastPropertyId: const obx_int.IdUid(28, 5180667781003373211),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -311,7 +311,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [],
       retiredIndexUids: const [],
-      retiredPropertyUids: const [945864541081495901],
+      retiredPropertyUids: const [945864541081495901, 5180667781003373211],
       retiredRelationUids: const [],
       modelVersion: 5,
       modelVersionParserMinimum: 5,
@@ -345,7 +345,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
               ? null
               : fbb.writeString(object.filePath!);
           final podcastTitleOffset = fbb.writeString(object.podcastTitle);
-          fbb.startTable(28);
+          fbb.startTable(29);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.eId);
           fbb.addOffset(2, titleOffset);
