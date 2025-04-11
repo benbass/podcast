@@ -44,24 +44,45 @@ class PodcastModel extends PodcastEntity {
   /// This factory constructor parses the JSON data, extracts relevant information,
   /// and constructs a [PodcastModel] object.
   factory PodcastModel.fromJson(Map<String, dynamic> json) {
+    // Helper to safely extract values from JSON with default values and HTML stripping
+    String? parseHtmlText(dynamic value) {
+      if (value == null) return null;
+      if (value is String && value.contains('<')) {
+        return parse(value).documentElement?.text;
+      }
+      return value.toString();
+    }
+
+    int? tryParseInt(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value);
+      return null;
+    }
+
+    bool? tryParseBool(dynamic value) {
+      if (value == null) return null;
+      if (value is bool) return value;
+      if (value is int) return value == 1; // We assume 1 corresponds to true
+      return null;
+    }
+
     return PodcastModel(
-      pId: json['id'],
-      podcastGuid: json['podcastGuid'],
-      title: parse(json['title']).documentElement?.text ?? "",
-      url: json['url'] ?? "",
-      link: json['link'] ?? "",
-      description: parse(json['description']).documentElement?.text ?? "",
-      author: parse(json['author']).documentElement?.text ?? "",
-      ownerName: parse(json['ownerName']).documentElement?.text ?? "",
-      artwork: json['artwork'] ?? "",
-      lastUpdateTime: json['lastUpdateTime'] ?? 0,
-      language: json['language'] ?? "",
-      explicit: json['explicit'] ?? false,
-      medium: json['medium'] ?? "",
-      episodeCount: json['episodeCount'] ?? 0,
-      categories: json['categories'] != null
-          ? _categoryValuesToList(json['categories'])
-          : [],
+      pId: tryParseInt(json['id']) ?? -1, // Use -1 as invalid ID
+      podcastGuid: json['podcastGuid'] as String?,
+      title: parseHtmlText(json['title']) ?? "",
+      url: json['url'] as String? ?? "",
+      link: json['link'] as String?, // stays nullable
+      description: parseHtmlText(json['description']) ?? "",
+      author: parseHtmlText(json['author']) ?? "",
+      ownerName: parseHtmlText(json['ownerName']) ?? "",
+      artwork: (json['artwork'] ?? json['image']) as String? ?? "", // artwork OR image
+      lastUpdateTime: tryParseInt(json['lastUpdateTime']) ?? tryParseInt(json['newestItemPubdate']) ?? tryParseInt(json['newestItemPublishTime']),
+      language: json['language'] as String? ?? "",
+      explicit: tryParseBool(json['explicit']), // stays nullable
+      medium: json['medium'] as String?, // stays nullable
+      episodeCount: tryParseInt(json['episodeCount']), // stays nullable
+      categories: (json['categories'] != null) ? _categoryValuesToList(json['categories'] as Map<String, dynamic>) : [],
       subscribed: false,
       artworkFilePath: null,
       episodes: [],
