@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
-
-
 class MyImageProvider {
   final String url;
 
@@ -34,16 +32,20 @@ class MyImageProvider {
         Uri.parse(url),
         headers: {'Range': 'bytes=0-0'}, // Only check the first byte
       ).timeout(const Duration(seconds: 5)); // Timeout
+      final contentType = response.headers['content-type'];
 
       if (response.statusCode == 200 || response.statusCode == 206) {
         // 206: Partial Content
-        final contentType = response.headers['content-type'];
+
         if (contentType != null && contentType.startsWith('image/')) {
           // valid image: add it to the verifiedUrls set
           _verifiedUrls.add(url);
           return NetworkImage(url);
+        } else if (contentType != null && contentType.startsWith('binary/')) {
+          return NetworkImage(url);
         } else {
           debugPrint('Invalid Content-Type: $contentType for URL: $url');
+          return const AssetImage("assets/placeholder.png");
         }
       } else if (response.statusCode == 404) {
         debugPrint('Image not found (404): $url');
