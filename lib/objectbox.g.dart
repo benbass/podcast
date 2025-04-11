@@ -480,16 +480,22 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.id = id;
         },
         objectToFB: (PodcastEntity object, fb.Builder fbb) {
-          final podcastGuidOffset = fbb.writeString(object.podcastGuid);
+          final podcastGuidOffset = object.podcastGuid == null
+              ? null
+              : fbb.writeString(object.podcastGuid!);
           final titleOffset = fbb.writeString(object.title);
           final urlOffset = fbb.writeString(object.url);
-          final linkOffset = fbb.writeString(object.link);
+          final linkOffset =
+              object.link == null ? null : fbb.writeString(object.link!);
           final descriptionOffset = fbb.writeString(object.description);
           final authorOffset = fbb.writeString(object.author);
-          final ownerNameOffset = fbb.writeString(object.ownerName);
+          final ownerNameOffset = object.ownerName == null
+              ? null
+              : fbb.writeString(object.ownerName!);
           final artworkOffset = fbb.writeString(object.artwork);
           final languageOffset = fbb.writeString(object.language);
-          final mediumOffset = fbb.writeString(object.medium);
+          final mediumOffset =
+              object.medium == null ? null : fbb.writeString(object.medium!);
           final categoriesOffset = fbb.writeList(
               object.categories.map(fbb.writeString).toList(growable: false));
           final artworkFilePathOffset = object.artworkFilePath == null
@@ -524,32 +530,32 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
           final podcastGuidParam =
               const fb.StringReader(asciiOptimization: true)
-                  .vTableGet(buffer, rootOffset, 8, '');
+                  .vTableGetNullable(buffer, rootOffset, 8);
           final titleParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 10, '');
           final urlParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 12, '');
           final linkParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 14, '');
+              .vTableGetNullable(buffer, rootOffset, 14);
           final descriptionParam =
               const fb.StringReader(asciiOptimization: true)
                   .vTableGet(buffer, rootOffset, 16, '');
           final authorParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 18, '');
           final ownerNameParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 20, '');
+              .vTableGetNullable(buffer, rootOffset, 20);
           final artworkParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 22, '');
           final lastUpdateTimeParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 24, 0);
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 24);
           final languageParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 26, '');
           final explicitParam =
-              const fb.BoolReader().vTableGet(buffer, rootOffset, 28, false);
+              const fb.BoolReader().vTableGetNullable(buffer, rootOffset, 28);
           final mediumParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 30, '');
+              .vTableGetNullable(buffer, rootOffset, 30);
           final episodeCountParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 32, 0);
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 32);
           final categoriesParam = const fb.ListReader<String>(
                   fb.StringReader(asciiOptimization: true),
                   lazy: false)
