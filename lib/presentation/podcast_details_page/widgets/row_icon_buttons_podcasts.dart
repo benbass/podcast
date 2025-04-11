@@ -22,7 +22,9 @@ class RowIconButtonsPodcasts extends StatelessWidget {
         Row(
           children: [
             Text(
-              podcast.episodeCount.toString(),
+              podcast.episodeCount != null
+                  ? podcast.episodeCount.toString()
+                  : "",
               style: const TextStyle(
                 fontSize: 16,
               ),
