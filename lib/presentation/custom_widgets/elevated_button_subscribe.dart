@@ -5,7 +5,7 @@ import 'package:podcast/presentation/custom_widgets/page_transition.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../helpers/core/connectivity_manager.dart';
 import '../../injection.dart';
-import '../subscribed_podcasts_homepage/subscribed_podcasts_homepage.dart';
+import '../homepage/homepage.dart';
 import 'failure_dialog.dart';
 
 class ElevatedButtonSubscribe extends StatelessWidget {
@@ -46,7 +46,7 @@ class ElevatedButtonSubscribe extends StatelessWidget {
           Navigator.push(
             context,
             ScaleRoute(
-              page: const SubscribedPodcastsHomePage(),
+              page: const HomePage(),
             ),
           );
         }
