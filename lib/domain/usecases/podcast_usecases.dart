@@ -12,6 +12,10 @@ class PodcastUseCases {
     return podcastRepository.fetchPodcastsByKeywords(keyword);
   }
 
+  Future<List<PodcastEntity>> fetchTrendingPodcasts() async {
+    return podcastRepository.fetchTrendingPodcasts();
+  }
+
   Future<PodcastEntity> fetchPodcastByFeedId(int feedId) async {
     return podcastRepository.fetchPodcastByFeedId(feedId);
   }
