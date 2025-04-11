@@ -11,20 +11,20 @@ class PodcastEntity {
   /// Data from json
   final int
       pId; // internal PodcastIndex.org Feed ID. To be used for fetching episodes!
-  final String podcastGuid;
+  final String? podcastGuid;
   final String title;
   final String url; // xml
-  final String link;
+  final String? link;
   final String description;
   final String author;
-  final String ownerName;
+  final String? ownerName;
   final String artwork; //
-  final int lastUpdateTime;
+  final int? lastUpdateTime;
   final String language;
-  final bool explicit;
+  final bool? explicit;
   // Possible values for medium: https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#node-value-12
-  final String medium;
-  final int episodeCount;
+  final String? medium;
+  final int? episodeCount;
   final List<String> categories;
 
   /// User parameter
