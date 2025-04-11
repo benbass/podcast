@@ -41,6 +41,9 @@ final class UnSubscribeFromPodcastEvent extends PodcastEvent {
 
 /// REMOTE
 // Podcast Remote
+
+final class FetchTrendingPodcastsEvent extends PodcastEvent {}
+
 final class GetRemotePodcastsByKeywordEvent extends PodcastEvent {
   final String keyword;
   const GetRemotePodcastsByKeywordEvent({
