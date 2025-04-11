@@ -7,6 +7,7 @@ class PodcastState extends Equatable {
   final PodcastStatus status;
   final List<PodcastEntity> subscribedPodcasts;
   final List<PodcastEntity> queryResultPodcasts;
+  final List<PodcastEntity> trendingPodcasts;
   final PodcastEntity currentPodcast;
   final List<EpisodeEntity> episodes;
   final bool areReadEpisodesVisible;
@@ -15,6 +16,7 @@ class PodcastState extends Equatable {
     required this.status,
     required this.subscribedPodcasts,
     required this.queryResultPodcasts,
+    required this.trendingPodcasts,
     required this.currentPodcast,
     required this.episodes,
     required this.areReadEpisodesVisible,
@@ -25,6 +27,7 @@ class PodcastState extends Equatable {
       : status = PodcastStatus.initial,
         subscribedPodcasts = const <PodcastEntity>[],
         queryResultPodcasts = const <PodcastEntity>[],
+        trendingPodcasts = const <PodcastEntity>[],
         currentPodcast = PodcastEntity.emptyPodcast(),
         episodes = const <EpisodeEntity>[],
         areReadEpisodesVisible = false,
@@ -34,6 +37,7 @@ class PodcastState extends Equatable {
     PodcastStatus? status,
     List<PodcastEntity>? subscribedPodcasts,
     List<PodcastEntity>? queryResultPodcasts,
+    List<PodcastEntity>? trendingPodcasts,
     PodcastEntity? currentPodcast,
     List<EpisodeEntity>? episodes,
     bool? areReadEpisodesVisible,
@@ -43,6 +47,7 @@ class PodcastState extends Equatable {
       status: status ?? this.status,
       subscribedPodcasts: subscribedPodcasts ?? this.subscribedPodcasts,
       queryResultPodcasts: queryResultPodcasts ?? this.queryResultPodcasts,
+      trendingPodcasts: trendingPodcasts ?? this.trendingPodcasts,
       currentPodcast: currentPodcast ?? this.currentPodcast,
       episodes: episodes ?? this.episodes,
       areReadEpisodesVisible:
@@ -56,6 +61,7 @@ class PodcastState extends Equatable {
         status,
         subscribedPodcasts,
         queryResultPodcasts,
+        trendingPodcasts,
         currentPodcast,
         episodes,
         areReadEpisodesVisible,
