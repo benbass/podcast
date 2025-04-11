@@ -35,6 +35,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     /// END LOCAL
 
     /// REMOTE
+    on<FetchTrendingPodcastsEvent>(_onFetchTrendingPodcastsEvent);
     on<GetRemotePodcastsByKeywordEvent>(_onGetRemotePodcastsByKeywordEvent);
     on<RefreshEpisodesByFeedIdEvent>(_onRefreshEpisodesByFeedIdEvent);
 
@@ -59,6 +60,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
         status: PodcastStatus.success,
         subscribedPodcasts: subscribedPodcasts,
       ));
+      add(FetchTrendingPodcastsEvent());
     } catch (e) {
       emit(state.copyWith(status: PodcastStatus.failure));
     }
@@ -189,6 +191,21 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
       currentPodcast: event.podcast,
     ));
   }
+
+  FutureOr<void> _onFetchTrendingPodcastsEvent(event, emit) async {
+   emit(state.copyWith(status: PodcastStatus.loading));
+    try {
+      List<PodcastEntity> trendingPodcasts =
+          await podcastUseCases.fetchTrendingPodcasts();
+      emit(state.copyWith(
+        status: PodcastStatus.success,
+        trendingPodcasts: trendingPodcasts,
+      ));
+    } catch (e) {
+      emit(state.copyWith(status: PodcastStatus.failure));
+    }
+  }
+
 
   FutureOr<void> _onGetEpisodesByFeedIdEvent(event, emit) async {
     emit(state.copyWith(status: PodcastStatus.loading));
