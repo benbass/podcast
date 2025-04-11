@@ -120,9 +120,9 @@ class EpisodeDetailsPage extends StatelessWidget {
                                     "${episode.episodeNr}/${podcast.episodeCount}"),
                                 const SizedBox(height: 16.0),
                               ],
-                              if (podcast.link.isNotEmpty &&
-                                  podcast.link.contains('://'))
-                                PodcastWebsiteLink(podcast: podcast),
+                              if (podcast.link != null && podcast.link!.isNotEmpty &&
+                                  podcast.link!.contains('://'))
+                                PodcastWebsiteLink(link: podcast.link!),
                             ],
                           ),
                         ),
