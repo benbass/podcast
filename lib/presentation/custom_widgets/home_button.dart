@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:podcast/presentation/custom_widgets/page_transition.dart';
-import '../subscribed_podcasts_homepage/subscribed_podcasts_homepage.dart';
+import '../homepage/homepage.dart';
 
 class MyHomeButton extends StatelessWidget {
   const MyHomeButton({super.key});
@@ -12,7 +12,7 @@ class MyHomeButton extends StatelessWidget {
         Navigator.push(
           context,
           ScaleRoute(
-            page: const SubscribedPodcastsHomePage(),
+            page: const HomePage(),
           ),
         );
       },
