@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../../domain/entities/podcast_entity.dart';
 import '../../custom_widgets/webview.dart';
 
 class PodcastWebsiteLink extends StatelessWidget {
   const PodcastWebsiteLink({
     super.key,
-    required this.podcast,
+    required this.link,
   });
 
-  final PodcastEntity podcast;
+  final String link;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +17,7 @@ class PodcastWebsiteLink extends StatelessWidget {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => MyWebView(
-              url: podcast.link,
+              url: link,
             ),
           ),
         );
