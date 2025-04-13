@@ -36,9 +36,9 @@ class FlaggedEpisodesPage extends StatelessWidget {
           } else if (snapshot.hasError) {
             return const Center(
                 child: Text(
-                    'An error occurred while fetching your favorite episodes\nPlease try again.'));
+                    'An error occurred while fetching the episodes\nPlease try again.'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No ${flag.toLowerCase()} found'));
+            return Center(child: Text('No episodes found in "${flag.toLowerCase()}"'));
           } else {
             final groupedEpisodes = snapshot.data!;
             return buildListView(
