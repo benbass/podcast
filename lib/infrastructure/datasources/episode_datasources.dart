@@ -65,7 +65,7 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     } else if (flag == "Downloads") {
       queryBuilder = episodeBox.query(EpisodeEntity_.filePath.notNull())
         ..order(EpisodeEntity_.datePublished, flags: Order.descending);
-    } else if (flag == "Started") {
+    } else if (flag == "In Progress") {
       queryBuilder = episodeBox.query((EpisodeEntity_.position > 0).and(EpisodeEntity_.read.equals(false)));
     } else if (flag == "Read") {
       queryBuilder = episodeBox.query((EpisodeEntity_.position > 0).and(EpisodeEntity_.read.equals(true)));
