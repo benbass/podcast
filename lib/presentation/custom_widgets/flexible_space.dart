@@ -66,7 +66,6 @@ class FlexibleSpace extends StatelessWidget {
                   right: 12,
                   child: PlayButton(
                     episode: episode!,
-                    podcast: podcast,
                     podcastTitle: title,
                   ),
                 ),
