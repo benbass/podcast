@@ -103,6 +103,15 @@ class HomePage extends StatelessWidget {
           },
           icon: const Icon(Icons.file_download_outlined),
         ),
+        IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              ScaleRoute(page: const FlaggedEpisodesPage(flag: "Started")),
+            );
+          },
+          icon: const Icon(Icons.history_rounded),
+        ),
         const SizedBox(
           width: 30.0,
         ),
