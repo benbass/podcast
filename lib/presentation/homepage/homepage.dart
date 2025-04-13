@@ -107,10 +107,10 @@ class HomePage extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              ScaleRoute(page: const FlaggedEpisodesPage(flag: "Started")),
+              ScaleRoute(page: const FlaggedEpisodesPage(flag: "In Progress")),
             );
           },
-          icon: const Icon(Icons.history_rounded),
+          icon: const Icon(Icons.incomplete_circle_outlined),
         ),
         const SizedBox(
           width: 30.0,
