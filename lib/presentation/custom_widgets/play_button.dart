@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../core/globals.dart';
 import '../../domain/entities/episode_entity.dart';
-import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/core/connectivity_manager.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
@@ -15,19 +15,17 @@ class PlayButton extends StatelessWidget {
   const PlayButton({
     super.key,
     required this.episode,
-    required this.podcast,
     required this.podcastTitle,
   });
 
   final EpisodeEntity episode;
-  final PodcastEntity podcast;
   final String podcastTitle;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
       builder: (context, state) {
-        if (state?.id != episode.id) {
+        if (state?.eId != episode.eId) {
           return PlayButtonActive(episode: episode);
         } else {
           return const PlayButtonInactive();
@@ -64,6 +62,8 @@ class PlayButtonActive extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () async {
+        final currentPosition =
+            getIt<MyAudioHandler>().player.position.inSeconds;
         final String connectionType =
             await getIt<ConnectivityManager>().getConnectionTypeAsString();
         String filePath = episode.filePath ?? episode.enclosureUrl;
@@ -78,16 +78,28 @@ class PlayButtonActive extends StatelessWidget {
         } else {
           // source error?
           try {
+            if (context.mounted) {
+              // Let's save position of previous episode before changing to new one
+              if (BlocProvider.of<EpisodePlaybackCubit>(context).state !=
+                  null) {
+                final previousEpisode =
+                    BlocProvider.of<EpisodePlaybackCubit>(context).state!;
+                previousEpisode.position = currentPosition;
+                episodeBox.put(previousEpisode);
+              }
+            }
+
             await getIt<MyAudioHandler>().player.setUrl(filePath);
             getIt<MyAudioHandler>().play();
-            if(episode.position > 0) {
-              getIt<MyAudioHandler>().player.seek(Duration(seconds: episode.position));
+            if (episode.position > 0) {
+              getIt<MyAudioHandler>()
+                  .player
+                  .seek(Duration(seconds: episode.position));
             }
 
             if (context.mounted) {
               BlocProvider.of<EpisodePlaybackCubit>(context)
                   .setPlaybackEpisode(episode);
-              //showOverlayPlayerMin(context, episode, podcast, podcastTitle);
             }
           } on PlayerException {
             if (context.mounted) {
