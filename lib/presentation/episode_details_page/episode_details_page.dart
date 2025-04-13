@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
@@ -28,26 +27,16 @@ class EpisodeDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // We wrap this widget in PopScope so we can apply a method on the OS back-button
-    // where we rebuild the overlay!
+    // where we handle the overlay!
     return PopScope(
-      canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) {
-          return;
+          if (getIt<PlayerStatesListener>().player.processingState ==
+                  ProcessingState.ready &&
+              overlayEntry == null) {
+            showOverlayPlayerMin(context, episode, podcast, podcast.title);
+          }
         }
-        if (getIt<PlayerStatesListener>().player.processingState ==
-                ProcessingState.ready &&
-            overlayEntry == null) {
-          showOverlayPlayerMin(context, episode, podcast, podcast.title);
-        }
-        if (getIt<PlayerStatesListener>().player.processingState ==
-            ProcessingState.completed) {
-          Navigator.of(context).pop();
-        }
-        // We don't pop immediately (it causes an exception): we use a scheduler
-        SchedulerBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(context).pop();
-        });
       },
       child: BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
         builder: (context, state) {
@@ -73,7 +62,9 @@ class EpisodeDetailsPage extends StatelessWidget {
                             children: [
                               Text(formatTimestamp(episode.datePublished)),
                               Icon(
-                                episode.read && podcast.subscribed ? Icons.check_rounded : null,
+                                episode.read && podcast.subscribed
+                                    ? Icons.check_rounded
+                                    : null,
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                               Icon(
@@ -120,7 +111,8 @@ class EpisodeDetailsPage extends StatelessWidget {
                                     "${episode.episodeNr}/${podcast.episodeCount}"),
                                 const SizedBox(height: 16.0),
                               ],
-                              if (podcast.link != null && podcast.link!.isNotEmpty &&
+                              if (podcast.link != null &&
+                                  podcast.link!.isNotEmpty &&
                                   podcast.link!.contains('://'))
                                 PodcastWebsiteLink(link: podcast.link!),
                             ],
