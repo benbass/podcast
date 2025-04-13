@@ -72,18 +72,9 @@ class FlaggedEpisodesPage extends StatelessWidget {
               ),
               child: ExpansionTile(
                 showTrailingIcon: false,
-                title: Container(
-                  decoration: BoxDecoration(
-                    color: themeData.colorScheme.onPrimary,
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    podcastTitle,
-                    style: themeData.textTheme.displayLarge!.copyWith(
-                      color: themeData.colorScheme.primaryContainer,
-                    ),
-                  ),
+                title: Text(
+                  podcastTitle,
+                  style: themeData.textTheme.displayLarge!,
                 ),
                 initiallyExpanded: index == 0,
                 shape: const RoundedRectangleBorder(),
