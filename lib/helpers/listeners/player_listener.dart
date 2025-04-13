@@ -44,15 +44,11 @@ class PlayerStatesListener {
         _resetPlaybackEpisode?.call();
         break;
       case ProcessingState.ready:
-        if (playerState.playing) {
+        if (player.position.inSeconds > 0) {
           _updateEpisodePosition(
               currentEpisode, player.position.inSeconds, false);
-        } else {
-          if (player.position.inSeconds > 0) {
-            _updateEpisodePosition(
-                currentEpisode, player.position.inSeconds, false);
-          }
         }
+
         break;
       default:
         break;
@@ -70,9 +66,6 @@ class PlayerStatesListener {
       episode.read = true;
     }
 
-    // We can save the episode only when it exists in the database
-    if (episode.id != 0) {
-      episodeBox.put(episode);
-    }
+    episodeBox.put(episode);
   }
 }
