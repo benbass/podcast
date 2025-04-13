@@ -55,7 +55,6 @@ class PlayerControls extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () {
-                      Navigator.of(context).pop();
                       getIt<MyAudioHandler>().stop().then((_) {
                         if (context.mounted) {
                           BlocProvider.of<EpisodePlaybackCubit>(context)
