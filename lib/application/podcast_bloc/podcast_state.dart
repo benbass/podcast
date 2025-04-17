@@ -9,18 +9,14 @@ class PodcastState extends Equatable {
   final List<PodcastEntity> queryResultPodcasts;
   final List<PodcastEntity> trendingPodcasts;
   final PodcastEntity currentPodcast;
-  final List<EpisodeEntity> episodes;
   final bool areReadEpisodesVisible;
-  final String episodeToRefresh;
   const PodcastState({
     required this.status,
     required this.subscribedPodcasts,
     required this.queryResultPodcasts,
     required this.trendingPodcasts,
     required this.currentPodcast,
-    required this.episodes,
     required this.areReadEpisodesVisible,
-    required this.episodeToRefresh,
   });
 
   PodcastState.initial()
@@ -29,9 +25,7 @@ class PodcastState extends Equatable {
         queryResultPodcasts = const <PodcastEntity>[],
         trendingPodcasts = const <PodcastEntity>[],
         currentPodcast = PodcastEntity.emptyPodcast(),
-        episodes = const <EpisodeEntity>[],
-        areReadEpisodesVisible = false,
-        episodeToRefresh = "";
+        areReadEpisodesVisible = false;
 
   PodcastState copyWith({
     PodcastStatus? status,
@@ -39,9 +33,7 @@ class PodcastState extends Equatable {
     List<PodcastEntity>? queryResultPodcasts,
     List<PodcastEntity>? trendingPodcasts,
     PodcastEntity? currentPodcast,
-    List<EpisodeEntity>? episodes,
     bool? areReadEpisodesVisible,
-    String? episodeToRefresh,
   }) {
     return PodcastState(
       status: status ?? this.status,
@@ -49,10 +41,8 @@ class PodcastState extends Equatable {
       queryResultPodcasts: queryResultPodcasts ?? this.queryResultPodcasts,
       trendingPodcasts: trendingPodcasts ?? this.trendingPodcasts,
       currentPodcast: currentPodcast ?? this.currentPodcast,
-      episodes: episodes ?? this.episodes,
       areReadEpisodesVisible:
           areReadEpisodesVisible ?? this.areReadEpisodesVisible,
-      episodeToRefresh: episodeToRefresh ?? this.episodeToRefresh,
     );
   }
 
@@ -63,8 +53,6 @@ class PodcastState extends Equatable {
         queryResultPodcasts,
         trendingPodcasts,
         currentPodcast,
-        episodes,
         areReadEpisodesVisible,
-        episodeToRefresh,
       ];
 }
