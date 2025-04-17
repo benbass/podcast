@@ -20,7 +20,6 @@ class PodcastModel extends PodcastEntity {
     required super.categories,
     required super.subscribed,
     required super.artworkFilePath,
-    required episodes,
   });
 
   /// Converts a map of categories to a list of strings representing the category names.
@@ -85,7 +84,6 @@ class PodcastModel extends PodcastEntity {
       categories: (json['categories'] != null) ? _categoryValuesToList(json['categories'] as Map<String, dynamic>) : [],
       subscribed: false,
       artworkFilePath: null,
-      episodes: [],
     );
   }
 
