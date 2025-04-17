@@ -33,12 +33,13 @@ class EpisodeEntity {
   // Manually added info:
   final String podcastTitle;
 
-  /// Additional data for user prefs and info (mostly for subscribed podcasts)
+  /// Additional data for user prefs and info
+  bool isSubscribed;
   bool favorite;
-  bool read;
-  bool completed;
+  bool read; // can be set to true and back to false by user. Automatically set to true when episode is completed
+  bool completed; // automatically set to true when episode is completed
   int position;
-  String? filePath; // downloaded file (subscribed or not!), if applicable
+  String? filePath; // downloaded file
 
   /// ObjectBox relation
   final podcast = ToOne<PodcastEntity>();
@@ -64,6 +65,7 @@ class EpisodeEntity {
     required this.feedId,
     required this.podcastGuid,
     required this.podcastTitle,
+    required this.isSubscribed,
     required this.favorite,
     required this.read,
     required this.completed,
@@ -72,6 +74,7 @@ class EpisodeEntity {
   });
 
   EpisodeEntity copyWith({
+    bool? isSubscribed,
     bool? favorite,
     bool? read,
     bool? completed,
@@ -99,6 +102,7 @@ class EpisodeEntity {
       feedImage: feedImage,
       feedId: feedId,
       podcastGuid: podcastGuid,
+      isSubscribed: isSubscribed ?? this.isSubscribed,
       favorite: favorite ?? this.favorite,
       read: read ?? this.read,
       completed: completed ?? this.completed,
