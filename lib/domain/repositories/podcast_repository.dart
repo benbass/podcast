@@ -7,6 +7,5 @@ abstract class PodcastRepository {
   Future<bool> subscribeToPodcast(PodcastEntity podcast);
   Future<void>  unsubscribeFromPodcast(PodcastEntity podcast);
   Future<List<PodcastEntity>> getSubscribedPodcasts();
-  Future<PodcastEntity> fillPodcastWithEpisodes(PodcastEntity podcast);
   Future<List<PodcastEntity>> updatedQueryResult(queryResult, currentPodcast);
 }
