@@ -7,6 +7,7 @@ import 'package:podcast/helpers/player/audiohandler.dart';
 import 'package:podcast/infrastructure/repositories/podcast_repository_impl.dart';
 
 import 'application/episode_playback_cubit/episode_playback_cubit.dart';
+import 'application/episodes_cubit/episodes_cubit.dart';
 import 'application/podcast_bloc/podcast_bloc.dart';
 import 'application/textfield_cubit/text_field_cubit.dart';
 import 'domain/repositories/episode_repository.dart';
@@ -26,6 +27,7 @@ Future<void> init() async {
       ));
   getIt.registerFactory(() => TextFieldCubit());
   getIt.registerFactory(() => EpisodePlaybackCubit());
+  getIt.registerFactory(() => EpisodesCubit());
 
   // Use cases
   getIt
