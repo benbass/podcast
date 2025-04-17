@@ -38,7 +38,6 @@ final class UnSubscribeFromPodcastEvent extends PodcastEvent {
   List<Object> get props => [id];
 }
 
-
 /// REMOTE
 // Podcast Remote
 
@@ -63,21 +62,6 @@ final class RefreshEpisodesByFeedIdEvent extends PodcastEvent {
   @override
   List<Object> get props => [feedId];
 }
-
-final class EpisodeFlagChangedEvent extends PodcastEvent {
-  final String uid;
-  const EpisodeFlagChangedEvent({
-    required this.uid,
-  });
-  @override
-  List<Object> get props => [uid];
-}
-
-
-/// LOCAL and REMOTE
-// Episodes Local or remote
-class GetEpisodesByFeedIdEvent extends PodcastEvent {}
-
 
 /// None
 final class PodcastTappedEvent extends PodcastEvent {
