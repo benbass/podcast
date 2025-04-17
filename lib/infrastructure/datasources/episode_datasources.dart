@@ -20,9 +20,10 @@ abstract class _BaseEpisodeLocalDatasource {
             ? EpisodeEntity_.read.notNull()
             : EpisodeEntity_.read.equals(false)))
       ..order(EpisodeEntity_.datePublished, flags: Order.descending);
-    return queryBuilder
+    final results = queryBuilder
         .watch(triggerImmediately: true)
         .map((query) => query.find());
+    return results;
   }
 }
 
@@ -32,29 +33,16 @@ abstract class EpisodeLocalDatasource extends _BaseEpisodeLocalDatasource {
     required int feedId,
     required String podcastTitle,
     required bool showRead,
+    required bool refresh,
   });
   Stream<int> unreadLocalEpisodesCount(
       {required int feedId}); // this is only needed for subscribed = true
-  Future<List<EpisodeEntity>> getNewEpisodesByFeedId(
-      {required int feedId, required String podcastTitle});
-  Stream<List<EpisodeEntity>> getLocalEpisodesFromUnsubscribedPodcastByFeedId(
-      {required int feedId});
   Stream<Map<String, List<EpisodeEntity>>> getFlaggedEpisodes(
       {required String flag});
 }
 
 class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     implements EpisodeLocalDatasource {
-  @override
-  Stream<List<EpisodeEntity>> getLocalEpisodesFromUnsubscribedPodcastByFeedId(
-      {required int feedId}) {
-    final queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId))
-      ..order(EpisodeEntity_.datePublished, flags: Order.descending);
-    return queryBuilder
-        .watch(triggerImmediately: true)
-        .map((query) => query.find());
-  }
-
   @override
   Stream<Map<String, List<EpisodeEntity>>> getFlaggedEpisodes(
       {required String flag}) {
@@ -66,11 +54,12 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
       queryBuilder = episodeBox.query(EpisodeEntity_.filePath.notNull())
         ..order(EpisodeEntity_.datePublished, flags: Order.descending);
     } else if (flag == "In Progress") {
-      queryBuilder = episodeBox.query((EpisodeEntity_.position > 0).and(EpisodeEntity_.read.equals(false)));
+      queryBuilder = episodeBox.query(
+          (EpisodeEntity_.position > 0).and(EpisodeEntity_.read.equals(false)));
     } else if (flag == "Read") {
-      queryBuilder = episodeBox.query((EpisodeEntity_.position > 0).and(EpisodeEntity_.read.equals(true)));
-    }
-    else {
+      queryBuilder = episodeBox.query(
+          (EpisodeEntity_.position > 0).and(EpisodeEntity_.read.equals(true)));
+    } else {
       queryBuilder = episodeBox.query(EpisodeEntity_.id.equals(-100));
     }
 
@@ -91,40 +80,26 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     });
   }
 
-  Stream<List<EpisodeEntity>> _fetchRemoteEpisodes(
-      {required int feedId, required String podcastTitle}) async* {
-    // This is the real fetch from remote
-    List<EpisodeEntity> remoteEpisodes = await getIt<EpisodeRemoteDataSource>()
-        .fetchRemoteEpisodesByFeedId(feedId: feedId, podcastTitle: podcastTitle)
-        .first;
-
-    // User may have viewed this podcast already and marked some episodes as favorite, or downloaded some
-    List<EpisodeEntity> localEpisodes =
-        await getLocalEpisodesFromUnsubscribedPodcastByFeedId(feedId: feedId)
-            .first;
-
-    final Map<int, EpisodeEntity> localEpisodeMap = {
-      for (var e in localEpisodes) e.eId: e
-    };
-    // Replace remote episodes with local ones if they exist
-    remoteEpisodes = remoteEpisodes.map((episode) {
-      final localEpisode = localEpisodeMap[episode.eId];
-      return localEpisode ??
-          episode; // Use local if exists, otherwise use remote
-    }).toList();
-    yield remoteEpisodes;
-  }
-
   @override
   Stream<List<EpisodeEntity>> getEpisodes({
     required bool subscribed,
     required int feedId,
     required String podcastTitle,
     required bool showRead,
-  }) {
-    return subscribed
-        ? _getEpisodesByFeedId(feedId, showRead: showRead)
-        : _fetchRemoteEpisodes(feedId: feedId, podcastTitle: podcastTitle);
+    required bool refresh,
+  }) async* {
+    if (!subscribed) {
+      yield* getIt<EpisodeRemoteDataSource>()
+          .fetchRemoteEpisodesByFeedId(
+              feedId: feedId, podcastTitle: podcastTitle)
+          .asStream();
+    } else {
+      if (refresh) {
+        await _getNewEpisodesByFeedId(
+            feedId: feedId, podcastTitle: podcastTitle);
+      }
+      yield* _getEpisodesByFeedId(feedId, showRead: showRead);
+    }
   }
 
   @override
@@ -138,40 +113,38 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
   }
 
   // This gets all episodes (unfiltered!) from db
-  Future<List<EpisodeEntity>> _getLocalEpisodesByFeedId(
-      {required int feedId}) async {
-    final queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId))
-      ..order(EpisodeEntity_.datePublished, flags: Order.descending);
-    return queryBuilder.build().find();
+  List<EpisodeEntity> _getLocalEpisodesByFeedId({required int feedId}) {
+    final queryBuilder =
+        episodeBox.query(EpisodeEntity_.feedId.equals(feedId)).build();
+    final results = queryBuilder.find();
+    return results;
   }
 
-  @override
-  Future<List<EpisodeEntity>> getNewEpisodesByFeedId(
+  _getNewEpisodesByFeedId(
       {required int feedId, required String podcastTitle}) async {
-    final List<EpisodeEntity> currentLocalEpisodes =
-        await _getLocalEpisodesByFeedId(feedId: feedId);
+    // Get remaining episodes from db for the podcast feed id
+    final List<EpisodeEntity> localEpisodes =
+        _getLocalEpisodesByFeedId(feedId: feedId);
 
-    List<EpisodeEntity> currentEpisodesOnRemote =
-        await getIt<EpisodeRemoteDataSource>()
-            .fetchRemoteEpisodesByFeedId(
-                feedId: feedId, podcastTitle: podcastTitle)
-            .first;
+    // Fetch episodes from remote for same podcast feed id
+    final List<EpisodeEntity> remoteEpisodes = await getIt<EpisodeRemoteDataSource>()
+        .fetchRemoteEpisodesByFeedId(
+            feedId: feedId, podcastTitle: podcastTitle);
 
-    final Set<int> currentEpisodeIds =
-        currentLocalEpisodes.map((ep) => ep.eId).toSet();
+    // Put all ids of local episodes into a set
+    final Set<int> localEpisodeIds = localEpisodes.map((ep) => ep.eId).toSet();
 
-    final List<EpisodeEntity> newEpisodes = currentEpisodesOnRemote
-        .where((episode) => !currentEpisodeIds.contains(episode.eId))
-        .toList()
-      ..sort((a, b) => a.datePublished.compareTo(b.datePublished));
-
-    return newEpisodes;
+    // Filter out remote episodes that are already in the database
+    final List<EpisodeEntity> newEpisodes = remoteEpisodes
+        .where((episode) => !localEpisodeIds.contains(episode.eId))
+        .toList();
+    episodeBox.putMany(newEpisodes);
   }
 }
 
 /// Remote data source = http requests
 abstract class EpisodeRemoteDataSource {
-  Stream<List<EpisodeEntity>> fetchRemoteEpisodesByFeedId(
+  Future<List<EpisodeEntity>> fetchRemoteEpisodesByFeedId(
       {required int feedId, required String podcastTitle});
 }
 
@@ -180,11 +153,10 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
 
   EpisodeRemoteDataSourceImpl({required this.httpClient});
   @override
-  Stream<List<EpisodeEntity>> fetchRemoteEpisodesByFeedId(
-      {required int feedId, required String podcastTitle}) async* {
+  Future<List<EpisodeEntity>> fetchRemoteEpisodesByFeedId(
+      {required int feedId, required String podcastTitle}) async {
     // Authorization:
     Map<String, String> headers = headersForAuth(); // this is the real auth
-
 
     // The following code allows to check some podcasts that actually have live episodes:
     // uri is specific!
@@ -200,18 +172,18 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
     }
     */
 
-
-
     final Uri uri =
-      Uri.parse('$baseUrl/episodes/byfeedid?id=$feedId&pretty&max=1000');
+        Uri.parse('$baseUrl/episodes/byfeedid?id=$feedId&pretty&max=1000');
 
-      final response = await httpClient.get(uri, headers: headers);
-      if (response.statusCode == 200) {
-        var jsonItems = json.decode(response.body);
-        List<EpisodeEntity> episodes = List<EpisodeEntity>.from(
-            jsonItems['items'].map((x) => EpisodeModel.fromJson(x)))
-            .map((e) => e.copyWith(podcastTitle: podcastTitle))
-            .toList();
+    final response = await httpClient.get(uri, headers: headers);
+    if (response.statusCode == 200) {
+      var jsonItems = json.decode(response.body);
+      List<EpisodeEntity> episodes = List<EpisodeEntity>.from(
+              jsonItems['items'].map((x) => EpisodeModel.fromJson(x)))
+          .map((e) => e.copyWith(podcastTitle: podcastTitle))
+          .toList();
+
+      //episodeBox.putMany(episodes);
 
       /*
       // Test for retrieving live items from current podcast (for future feature).
@@ -223,14 +195,13 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
       debugPrint(prettyJson);
       */
 
-        yield episodes;
-      } else {
-        print(
-            "Error Episode datasource fetchEpisodesAsStreamByFeedId: ${response.statusCode}");
-        // If the server did not return a 200 OK response,
-        // then throw an exception.
-        throw Exception('Failed to load episodes');
-      }
+      return episodes;
+    } else {
+      print(
+          "Error Episode datasource fetchEpisodesAsStreamByFeedId: ${response.statusCode}");
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load episodes');
     }
   }
-
+}
