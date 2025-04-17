@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:1565139607905705435",
-      "lastPropertyId": "28:5180667781003373211",
+      "lastPropertyId": "29:159728299005146543",
       "name": "EpisodeEntity",
       "properties": [
         {
@@ -146,6 +146,11 @@
           "id": "27:783881693732996932",
           "name": "podcastTitle",
           "type": 9
+        },
+        {
+          "id": "29:159728299005146543",
+          "name": "isSubscribed",
+          "type": 1
         }
       ],
       "relations": []
