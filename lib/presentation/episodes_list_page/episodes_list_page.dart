@@ -6,6 +6,7 @@ import 'package:podcast/injection.dart';
 
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card_for_list.dart';
+import '../../application/episodes_cubit/episodes_cubit.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../custom_widgets/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
@@ -35,8 +36,9 @@ class EpisodesListPage extends StatelessWidget {
     );
   }
 
-  Scaffold _buildPage(BuildContext context) {
+  Widget _buildPage(BuildContext context) {
     PodcastState state = context.watch<PodcastBloc>().state;
+    BlocProvider.of<EpisodesCubit>(context).setEpisodes([]);
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -92,6 +94,7 @@ class EpisodesListPage extends StatelessWidget {
               ),
             ),
             StreamBuilder<List<EpisodeEntity>>(
+              initialData: const [],
                 // The method getEpisodes checks the subscribed flag of
                 // the podcast and returns the correct stream
                 // (from objectBox database or from the remote server)
@@ -100,6 +103,7 @@ class EpisodesListPage extends StatelessWidget {
                   feedId: state.currentPodcast.pId,
                   podcastTitle: state.currentPodcast.title,
                   showRead: state.areReadEpisodesVisible,
+                  refresh: false,
                 ),
                 builder: (context, snapshot) {
                   if (state.status == PodcastStatus.loading) {
@@ -115,6 +119,7 @@ class EpisodesListPage extends StatelessWidget {
                         itemCount: snapshot.hasData ? snapshot.data!.length : 0,
                         itemBuilder: (context, index) {
                           List<EpisodeEntity> episodes = snapshot.data ?? [];
+                          BlocProvider.of<EpisodesCubit>(context).setEpisodes(episodes);
                           final item = episodes[index];
                           return EpisodeCardForList(
                             episode: item,
