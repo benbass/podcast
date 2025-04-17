@@ -5,7 +5,6 @@ import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:podcast/core/globals.dart';
 
-import '../../domain/entities/episode_entity.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../domain/usecases/episode_usecases.dart';
 import '../../domain/usecases/podcast_usecases.dart';
@@ -26,8 +25,6 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     on<LoadSubscribedPodcastsEvent>(_onLoadSubscribedPodcastsEvent);
     on<ToggleUnreadEpisodesVisibilityEvent>(
         _onToggleUnreadEpisodesVisibilityEvent);
-    on<EpisodeFlagChangedEvent>(
-        _onEpisodeFlagChangedEvent);
     on<SubscribeToPodcastEvent>(_onSubscribeToPodcastEvent);
     on<UnSubscribeFromPodcastEvent>(_onUnSubscribeToPodcastEvent);
     on<UpdateQueryEvent>(_onUpdateQueryEvent);
@@ -40,11 +37,6 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     on<RefreshEpisodesByFeedIdEvent>(_onRefreshEpisodesByFeedIdEvent);
 
     /// END REMOTE
-
-    /// LOCAL and REMOTE
-    on<GetEpisodesByFeedIdEvent>(_onGetEpisodesByFeedIdEvent);
-
-    /// END LOCAL and REMOTE
 
     on<PodcastTappedEvent>(_onPodcastTappedEvent);
     on<ToggleStateToSuccessAfterFailureEvent>(
@@ -68,10 +60,6 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
 
   void _onToggleUnreadEpisodesVisibilityEvent(event, emit) {
     emit(state.copyWith(areReadEpisodesVisible: event.areReadEpisodesVisible));
-  }
-
-  void _onEpisodeFlagChangedEvent(event, emit) {
-    emit(state.copyWith(episodeToRefresh: event.uid));
   }
 
   // FutureOr here because subscribing also fetches the episodes from remote
@@ -107,15 +95,12 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   Future<void> _onUnSubscribeToPodcastEvent(event, emit) async {
     emit(state.copyWith(status: PodcastStatus.loading));
     try {
-      // We want to keep this podcast with all its episodes in case user navigates back to the episode list
       PodcastEntity unsubscribedPodcast = state.currentPodcast.copyWith(
         subscribed: false,
-      )..episodes.addAll(
-          state.currentPodcast.episodes,
-        );
+      );
       await podcastUseCases.unsubscribeFromPodcast(state.currentPodcast);
-      List<PodcastEntity> subscribedPodcasts =
-          await podcastUseCases.getSubscribedPodcasts();
+      List<PodcastEntity> subscribedPodcasts = await podcastUseCases
+          .getSubscribedPodcasts();
       emit(state.copyWith(
         subscribedPodcasts: subscribedPodcasts,
         currentPodcast: unsubscribedPodcast,
@@ -154,33 +139,16 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   FutureOr<void> _onRefreshEpisodesByFeedIdEvent(event, emit) async {
     emit(state.copyWith(status: PodcastStatus.loading));
     try {
-      final List<EpisodeEntity> newEpisodes =
-          await episodeUseCases.getNewEpisodesByFeedId(
-        feedId: state.currentPodcast.pId,
-        podcastTitle: state.currentPodcast.title,
-      );
-      if (newEpisodes.isNotEmpty) {
-        // Get list of current podcast from db
-        PodcastEntity podcast = podcastBox.get(state.currentPodcast.id)!;
-        // Insert new episodes into podcast episodes list
-        podcast.episodes.insertAll(0, newEpisodes);
-        // Save list to db
-        podcast.episodes.applyToDb();
-        // Get episodes from db now that they have been assigned an id
-        final List<EpisodeEntity> updatedEpisodes = await episodeUseCases
-            .getEpisodes(
-                feedId: state.currentPodcast.pId,
-                podcastTitle: state.currentPodcast.title,
-                subscribed: true,
-                showRead: true)
-            .first;
-        emit(state.copyWith(
-          status: PodcastStatus.success,
-          episodes: updatedEpisodes,
-        ));
-      } else {
-        emit(state.copyWith(status: PodcastStatus.success));
-      }
+      await episodeUseCases
+          .getEpisodes(
+            feedId: state.currentPodcast.pId,
+            podcastTitle: state.currentPodcast.title,
+            subscribed: state.currentPodcast.subscribed,
+            showRead: state.areReadEpisodesVisible,
+            refresh: true,
+          )
+          .first;
+      emit(state.copyWith(status: PodcastStatus.success));
     } catch (e) {
       emit(state.copyWith(status: PodcastStatus.failure));
     }
@@ -193,34 +161,13 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   }
 
   FutureOr<void> _onFetchTrendingPodcastsEvent(event, emit) async {
-   emit(state.copyWith(status: PodcastStatus.loading));
+    emit(state.copyWith(status: PodcastStatus.loading));
     try {
       List<PodcastEntity> trendingPodcasts =
           await podcastUseCases.fetchTrendingPodcasts();
       emit(state.copyWith(
         status: PodcastStatus.success,
         trendingPodcasts: trendingPodcasts,
-      ));
-    } catch (e) {
-      emit(state.copyWith(status: PodcastStatus.failure));
-    }
-  }
-
-
-  FutureOr<void> _onGetEpisodesByFeedIdEvent(event, emit) async {
-    emit(state.copyWith(status: PodcastStatus.loading));
-    try {
-      final List<EpisodeEntity> stream = await episodeUseCases
-          .getEpisodes(
-            subscribed: state.currentPodcast.subscribed,
-            feedId: state.currentPodcast.pId,
-            podcastTitle: state.currentPodcast.title,
-            showRead: true,
-          )
-          .first;
-      emit(state.copyWith(
-        status: PodcastStatus.success,
-        episodes: stream,
       ));
     } catch (e) {
       emit(state.copyWith(status: PodcastStatus.failure));
