@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
-import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../helpers/core/format_pubdate_string.dart';
 import '../../helpers/core/image_provider.dart';
@@ -27,13 +25,11 @@ class EpisodeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     var themeData = Theme.of(context);
     double dimension = 120.0;
-    // Let's see if episode exists in DB:
-    final episodeForCard =
-        episode.id != 0 ? episodeBox.get(episode.id) : episode;
+    //episode.id != 0 ? episodeBox.get(episode.id) : episode;
     return FutureBuilder<ImageProvider>(
         future: MyImageProvider(
-                url: episodeForCard!.image.isNotEmpty
-                    ? episodeForCard.image
+                url: episode.image.isNotEmpty
+                    ? episode.image
                     : podcast.artworkFilePath != null
                         ? podcast.artworkFilePath!
                         : podcast.artwork)
@@ -47,7 +43,7 @@ class EpisodeCard extends StatelessWidget {
               final isCurrentlyPlaying =
                   currentlyPlayingEpisodeState?.eId == episode.eId;
               return Card(
-                key: ValueKey(episodeForCard.eId),
+                key: ValueKey(episode.eId),
                 color: themeData.colorScheme.primaryContainer,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
@@ -66,8 +62,7 @@ class EpisodeCard extends StatelessWidget {
                   width: MediaQuery.of(context).size.width,
                   child: InkWell(
                     splashColor: Colors.black87,
-                    onTap: () =>
-                        _navigateToEpisodeDetails(context, episodeForCard),
+                    onTap: () => _navigateToEpisodeDetails(context),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,15 +97,14 @@ class EpisodeCard extends StatelessWidget {
                                         minWidth:
                                             MediaQuery.of(context).size.width /
                                                 2),
-                                    child: _buildEpisodeDetails(
-                                        themeData, episodeForCard),
+                                    child: _buildEpisodeDetails(themeData),
                                   ),
                                   const SizedBox(
                                     width: 40,
                                   ),
                                   IconButton(
-                                    onPressed: () => _showEpisodeActionsDialog(
-                                        context, episodeForCard),
+                                    onPressed: () =>
+                                        _showEpisodeActionsDialog(context),
                                     icon: const Icon(
                                       Icons.more_horiz_rounded,
                                     ),
@@ -124,13 +118,13 @@ class EpisodeCard extends StatelessWidget {
                                 children: [
                                   EpisodeProgressIndicator(
                                     themeData: themeData,
-                                    episode: episodeForCard,
+                                    episode: episode,
                                     isCurrentlyPlaying: isCurrentlyPlaying,
                                     currentlyPlayingEpisode:
                                         currentlyPlayingEpisodeState,
                                   ),
-                                  _buildEpisodeIconsRow(
-                                      context, episodeForCard),
+                                  if (podcast.subscribed)
+                                    _buildEpisodeIconsRow(context),
                                 ],
                               ),
                             ],
@@ -146,13 +140,12 @@ class EpisodeCard extends StatelessWidget {
         });
   }
 
-  void _navigateToEpisodeDetails(
-      BuildContext context, EpisodeEntity episodeForCard) {
+  void _navigateToEpisodeDetails(BuildContext context) {
     Navigator.push(
       context,
       ScaleRoute(
         page: EpisodeDetailsPage(
-          episode: episodeForCard,
+          episode: episode,
           podcast: podcast,
         ),
       ),
@@ -176,22 +169,24 @@ class EpisodeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEpisodeDetails(
-      ThemeData themeData, EpisodeEntity episodeForCard) {
+  Widget _buildEpisodeDetails(ThemeData themeData) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          episodeForCard.title,
+          episode.title,
           overflow: TextOverflow.ellipsis,
           softWrap: true,
           maxLines: 2,
           style: themeData.textTheme.displayMedium,
         ),
+        const SizedBox(
+          height: 10,
+        ),
         Text(
           formatTimestamp(
-            episodeForCard.datePublished,
+            episode.datePublished,
           ),
           style: themeData.textTheme.bodyMedium,
         ),
@@ -199,59 +194,44 @@ class EpisodeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEpisodeIconsRow(
-      BuildContext context, EpisodeEntity episodeForCard) {
+  Widget _buildEpisodeIconsRow(BuildContext context) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.6,
-      child: BlocListener<PodcastBloc, PodcastState>(
-        listenWhen: (previous, current) =>
-            (previous.episodeToRefresh != current.episodeToRefresh) &&
-            !podcast.subscribed,
-        listener: (context, state) {},
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          spacing: 40,
-          children: [
-            const Spacer(),
-            Icon(
-              episodeForCard.read ? Icons.check_rounded : null,
-              size: 30.0,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const Spacer(),
-            Icon(
-              episodeForCard.favorite
-                  ? Icons.star_rounded
-                  : Icons.star_border_rounded,
-              size: 30.0,
-              color: episodeForCard.favorite
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.white12,
-            ),
-            Icon(
-              Icons.save_alt_rounded,
-              size: 30.0,
-              color: episodeForCard.filePath != null
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.white12,
-            ),
-          ],
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        spacing: 40,
+        children: [
+          const Spacer(),
+          Icon(
+            episode.read ? Icons.check_rounded : null,
+            size: 30.0,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const Spacer(),
+          Icon(
+            episode.favorite ? Icons.star_rounded : Icons.star_border_rounded,
+            size: 30.0,
+            color: episode.favorite
+                ? Theme.of(context).colorScheme.primary
+                : Colors.white12,
+          ),
+          Icon(
+            Icons.save_alt_rounded,
+            size: 30.0,
+            color: episode.filePath != null
+                ? Theme.of(context).colorScheme.primary
+                : Colors.white12,
+          ),
+        ],
       ),
     );
   }
 
-  void _performAction(String flag, dynamic value, BuildContext context,
-      EpisodeEntity episodeForCard) {
-    final podcastBloc = BlocProvider.of<PodcastBloc>(context);
-
-    // Check if episode is already in db. If not, we need to add it
-    int id = episodeForCard.id != 0
-        ? episodeForCard.id
-        : episodeBox.put(episodeForCard);
-    // Then we get the episode from db so it can be updated in there
-    EpisodeEntity episodeToUpdate = episodeBox.get(id)!;
-
+  void _performAction(
+    String flag,
+    dynamic value,
+    BuildContext context,
+  ) {
 /*
 // Delete specific episode from db (just for testing)
     List episodeList = episodeBox.getAll();
@@ -267,21 +247,12 @@ class EpisodeCard extends StatelessWidget {
 
     switch (flag) {
       case "favorite":
-        episodeToUpdate.favorite = !value;
-        episodeBox.put(episodeToUpdate);
-        if (!podcast.subscribed) {
-          // Not needed by subscribed podcasts because icons update
-          // automatically when stream data from db changes.
-          // This Bloc event is needed only when podcast is not subscribed since
-          // stream doesn't change anymore after episodes were fetched from remote.
-
-          // We use a Uuid for each tap so BlocListener always receives a different value
-          podcastBloc.add(EpisodeFlagChangedEvent(uid: const Uuid().v4()));
-        }
+        episode.favorite = !value;
+        episodeBox.put(episode);
         break;
       case "read":
-        episodeToUpdate.read = !value;
-        episodeBox.put(episodeToUpdate);
+        episode.read = !value;
+        episodeBox.put(episode);
         break;
       case "download":
         break;
@@ -289,29 +260,34 @@ class EpisodeCard extends StatelessWidget {
         break;
       default:
     }
+    // We delete episode from db if it doesn't belong to any subscribed podcasts and all flag values are reset to initial
+    if ((episode.isSubscribed == false) &
+        (episode.favorite == false) &
+        (episode.filePath == null) &
+        (episode.position == 0)) {
+      episodeBox.remove(episode.id);
+    }
   }
 
-  void _showEpisodeActionsDialog(
-      BuildContext context, EpisodeEntity episodeForCard) {
+  void _showEpisodeActionsDialog(BuildContext context) {
     final List<Map<String, dynamic>> menuItems = [
       {
-        "title":
-            episodeForCard.favorite ? "Unmark as favorite" : "Mark as favorite",
+        "title": episode.favorite ? "Unmark as favorite" : "Mark as favorite",
         "onPressed": () {
-          final bool isFavorite = episodeForCard.favorite;
-          _performAction("favorite", isFavorite, context, episodeForCard);
+          final bool isFavorite = episode.favorite;
+          _performAction("favorite", isFavorite, context);
           Navigator.pop(context);
         }
       },
-      //if (podcast.subscribed)
-      {
-        "title": episodeForCard.read ? "unmark as read" : "Mark as read",
-        "onPressed": () {
-          final bool isRead = episodeForCard.read;
-          _performAction("read", isRead, context, episodeForCard);
-          Navigator.pop(context);
-        }
-      },
+      if (podcast.subscribed)
+        {
+          "title": episode.read ? "unmark as read" : "Mark as read",
+          "onPressed": () {
+            final bool isRead = episode.read;
+            _performAction("read", isRead, context);
+            Navigator.pop(context);
+          }
+        },
       {"title": "Download", "onPressed": () {}},
       {"title": "Share", "onPressed": () {}}
     ];
