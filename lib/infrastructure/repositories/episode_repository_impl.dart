@@ -17,9 +17,15 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
     required int feedId,
     required String podcastTitle,
     required bool showRead,
+    required bool refresh,
   }) {
     return episodeLocalDatasource.getEpisodes(
-        subscribed: subscribed, feedId: feedId, podcastTitle: podcastTitle, showRead: showRead);
+      subscribed: subscribed,
+      feedId: feedId,
+      podcastTitle: podcastTitle,
+      showRead: showRead,
+      refresh: refresh,
+    );
   }
 
   @override
@@ -28,12 +34,8 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   }
 
   @override
-  Future<List<EpisodeEntity>> getNewEpisodesByFeedId({required int feedId, required String podcastTitle}) async {
-    return await episodeLocalDatasource.getNewEpisodesByFeedId(feedId: feedId, podcastTitle: podcastTitle);
-  }
-
-  @override
-  Stream<Map<String, List<EpisodeEntity>>> getFlaggedEpisodes({required String flag}) {
+  Stream<Map<String, List<EpisodeEntity>>> getFlaggedEpisodes(
+      {required String flag}) {
     return episodeLocalDatasource.getFlaggedEpisodes(flag: flag);
   }
 }
