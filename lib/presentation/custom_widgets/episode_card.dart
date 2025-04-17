@@ -244,29 +244,39 @@ class EpisodeCard extends StatelessWidget {
       }
     }
 */
+    // We delete episode from db if it doesn't belong to any subscribed podcasts and all flag values are reset to initial
+    void deleteEpisodeFromDb() {
+      // Get the latest episode version from db since we just changed a flag value
+      final episodeDb = episodeBox.get(episode.id)!;
+      if ((episode.isSubscribed == false) &
+      (episodeDb.favorite == false) &
+      (episodeDb.filePath == null) &
+      (episodeDb.position == 0)) {
+        episodeBox.remove(episode.id);
+      }
+    }
 
     switch (flag) {
       case "favorite":
         episode.favorite = !value;
         episodeBox.put(episode);
+        deleteEpisodeFromDb();
         break;
       case "read":
         episode.read = !value;
         episodeBox.put(episode);
+        deleteEpisodeFromDb();
         break;
       case "download":
+        //episode.filePath = value;
+        //episodeBox.put(episode);
+        //deleteEpisodeFromDb();
         break;
       case "share":
         break;
       default:
     }
-    // We delete episode from db if it doesn't belong to any subscribed podcasts and all flag values are reset to initial
-    if ((episode.isSubscribed == false) &
-        (episode.favorite == false) &
-        (episode.filePath == null) &
-        (episode.position == 0)) {
-      episodeBox.remove(episode.id);
-    }
+
   }
 
   void _showEpisodeActionsDialog(BuildContext context) {
