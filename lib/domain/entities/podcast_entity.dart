@@ -1,7 +1,5 @@
 import 'package:objectbox/objectbox.dart';
 
-import 'episode_entity.dart';
-
 @Entity()
 class PodcastEntity {
   /// ObjectBox related
@@ -32,10 +30,6 @@ class PodcastEntity {
 
   // will be used for subscribed podcasts: artworkFilePath is artwork url file saved to device
   String? artworkFilePath;
-
-  /// ObjectBox relation
-  @Backlink('podcast')
-  final episodes = ToMany<EpisodeEntity>();
 
   PodcastEntity({
     required this.pId,
