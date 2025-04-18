@@ -80,6 +80,31 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     });
   }
 
+  Future<List<EpisodeEntity>> _fetchRemoteEpisodes(
+      {required int feedId, required String podcastTitle}) async {
+    List<EpisodeEntity> remoteEpisodes = [];
+    try {
+      // Fetch episodes from the remote data source.
+      remoteEpisodes = await getIt<EpisodeRemoteDataSource>()
+          .fetchRemoteEpisodesByFeedId(feedId: feedId, podcastTitle: podcastTitle);
+    } catch (e) {
+      remoteEpisodes = [];
+    }
+
+    // Retrieve locally stored episodes for the given feed ID.
+    final localEpisodes = _getLocalEpisodesByFeedId(feedId: feedId);
+
+    // Create a map of local episodes for efficient lookup by episode ID.
+    final localEpisodeMap = {for (final episode in localEpisodes) episode.eId: episode};
+
+    // Merge remote episodes with local data, prioritizing local versions if available.
+    return remoteEpisodes.map((remoteEpisode) {
+      // If a local episode with the same ID exists, return the local episode;
+      // otherwise, return the remote episode.
+      return localEpisodeMap[remoteEpisode.eId] ?? remoteEpisode;
+    }).toList();
+  }
+
   @override
   Stream<List<EpisodeEntity>> getEpisodes({
     required bool subscribed,
@@ -89,8 +114,7 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     required bool refresh,
   }) async* {
     if (!subscribed) {
-      yield* getIt<EpisodeRemoteDataSource>()
-          .fetchRemoteEpisodesByFeedId(
+      yield* _fetchRemoteEpisodes(
               feedId: feedId, podcastTitle: podcastTitle)
           .asStream();
     } else {
@@ -120,25 +144,34 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     return results;
   }
 
-  _getNewEpisodesByFeedId(
+  // Helper function to get local episode IDs for a given feed ID.
+  Set<int> _getLocalEpisodeIdsByFeedId({required int feedId}) {
+    return _getLocalEpisodesByFeedId(feedId: feedId).map((ep) => ep.eId).toSet();
+  }
+
+  Future<void> _getNewEpisodesByFeedId(
       {required int feedId, required String podcastTitle}) async {
-    // Get remaining episodes from db for the podcast feed id
-    final List<EpisodeEntity> localEpisodes =
-        _getLocalEpisodesByFeedId(feedId: feedId);
+    List<EpisodeEntity> remoteEpisodes = [];
+    try {
+      // Fetch episodes from remote for the given podcast feed ID.
+      remoteEpisodes = await getIt<EpisodeRemoteDataSource>()
+          .fetchRemoteEpisodesByFeedId(feedId: feedId, podcastTitle: podcastTitle);
+    } catch (e) {
+      remoteEpisodes = [];
+    }
 
-    // Fetch episodes from remote for same podcast feed id
-    final List<EpisodeEntity> remoteEpisodes = await getIt<EpisodeRemoteDataSource>()
-        .fetchRemoteEpisodesByFeedId(
-            feedId: feedId, podcastTitle: podcastTitle);
+    // Get the IDs of episodes currently stored locally for this feed ID.
+    final localEpisodeIds = _getLocalEpisodeIdsByFeedId(feedId: feedId);
 
-    // Put all ids of local episodes into a set
-    final Set<int> localEpisodeIds = localEpisodes.map((ep) => ep.eId).toSet();
-
-    // Filter out remote episodes that are already in the database
-    final List<EpisodeEntity> newEpisodes = remoteEpisodes
+    // Filter out remote episodes that are already in the database.
+    final newEpisodes = remoteEpisodes
         .where((episode) => !localEpisodeIds.contains(episode.eId))
         .toList();
-    episodeBox.putMany(newEpisodes);
+
+    // Add the new episodes to the local database.
+    if (newEpisodes.isNotEmpty) {
+      episodeBox.putMany(newEpisodes);
+    }
   }
 }
 
