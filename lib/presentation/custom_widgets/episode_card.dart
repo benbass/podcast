@@ -4,9 +4,11 @@ import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../application/episodes_cubit/episodes_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../helpers/core/format_pubdate_string.dart';
 import '../../helpers/core/image_provider.dart';
+import 'action_feedback/action_feedback.dart';
 import 'episode_progress_indicator.dart';
 import 'page_transition.dart';
 import '../episode_details_page/episode_details_page.dart';
@@ -123,7 +125,7 @@ class EpisodeCard extends StatelessWidget {
                                     currentlyPlayingEpisode:
                                         currentlyPlayingEpisodeState,
                                   ),
-                                  if (podcast.subscribed)
+                                  if (episode.isSubscribed)
                                     _buildEpisodeIconsRow(context),
                                 ],
                               ),
@@ -254,6 +256,19 @@ class EpisodeCard extends StatelessWidget {
       (episodeDb.position == 0)) {
         episodeBox.remove(episode.id);
       }
+      if((episode.isSubscribed == false) &
+      (episodeDb.favorite == true) ||
+      (episodeDb.filePath != null) ||
+      (episodeDb.position != 0)){
+        final episodes = BlocProvider.of<EpisodesCubit>(context).state;
+        if (episodes.isNotEmpty) {
+          int index = episodes.indexWhere((element) => element.eId == episode.eId);
+          episodes.insert(index, episodeDb);
+          episodes.removeAt(index+1);
+          BlocProvider.of<EpisodesCubit>(context).setEpisodes(episodes);
+        }
+      }
+
     }
 
     switch (flag) {
@@ -287,15 +302,17 @@ class EpisodeCard extends StatelessWidget {
           final bool isFavorite = episode.favorite;
           _performAction("favorite", isFavorite, context);
           Navigator.pop(context);
+          ActionFeedback.show(context, episode.favorite ? Icons.star : Icons.star_border);
         }
       },
-      if (podcast.subscribed)
+      if (episode.isSubscribed)
         {
           "title": episode.read ? "unmark as read" : "Mark as read",
           "onPressed": () {
             final bool isRead = episode.read;
             _performAction("read", isRead, context);
             Navigator.pop(context);
+            ActionFeedback.show(context, episode.read ? Icons.check : Icons.radio_button_unchecked);
           }
         },
       {"title": "Download", "onPressed": () {}},
