@@ -28,9 +28,9 @@ class ElevatedButtonSubscribe extends StatelessWidget {
     return ElevatedButton(
       onPressed: () async {
         !podcast.subscribed
-            ? subscribeToPodcast(context)
-            : unsubscribe(context);
-        if (navigate) {
+            ? await _subscribeToPodcast(context)
+            : await _unsubscribe(context);
+        if (navigate && context.mounted) {
           Navigator.push(
             context,
             ScaleRoute(
@@ -49,30 +49,39 @@ class ElevatedButtonSubscribe extends StatelessWidget {
   }
 
   /// SUBSCRIBE
-  void subscribeToPodcast(BuildContext context) async {
+  _handleEpisodes(BuildContext context) async {
+    // Make sure we have episodes when we subscribe before calling the episode list page
+    List<EpisodeEntity> episodes = BlocProvider.of<EpisodesCubit>(context)
+        .state
+        .where((episode) => episode.feedId == podcast.pId)
+        .toList();
+    if (episodes.isEmpty) {
+      episodes = await getIt<EpisodeUseCases>()
+          .getEpisodes(
+            subscribed: false,
+            feedId: podcast.pId,
+            podcastTitle: podcast.title,
+            showRead: true,
+            refresh: false,
+          )
+          .first;
+    }
+    // Set flag isSubscribed to true
+    for (var episode in episodes) {
+      episode.isSubscribed = true;
+    }
+    // Save episodes to db
+    episodeBox.putMany(episodes);
+  }
+
+  _subscribeToPodcast(BuildContext context) async {
     final String connectionType =
         await getIt<ConnectivityManager>().getConnectionTypeAsString();
     if (connectionType != 'none' && context.mounted) {
       BlocProvider.of<PodcastBloc>(context)
           .add(SubscribeToPodcastEvent(podcast: podcast));
 
-      // Make sure we have episodes when we subscribe before calling the episode list page
-      List<EpisodeEntity> episodes = BlocProvider.of<EpisodesCubit>(context).state.where((episode) => episode.feedId == podcast.pId).toList();
-      if (episodes.isEmpty) {
-       episodes =  await getIt<EpisodeUseCases>().getEpisodes(
-          subscribed: false,
-          feedId: podcast.pId,
-          podcastTitle: podcast.title,
-          showRead: true,
-          refresh: false,
-        ).first;
-      }
-      // We set flag isSubscribed to true
-      for (var episode in episodes) {
-        episode.isSubscribed = true;
-      }
-      // We save episodes to db
-      episodeBox.putMany(episodes);
+      await _handleEpisodes(context);
     } else {
       if (context.mounted) {
         showDialog(
@@ -84,38 +93,35 @@ class ElevatedButtonSubscribe extends StatelessWidget {
   }
 
   /// UNSUBSCRIBE
-  deleteUnFlaggedEpisodes() async {
+  _deleteUnFlaggedEpisodes() async {
     // We do not just delete the episodes from the db: User may have
-    // flagged some episodes and wants to keep them.
+    // flagged some episodes so we  want to keep them.
     // 1. we set isSubscribed to false for all episodes anyway
-    final queryBuilderEpisodes =
+    final episodesQueryBuilder =
         episodeBox.query(EpisodeEntity_.feedId.equals(podcast.pId)).build();
-    final resultsA = queryBuilderEpisodes.find();
-    for (var ep in resultsA) {
+    final results = episodesQueryBuilder.find();
+    for (var ep in results) {
       ep.isSubscribed = false;
       episodeBox.put(ep);
     }
 
     // 2. We query all ids for episodes with no flag
-    final queryBuilderIds = episodeBox
+    final idsQueryBuilder = episodeBox
         .query(EpisodeEntity_.feedId
             .equals(podcast.pId)
             .and(EpisodeEntity_.favorite.equals(false))
             .and(EpisodeEntity_.filePath.isNull())
             .and(EpisodeEntity_.position.equals(0)))
         .build();
-    final ids = queryBuilderIds.findIds();
+    final determinedIds = idsQueryBuilder.findIds();
 
     // 3. We delete the episodes in db
-    List<int> episodeIds = [];
-    for (var id in ids) {
-      episodeIds.add(id);
-    }
-    episodeBox.removeMany(episodeIds);
+    episodeBox.removeMany(determinedIds);
+
   }
 
-  void unsubscribe(BuildContext context) async {
-    await deleteUnFlaggedEpisodes();
+  _unsubscribe(BuildContext context) async {
+    await _deleteUnFlaggedEpisodes();
     if (context.mounted) {
       BlocProvider.of<PodcastBloc>(context)
           .add(UnSubscribeFromPodcastEvent(id: podcast.id));
