@@ -5,6 +5,8 @@ import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/page_transition.dart';
 import '../../application/episodes_cubit/episodes_cubit.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../../domain/entities/episode_entity.dart';
+import '../../domain/usecases/episode_usecases.dart';
 import '../../helpers/core/connectivity_manager.dart';
 import '../../injection.dart';
 import '../../objectbox.g.dart';
@@ -53,8 +55,19 @@ class ElevatedButtonSubscribe extends StatelessWidget {
     if (connectionType != 'none' && context.mounted) {
       BlocProvider.of<PodcastBloc>(context)
           .add(SubscribeToPodcastEvent(podcast: podcast));
+
+      // Make sure we have episodes when we subscribe before calling the episode list page
+      List<EpisodeEntity> episodes = BlocProvider.of<EpisodesCubit>(context).state.where((episode) => episode.feedId == podcast.pId).toList();
+      if (episodes.isEmpty) {
+       episodes =  await getIt<EpisodeUseCases>().getEpisodes(
+          subscribed: false,
+          feedId: podcast.pId,
+          podcastTitle: podcast.title,
+          showRead: true,
+          refresh: false,
+        ).first;
+      }
       // We set flag isSubscribed to true
-      final episodes = BlocProvider.of<EpisodesCubit>(context).state;
       for (var episode in episodes) {
         episode.isSubscribed = true;
       }
