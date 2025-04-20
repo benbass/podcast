@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
-import 'package:podcast/presentation/custom_widgets/page_transition.dart';
 import '../../application/episodes_cubit/episodes_cubit.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../domain/entities/episode_entity.dart';
@@ -10,7 +9,6 @@ import '../../domain/usecases/episode_usecases.dart';
 import '../../helpers/core/connectivity_manager.dart';
 import '../../injection.dart';
 import '../../objectbox.g.dart';
-import '../homepage/homepage.dart';
 import 'failure_dialog.dart';
 
 class ElevatedButtonSubscribe extends StatelessWidget {
@@ -30,19 +28,38 @@ class ElevatedButtonSubscribe extends StatelessWidget {
         !podcast.subscribed
             ? await _subscribeToPodcast(context)
             : await _unsubscribe(context);
-        if (navigate && context.mounted) {
+        /*if (navigate && context.mounted) {
           Navigator.push(
             context,
             ScaleRoute(
               page: const HomePage(),
             ),
           );
-        }
+        }*/
       },
       child: BlocBuilder<PodcastBloc, PodcastState>(
         builder: (context, state) {
-          return Text(
-              state.currentPodcast.subscribed ? "Unsubscribe" : "Subscribe");
+          return state.status != PodcastStatus.loading
+              ? SizedBox(
+                  width: 80,
+                  child: Text(state.currentPodcast.subscribed
+                      ? "Unsubscribe"
+                      : "Subscribe",
+                  textAlign: TextAlign.center,),
+                )
+              : const SizedBox(
+                  width: 80,
+                  child: CircularProgressIndicator(
+                    constraints: BoxConstraints(
+                      maxWidth: 28,
+                      minHeight: 28,
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      vertical: 3,
+                      horizontal: 24,
+                    ),
+                  ),
+                );
         },
       ),
     );
@@ -78,10 +95,11 @@ class ElevatedButtonSubscribe extends StatelessWidget {
     final String connectionType =
         await getIt<ConnectivityManager>().getConnectionTypeAsString();
     if (connectionType != 'none' && context.mounted) {
-      BlocProvider.of<PodcastBloc>(context)
-          .add(SubscribeToPodcastEvent(podcast: podcast));
-
       await _handleEpisodes(context);
+      if (context.mounted) {
+        BlocProvider.of<PodcastBloc>(context)
+            .add(SubscribeToPodcastEvent(podcast: podcast));
+      }
     } else {
       if (context.mounted) {
         showDialog(
@@ -117,7 +135,6 @@ class ElevatedButtonSubscribe extends StatelessWidget {
 
     // 3. We delete the episodes in db
     episodeBox.removeMany(determinedIds);
-
   }
 
   _unsubscribe(BuildContext context) async {
