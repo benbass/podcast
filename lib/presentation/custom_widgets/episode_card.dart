@@ -302,7 +302,7 @@ class EpisodeCard extends StatelessWidget {
           final bool isFavorite = episode.favorite;
           _performAction("favorite", isFavorite, context);
           Navigator.pop(context);
-          ActionFeedback.show(context, episode.favorite ? Icons.star : Icons.star_border);
+          ActionFeedback.show(context, icon: episode.favorite ? Icons.star : Icons.star_border);
         }
       },
       if (episode.isSubscribed)
@@ -312,7 +312,7 @@ class EpisodeCard extends StatelessWidget {
             final bool isRead = episode.read;
             _performAction("read", isRead, context);
             Navigator.pop(context);
-            ActionFeedback.show(context, episode.read ? Icons.check : Icons.radio_button_unchecked);
+            ActionFeedback.show(context, icon: episode.read ? Icons.check : Icons.radio_button_unchecked);
           }
         },
       {"title": "Download", "onPressed": () {}},
