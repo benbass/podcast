@@ -106,7 +106,7 @@ class EpisodesListPage extends StatelessWidget {
                   refresh: false,
                 ),
                 builder: (context, snapshot) {
-                  if (state.status == PodcastStatus.loading) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return const SliverFillRemaining(
                       child: Center(
                         child: CircularProgressIndicator(),
