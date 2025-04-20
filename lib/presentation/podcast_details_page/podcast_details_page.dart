@@ -34,11 +34,7 @@ class PodcastDetailsPage extends StatelessWidget {
   Scaffold _buildPage(BuildContext context) {
     PodcastState state = context.watch<PodcastBloc>().state;
     return Scaffold(
-      body: state.status == PodcastStatus.loading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : SafeArea(
+      body: SafeArea(
               child: CustomScrollView(
                 slivers: [
                   FlexibleSpace(
