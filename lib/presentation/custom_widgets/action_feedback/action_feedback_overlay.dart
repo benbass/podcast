@@ -57,15 +57,14 @@ class ActionFeedbackOverlayState extends State<ActionFeedbackOverlay>
       child: FadeTransition(
         opacity: _opacityAnimation,
         child: AnimatedBuilder(
-          animation: _sizeAnimation,
-          builder: (context, child) {
-            return Icon(
-              widget.icon,
-              color: Theme.of(context).colorScheme.secondary,
-              size: _sizeAnimation.value,
-            );
-          }
-        ),
+            animation: _sizeAnimation,
+            builder: (context, child) {
+              return Icon(
+                widget.icon,
+                color: Theme.of(context).colorScheme.secondary,
+                size: _sizeAnimation.value,
+              );
+            }),
       ),
     );
   }
