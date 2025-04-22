@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcast/core/globals.dart';
 import 'package:podcast/presentation/flagged_episodes_page/widgets/episode_card_for_flagged.dart';
 
 import '../../application/episodes_cubit/episodes_cubit.dart';
@@ -22,8 +23,14 @@ class FlaggedEpisodesPage extends StatelessWidget {
 
     Future<PodcastEntity> podcastForEpisode(EpisodeEntity episode) async {
       // Does podcast exist in db? If not, fetch it from remote.
-      return episode.podcast.target ?? await getIt<PodcastUseCases>()
-          .fetchPodcastByFeedId(episode.feedId);
+      List<PodcastEntity> podcasts = podcastBox.getAll();
+      PodcastEntity? podcast = podcasts.firstWhere((element) => element.pId == episode.feedId, orElse: () => PodcastEntity.emptyPodcast());
+      if (podcast.pId != -1) {
+        return podcast;
+      } else {
+        return await getIt<PodcastUseCases>()
+            .fetchPodcastByFeedId(episode.feedId);
+      }
     }
 
     return Scaffold(
