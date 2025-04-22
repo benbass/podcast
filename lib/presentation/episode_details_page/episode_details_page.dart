@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:podcast/application/episodes_cubit/episodes_cubit.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/presentation/episode_details_page/widgets/player_controls.dart';
 
@@ -26,6 +27,10 @@ class EpisodeDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<EpisodeEntity> episodes = BlocProvider.of<EpisodesCubit>(context, listen: false).state;
+    int indexOfInitial = episodes.indexWhere((element) => element.eId == episode.eId);
+    PageController pageController = PageController(initialPage: indexOfInitial);
+
     // We wrap this widget in PopScope so we can apply a method on the OS back-button
     // where we handle the overlay!
     return PopScope(
@@ -34,7 +39,7 @@ class EpisodeDetailsPage extends StatelessWidget {
           if (getIt<PlayerStatesListener>().player.processingState ==
                   ProcessingState.ready &&
               overlayEntry == null) {
-            showOverlayPlayerMin(context, episode, podcast, podcast.title);
+            showOverlayPlayerMin(context, podcast, episode);
           }
         }
       },
@@ -42,97 +47,128 @@ class EpisodeDetailsPage extends StatelessWidget {
         builder: (context, state) {
           state != null && state.eId == episode.eId ? removeOverlay() : null;
           return Scaffold(
-            body: Stack(
-              children: [
-                SafeArea(
-                  child: CustomScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    slivers: [
-                      FlexibleSpace(
-                        podcast: podcast,
-                        episode: episode,
-                        title: episode.title,
-                      ),
-                      SliverPadding(
-                        padding:
-                            const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
-                        sliver: SliverToBoxAdapter(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(formatTimestamp(episode.datePublished)),
-                              Icon(
-                                episode.read && podcast.subscribed
-                                    ? Icons.check_rounded
-                                    : null,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              Icon(
-                                episode.favorite
-                                    ? Icons.star_rounded
-                                    : Icons.star_border_rounded,
-                                color: episode.favorite
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Colors.white12,
-                              ),
-                              Icon(
-                                Icons.save_alt_rounded,
-                                color: episode.filePath != null
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Colors.white12,
-                              ),
-                              Text(
-                                episode.duration! == 0
-                                    ? ""
-                                    : intToDurationFormatted(
-                                        episode.duration!,
-                                      ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SliverPadding(
-                        padding:
-                            const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 170.0),
-                        sliver: SliverToBoxAdapter(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                episode.description,
-                                style: const TextStyle(
-                                  fontSize: 16.0,
+            body: PageView.builder(
+                controller: pageController,
+                onPageChanged: (index) {
+                  final ep = episodes[index];
+                  if (getIt<PlayerStatesListener>().player.processingState ==
+                      ProcessingState.ready) {
+                    if (overlayEntry == null && state != null) {
+                      showOverlayPlayerMin(
+                          context, podcast, episode);
+                    } else {
+                      if (overlayEntry != null &&
+                          state != null &&
+                          state.eId == ep.eId) {
+                        removeOverlay();
+                      }
+                    }
+                  }
+                },
+                itemCount: episodes.length,
+                itemBuilder: (context, index) {
+                  final episodeToDisplay = episodes[index];
+                  return Stack(
+                    children: [
+                      SafeArea(
+                        child: CustomScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          slivers: [
+                            FlexibleSpace(
+                              podcast: podcast,
+                              episode: episodeToDisplay,
+                              title: episodeToDisplay.title,
+                            ),
+                            SliverPadding(
+                              padding: const EdgeInsets.fromLTRB(
+                                  20.0, 20.0, 20.0, 20.0),
+                              sliver: SliverToBoxAdapter(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(formatTimestamp(
+                                        episodeToDisplay.datePublished)),
+                                    Icon(
+                                      episodeToDisplay.read &&
+                                              podcast.subscribed
+                                          ? Icons.check_rounded
+                                          : null,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                    Icon(
+                                      episodeToDisplay.favorite
+                                          ? Icons.star_rounded
+                                          : Icons.star_border_rounded,
+                                      color: episodeToDisplay.favorite
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Colors.white12,
+                                    ),
+                                    Icon(
+                                      Icons.save_alt_rounded,
+                                      color: episodeToDisplay.filePath != null
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Colors.white12,
+                                    ),
+                                    Text(
+                                      episodeToDisplay.duration! == 0
+                                          ? ""
+                                          : intToDurationFormatted(
+                                              episodeToDisplay.duration!,
+                                            ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 16.0),
-                              if (episode.episodeNr != 0) ...[
-                                Text(
-                                    "${episode.episodeNr}/${podcast.episodeCount}"),
-                                const SizedBox(height: 16.0),
-                              ],
-                              if (podcast.link != null &&
-                                  podcast.link!.isNotEmpty &&
-                                  podcast.link!.contains('://'))
-                                PodcastWebsiteLink(link: podcast.link!),
-                            ],
-                          ),
+                            ),
+                            SliverPadding(
+                              padding: const EdgeInsets.fromLTRB(
+                                  20.0, 0.0, 20.0, 170.0),
+                              sliver: SliverToBoxAdapter(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      episodeToDisplay.description,
+                                      style: const TextStyle(
+                                        fontSize: 16.0,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16.0),
+                                    if (episodeToDisplay.episodeNr != 0) ...[
+                                      Text(
+                                          "${episodeToDisplay.episodeNr}/${podcast.episodeCount}"),
+                                      const SizedBox(height: 16.0),
+                                    ],
+                                    if (podcast.link != null &&
+                                        podcast.link!.isNotEmpty &&
+                                        podcast.link!.contains('://'))
+                                      PodcastWebsiteLink(link: podcast.link!),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+                      Visibility(
+                        visible:
+                            state != null && state.eId == episodeToDisplay.eId,
+                        child: Positioned(
+                          bottom: MediaQuery.of(context).padding.bottom,
+                          left: 0,
+                          right: 0,
+                          child: const PlayerControls(),
+                        ),
+                      )
                     ],
-                  ),
-                ),
-                Visibility(
-                  visible: state != null && state.eId == episode.eId,
-                  child: Positioned(
-                    bottom: MediaQuery.of(context).padding.bottom,
-                    left: 0,
-                    right: 0,
-                    child: const PlayerControls(),
-                  ),
-                )
-              ],
-            ),
+                  );
+                }),
           );
         },
       ),
