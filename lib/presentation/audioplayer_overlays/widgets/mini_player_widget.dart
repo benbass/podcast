@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
+import 'package:podcast/application/episodes_cubit/episodes_cubit.dart';
+import 'package:podcast/domain/usecases/episode_usecases.dart';
 
+import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../../application/podcast_bloc/podcast_bloc.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/core/image_provider.dart';
@@ -11,11 +16,9 @@ import '../../custom_widgets/page_transition.dart';
 import '../../episode_details_page/episode_details_page.dart';
 
 class MiniPlayerWidget extends StatelessWidget {
-  final EpisodeEntity episode;
   final PodcastEntity podcast;
   const MiniPlayerWidget({
     super.key,
-    required this.episode,
     required this.podcast,
   });
 
@@ -23,6 +26,8 @@ class MiniPlayerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final EpisodeEntity episode =
+        BlocProvider.of<EpisodePlaybackCubit>(context).state!;
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -33,39 +38,88 @@ class MiniPlayerWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             GestureDetector(
-              onTap: () {
-                //removeOverlay();
-                Navigator.of(context).push(
-                  ScaleRoute(
-                    page: EpisodeDetailsPage(
-                      episode: episode,
-                      podcast: podcast,
-                    ),
-                  ),
-                );
+              onTap: () async {
+                // The EpisodeDetailsPage is a PageView depending on a list of episodes saved in EpisodesCubit state.
+                // If user called a new list of episodes after clicking on Play, the current EpisodesCubit doesn't contain the episode being played.
+                // (And the state of PodcastBloc also changed).
+                // That's why we need to check this now and set the state of EpisodesCubit with the list of episodes that contains the episode being played.
+                // We also set the PodcastBloc state with the podcast that was passed as the overlay was created.
+                // Once done, we can navigate to the EpisodeDetailsPage.
+                EpisodeEntity episodeToDisplay = episode;
+                List<EpisodeEntity> currentEpisodes =
+                    BlocProvider.of<EpisodesCubit>(context, listen: false)
+                        .state;
+                late List<EpisodeEntity>? episodes;
+                if (!currentEpisodes.contains(episodeToDisplay)) {
+                  episodes = await getIt<EpisodeUseCases>()
+                      .getEpisodes(
+                        subscribed: podcast.subscribed,
+                        feedId: podcast.pId,
+                        podcastTitle: podcast.title,
+                        showRead: true,
+                        refresh: false,
+                      )
+                      .first;
+                  episodeToDisplay = episodes.firstWhere(
+                      (element) => element.eId == episodeToDisplay.eId);
+                  if (context.mounted) {
+                    BlocProvider.of<PodcastBloc>(context)
+                        .add(PodcastTappedEvent(podcast: podcast));
+                  }
+                }
+
+                if (context.mounted) {
+                  if (episodes != null) {
+                    BlocProvider.of<EpisodesCubit>(context)
+                        .setEpisodes(episodes);
+                    Navigator.of(context).push(
+                      ScaleRoute(
+                        page: EpisodeDetailsPage(
+                          episode: episodeToDisplay,
+                          podcast: podcast,
+                        ),
+                      ),
+                    );
+                  } else {
+                    Navigator.of(context).push(
+                      ScaleRoute(
+                        page: EpisodeDetailsPage(
+                          episode: episodeToDisplay,
+                          podcast: podcast,
+                        ),
+                      ),
+                    );
+                  }
+                }
               },
               // set HitTestBehavior.opaque to enable the GestureDetector to receive events on the entire row and not only on the row's children
               behavior: HitTestBehavior.opaque,
               child: Row(
                 children: [
                   FutureBuilder<ImageProvider>(
-                      future: MyImageProvider(url: episode.image.isNotEmpty ? episode.image : podcast.artworkFilePath != null ? podcast.artworkFilePath! : podcast.artwork).imageProvider,
-                      builder: (BuildContext context, AsyncSnapshot<ImageProvider> snapshot) {
+                      future: MyImageProvider(
+                              url: episode.image.isNotEmpty
+                                  ? episode.image
+                                  : podcast.artworkFilePath != null
+                                      ? podcast.artworkFilePath!
+                                      : podcast.artwork)
+                          .imageProvider,
+                      builder: (BuildContext context,
+                          AsyncSnapshot<ImageProvider> snapshot) {
                         final ImageProvider imageProvider = snapshot.hasData
                             ? snapshot.data!
                             : const AssetImage('assets/placeholder.png');
-                    return Container(
-                    height: kPlayerHeight,
-                    width: kPlayerHeight,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: imageProvider,
-                        fit: BoxFit.fitWidth,
-                      ),
-                    ),
-                                  );
-                  }
-                ),
+                        return Container(
+                          height: kPlayerHeight,
+                          width: kPlayerHeight,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ),
+                        );
+                      }),
                   const SizedBox(
                     width: 4,
                   ),
