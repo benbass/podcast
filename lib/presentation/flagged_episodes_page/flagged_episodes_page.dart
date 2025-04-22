@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/flagged_episodes_page/widgets/episode_card_for_flagged.dart';
 
+import '../../application/episodes_cubit/episodes_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../domain/usecases/episode_usecases.dart';
@@ -41,6 +43,7 @@ class FlaggedEpisodesPage extends StatelessWidget {
             return Center(child: Text('No episodes found in "${flag.toLowerCase()}"'));
           } else {
             final groupedEpisodes = snapshot.data!;
+            BlocProvider.of<EpisodesCubit>(context).setEpisodes(groupedEpisodes.values.expand((episodes) => episodes).toList());
             return buildListView(
                 groupedEpisodes, themeData, podcastForEpisode, dimension);
           }
