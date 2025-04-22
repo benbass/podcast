@@ -28,6 +28,7 @@ class MiniPlayerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final EpisodeEntity episode =
         BlocProvider.of<EpisodePlaybackCubit>(context).state!;
+    bool areReadEpisodesVisible = context.watch<PodcastBloc>().state.areReadEpisodesVisible;
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -56,7 +57,7 @@ class MiniPlayerWidget extends StatelessWidget {
                         subscribed: podcast.subscribed,
                         feedId: podcast.pId,
                         podcastTitle: podcast.title,
-                        showRead: true,
+                        showRead: areReadEpisodesVisible,
                         refresh: false,
                       )
                       .first;
