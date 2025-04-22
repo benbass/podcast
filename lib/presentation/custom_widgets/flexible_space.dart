@@ -64,10 +64,7 @@ class FlexibleSpace extends StatelessWidget {
                 Positioned(
                   bottom: 12,
                   right: 12,
-                  child: PlayButton(
-                    episode: episode!,
-                    podcastTitle: title,
-                  ),
+                  child: PlayButton(episode: episode!),
                 ),
               if (episode != null)
                 BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
@@ -188,7 +185,7 @@ class FlexibleSpace extends StatelessWidget {
                 if (audioHandler.player.processingState ==
                         ProcessingState.ready &&
                     overlayEntry == null) {
-                  showOverlayPlayerMin(context, episode!, podcast, title);
+                  showOverlayPlayerMin(context, podcast, episode!);
                 }
               }
               Navigator.of(context).pop();
