@@ -39,7 +39,7 @@ class EpisodeDetailsPage extends StatelessWidget {
           if (getIt<PlayerStatesListener>().player.processingState ==
                   ProcessingState.ready &&
               overlayEntry == null) {
-            showOverlayPlayerMin(context, podcast, episode);
+            showOverlayPlayerMin(context, podcast);
           }
         }
       },
@@ -55,7 +55,7 @@ class EpisodeDetailsPage extends StatelessWidget {
                       ProcessingState.ready) {
                     if (overlayEntry == null && state != null) {
                       showOverlayPlayerMin(
-                          context, podcast, episode);
+                          context, podcast);
                     } else {
                       if (overlayEntry != null &&
                           state != null &&

@@ -185,7 +185,7 @@ class FlexibleSpace extends StatelessWidget {
                 if (audioHandler.player.processingState ==
                         ProcessingState.ready &&
                     overlayEntry == null) {
-                  showOverlayPlayerMin(context, podcast, episode!);
+                  showOverlayPlayerMin(context, podcast);
                 }
               }
               Navigator.of(context).pop();
