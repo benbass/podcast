@@ -15,11 +15,9 @@ class PlayButton extends StatelessWidget {
   const PlayButton({
     super.key,
     required this.episode,
-    required this.podcastTitle,
   });
 
   final EpisodeEntity episode;
-  final String podcastTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +74,7 @@ class PlayButtonActive extends StatelessWidget {
             );
           }
         } else {
+          removeOverlay();
           // source error?
           try {
             if (context.mounted) {
