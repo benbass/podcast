@@ -161,16 +161,21 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     }
 
     // Get the IDs of episodes currently stored locally for this feed ID.
-    final localEpisodeIds = _getLocalEpisodeIdsByFeedId(feedId: feedId);
+    final Set<int> localEpisodeIds = _getLocalEpisodeIdsByFeedId(feedId: feedId);
 
     // Filter out remote episodes that are already in the database.
-    final newEpisodes = remoteEpisodes
+    final List<EpisodeEntity> newEpisodes = remoteEpisodes
         .where((episode) => !localEpisodeIds.contains(episode.eId))
         .toList();
 
     // Add the new episodes to the local database.
     if (newEpisodes.isNotEmpty) {
-      episodeBox.putMany(newEpisodes);
+      final List<EpisodeEntity> newEpisodesSubscribed = [];
+      for (var episode in newEpisodes) {
+        newEpisodesSubscribed.add(episode.copyWith(isSubscribed: true));
+      }
+
+      episodeBox.putMany(newEpisodesSubscribed);
     }
   }
 }
