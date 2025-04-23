@@ -28,7 +28,8 @@ class MiniPlayerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final EpisodeEntity episode =
         BlocProvider.of<EpisodePlaybackCubit>(context).state!;
-    bool areReadEpisodesVisible = context.watch<PodcastBloc>().state.areReadEpisodesVisible;
+    bool areReadEpisodesVisible =
+        context.watch<PodcastBloc>().state.areReadEpisodesVisible;
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -50,47 +51,24 @@ class MiniPlayerWidget extends StatelessWidget {
                 List<EpisodeEntity> currentEpisodes =
                     BlocProvider.of<EpisodesCubit>(context, listen: false)
                         .state;
-                late List<EpisodeEntity>? episodes;
+
                 if (!currentEpisodes.contains(episodeToDisplay)) {
-                  episodes = await getIt<EpisodeUseCases>()
-                      .getEpisodes(
-                        subscribed: podcast.subscribed,
-                        feedId: podcast.pId,
-                        podcastTitle: podcast.title,
-                        showRead: areReadEpisodesVisible,
-                        refresh: false,
-                      )
-                      .first;
-                  episodeToDisplay = episodes.firstWhere(
-                      (element) => element.eId == episodeToDisplay.eId);
-                  if (context.mounted) {
-                    BlocProvider.of<PodcastBloc>(context)
-                        .add(PodcastTappedEvent(podcast: podcast));
-                  }
+                  await _resetEpisodesAndPodcast(
+                    context: context,
+                    episodeToDisplay: episodeToDisplay,
+                    areReadEpisodesVisible: areReadEpisodesVisible,
+                  );
                 }
 
                 if (context.mounted) {
-                  if (episodes != null) {
-                    BlocProvider.of<EpisodesCubit>(context)
-                        .setEpisodes(episodes);
-                    Navigator.of(context).push(
-                      ScaleRoute(
-                        page: EpisodeDetailsPage(
-                          episode: episodeToDisplay,
-                          podcast: podcast,
-                        ),
+                  Navigator.of(context).push(
+                    ScaleRoute(
+                      page: EpisodeDetailsPage(
+                        episode: episodeToDisplay,
+                        podcast: podcast,
                       ),
-                    );
-                  } else {
-                    Navigator.of(context).push(
-                      ScaleRoute(
-                        page: EpisodeDetailsPage(
-                          episode: episodeToDisplay,
-                          podcast: podcast,
-                        ),
-                      ),
-                    );
-                  }
+                    ),
+                  );
                 }
               },
               // set HitTestBehavior.opaque to enable the GestureDetector to receive events on the entire row and not only on the row's children
@@ -203,5 +181,28 @@ class MiniPlayerWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  _resetEpisodesAndPodcast({
+    required BuildContext context,
+    required EpisodeEntity episodeToDisplay,
+    required bool areReadEpisodesVisible,
+  }) async {
+    List<EpisodeEntity> episodes = await getIt<EpisodeUseCases>()
+        .getEpisodes(
+          subscribed: podcast.subscribed,
+          feedId: podcast.pId,
+          podcastTitle: podcast.title,
+          showRead: areReadEpisodesVisible,
+          refresh: false,
+        )
+        .first;
+    episodeToDisplay =
+        episodes.firstWhere((element) => element.eId == episodeToDisplay.eId);
+    if (context.mounted) {
+      BlocProvider.of<PodcastBloc>(context)
+          .add(PodcastTappedEvent(podcast: podcast));
+      BlocProvider.of<EpisodesCubit>(context).setEpisodes(episodes);
+    }
   }
 }
