@@ -18,11 +18,13 @@ import 'widgets/podcast_website_link.dart';
 class EpisodeDetailsPage extends StatelessWidget {
   final EpisodeEntity episode;
   final PodcastEntity podcast;
+  final String? flag;
 
   const EpisodeDetailsPage({
     super.key,
     required this.episode,
     required this.podcast,
+    this.flag,
   });
 
   @override
@@ -78,6 +80,7 @@ class EpisodeDetailsPage extends StatelessWidget {
                               podcast: podcast,
                               episode: episodeToDisplay,
                               title: episodeToDisplay.title,
+                              flag: flag,
                             ),
                             SliverPadding(
                               padding: const EdgeInsets.fromLTRB(
