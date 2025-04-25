@@ -16,6 +16,7 @@ import 'package:podcast/theme.dart';
 import 'application/episode_playback_cubit/episode_playback_cubit.dart';
 import 'application/episodes_cubit/episodes_cubit.dart';
 import 'application/podcast_bloc/podcast_bloc.dart';
+import 'application/show_flagged_list/show_flagged_list_cubit.dart';
 import 'core/globals.dart';
 import 'core/objectbox.dart';
 import 'helpers/core/lifecycle_oberserver.dart';
@@ -62,6 +63,7 @@ void main() async {
               create: (BuildContext context) => getIt<TextFieldCubit>()),
           BlocProvider(create: (BuildContext context) => getIt<PodcastBloc>()..add(LoadSubscribedPodcastsEvent())),
           BlocProvider(create: (BuildContext context) => getIt<EpisodesCubit>()),
+          BlocProvider(create: (BuildContext context) => getIt<ShowFlaggedListCubit>()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
