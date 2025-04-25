@@ -4,10 +4,10 @@ import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
-import '../../application/episodes_cubit/episodes_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../helpers/core/format_pubdate_string.dart';
 import '../../helpers/core/image_provider.dart';
+import '../../helpers/database/handle_episode.dart';
 import 'action_feedback/action_feedback.dart';
 import 'episode_progress_indicator.dart';
 import 'page_transition.dart';
@@ -237,53 +237,16 @@ class EpisodeCard extends StatelessWidget {
     dynamic value,
     BuildContext context,
   ) {
-/*
-// Delete specific episode from db (just for testing)
-    List episodeList = episodeBox.getAll();
-    for (var episode in episodeList) {
-      if (episode.favorite == true) {
-        print(episode.title);
-        if (episode.title == "...enter title here...") {
-          episodeBox.remove(episode.id);
-        }
-      }
-    }
-*/
-    // We delete episode from db if it doesn't belong to any subscribed podcasts and all flag values are reset to initial
-    void deleteEpisodeFromDb() {
-      // Get the latest episode version from db since we just changed a flag value
-      final episodeDb = episodeBox.get(episode.id)!;
-      if ((episode.isSubscribed == false) &
-      (episodeDb.favorite == false) &
-      (episodeDb.filePath == null) &
-      (episodeDb.position == 0)) {
-        episodeBox.remove(episode.id);
-      }
-      if((episode.isSubscribed == false) &
-      (episodeDb.favorite == true) ||
-      (episodeDb.filePath != null) ||
-      (episodeDb.position != 0)){
-        final episodes = BlocProvider.of<EpisodesCubit>(context).state;
-        if (episodes.isNotEmpty) {
-          int index = episodes.indexWhere((element) => element.eId == episode.eId);
-          episodes.insert(index, episodeDb);
-          episodes.removeAt(index+1);
-          BlocProvider.of<EpisodesCubit>(context).setEpisodes(episodes);
-        }
-      }
-
-    }
-
     switch (flag) {
       case "favorite":
         episode.favorite = !value;
         episodeBox.put(episode);
-        deleteEpisodeFromDb();
+        updateEpisodeOnFlagChanged(context, episode);
         break;
       case "read":
         episode.read = !value;
         episodeBox.put(episode);
-        deleteEpisodeFromDb();
+        updateEpisodeOnFlagChanged(context, episode);
         break;
       case "download":
         //episode.filePath = value;
