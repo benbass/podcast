@@ -99,7 +99,7 @@ class FlaggedEpisodesPage extends StatelessWidget {
                           } else {
                             podcast = PodcastEntity.emptyPodcast();
                           }
-                          return EpisodeCardForFlagged(episode: episode, podcast: podcast,);
+                          return EpisodeCardForFlagged(episode: episode, podcast: podcast, flag: flag);
                         });
                   }),
                   const SizedBox(height: 50),
