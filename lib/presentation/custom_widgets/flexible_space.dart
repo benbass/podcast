@@ -22,12 +22,14 @@ class FlexibleSpace extends StatelessWidget {
   final PodcastEntity podcast; // If null, widget displays episode details.
   final EpisodeEntity? episode; // If null, widget displays podcast details.
   final String title;
+  final String? flag;
 
   const FlexibleSpace({
     super.key,
     required this.podcast,
     this.episode,
     required this.title,
+    this.flag,
   });
 
   @override
@@ -64,7 +66,7 @@ class FlexibleSpace extends StatelessWidget {
                 Positioned(
                   bottom: 12,
                   right: 12,
-                  child: PlayButton(episode: episode!),
+                  child: PlayButton(episode: episode!, flag: flag),
                 ),
               if (episode != null)
                 BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
