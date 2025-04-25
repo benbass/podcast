@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
 import 'package:podcast/application/episodes_cubit/episodes_cubit.dart';
+import 'package:podcast/application/show_flagged_list/show_flagged_list_cubit.dart';
 import 'package:podcast/domain/usecases/episode_usecases.dart';
 
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
@@ -188,15 +189,25 @@ class MiniPlayerWidget extends StatelessWidget {
     required EpisodeEntity episodeToDisplay,
     required bool areReadEpisodesVisible,
   }) async {
-    List<EpisodeEntity> episodes = await getIt<EpisodeUseCases>()
-        .getEpisodes(
-          subscribed: podcast.subscribed,
-          feedId: podcast.pId,
-          podcastTitle: podcast.title,
-          showRead: areReadEpisodesVisible,
-          refresh: false,
-        )
-        .first;
+    List<EpisodeEntity> episodes = [];
+    // Depending on value of flag, we want to get either the flagged or un-flagged episodes.
+    String? flag = BlocProvider.of<ShowFlaggedListCubit>(context).state;
+    if (flag != null) {
+      final map =
+          await getIt<EpisodeUseCases>().getFlaggedEpisodes(flag: flag).first;
+      episodes = map.values.expand((episodes) => episodes).toList();
+    } else {
+      episodes = await getIt<EpisodeUseCases>()
+          .getEpisodes(
+            subscribed: podcast.subscribed,
+            feedId: podcast.pId,
+            podcastTitle: podcast.title,
+            showRead: areReadEpisodesVisible,
+            refresh: false,
+          )
+          .first;
+    }
+
     episodeToDisplay =
         episodes.firstWhere((element) => element.eId == episodeToDisplay.eId);
     if (context.mounted) {
