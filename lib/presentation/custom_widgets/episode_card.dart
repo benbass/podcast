@@ -18,10 +18,12 @@ class EpisodeCard extends StatelessWidget {
     super.key,
     required this.episode,
     required this.podcast,
+    this.flag,
   });
 
   final EpisodeEntity episode;
   final PodcastEntity podcast;
+  final String? flag;
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +151,7 @@ class EpisodeCard extends StatelessWidget {
         page: EpisodeDetailsPage(
           episode: episode,
           podcast: podcast,
+          flag: flag,
         ),
       ),
     );
