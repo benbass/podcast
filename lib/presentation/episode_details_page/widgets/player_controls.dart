@@ -5,6 +5,7 @@ import 'package:podcast/presentation/episode_details_page/widgets/playback_posit
 
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../../domain/entities/episode_entity.dart';
+import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
 import '../../audioplayer_overlays/audioplayer_overlays.dart';
@@ -23,10 +24,10 @@ class PlayerControls extends StatelessWidget {
       child: Center(
         child: Column(
           children: [
-            BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
+            BlocBuilder<EpisodePlaybackCubit, Map<PodcastEntity, EpisodeEntity>?>(
               builder: (context, state) {
                 if (state != null) {
-                  return PlaybackPositionSlider(episode: state);
+                  return PlaybackPositionSlider(episode: state.values.first);
                 } else {
                   return const SizedBox.shrink();
                 }
