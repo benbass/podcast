@@ -23,8 +23,8 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
         ) {
     /// LOCAL
     on<LoadSubscribedPodcastsEvent>(_onLoadSubscribedPodcastsEvent);
-    on<ToggleUnreadEpisodesVisibilityEvent>(
-        _onToggleUnreadEpisodesVisibilityEvent);
+    on<ToggleEpisodesFilterStatusEvent>(
+        _onToggleEpisodesFilterStatusEvent);
     on<SubscribeToPodcastEvent>(_onSubscribeToPodcastEvent);
     on<UnSubscribeFromPodcastEvent>(_onUnSubscribeToPodcastEvent);
     on<UpdateQueryEvent>(_onUpdateQueryEvent);
@@ -58,8 +58,8 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     }
   }
 
-  void _onToggleUnreadEpisodesVisibilityEvent(event, emit) {
-    emit(state.copyWith(areReadEpisodesVisible: event.areReadEpisodesVisible));
+  void _onToggleEpisodesFilterStatusEvent(event, emit) {
+    emit(state.copyWith(episodesFilterStatus: EpisodesFilterStatus.values.byName(event.filterStatus)));
   }
 
   // FutureOr here because subscribing also fetches the episodes from remote
@@ -99,8 +99,8 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
         subscribed: false,
       );
       await podcastUseCases.unsubscribeFromPodcast(state.currentPodcast);
-      List<PodcastEntity> subscribedPodcasts = await podcastUseCases
-          .getSubscribedPodcasts();
+      List<PodcastEntity> subscribedPodcasts =
+          await podcastUseCases.getSubscribedPodcasts();
       emit(state.copyWith(
         subscribedPodcasts: subscribedPodcasts,
         currentPodcast: unsubscribedPodcast,
@@ -144,7 +144,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
             feedId: state.currentPodcast.pId,
             podcastTitle: state.currentPodcast.title,
             subscribed: state.currentPodcast.subscribed,
-            showRead: state.areReadEpisodesVisible,
+            filterStatus: state.episodesFilterStatus.name,
             refresh: true,
           )
           .first;
@@ -157,6 +157,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   Future<void> _onPodcastTappedEvent(event, emit) async {
     emit(state.copyWith(
       currentPodcast: event.podcast,
+      episodesFilterStatus: EpisodesFilterStatus.hideRead,
     ));
   }
 
