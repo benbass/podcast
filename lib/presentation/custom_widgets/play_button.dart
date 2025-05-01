@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
-import '../../application/show_flagged_list/show_flagged_list_cubit.dart';
 import '../../core/globals.dart';
 import '../../domain/entities/episode_entity.dart';
+import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/core/connectivity_manager.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
@@ -16,18 +16,18 @@ class PlayButton extends StatelessWidget {
   const PlayButton({
     super.key,
     required this.episode,
-    this.flag,
+    required this.podcast,
   });
 
   final EpisodeEntity episode;
-  final String? flag;
+  final PodcastEntity podcast;
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
+    return BlocBuilder<EpisodePlaybackCubit, Map<PodcastEntity, EpisodeEntity>?>(
       builder: (context, state) {
-        if (state?.eId != episode.eId) {
-          return PlayButtonActive(episode: episode, flag: flag);
+        if (state?.values.first.eId != episode.eId) {
+          return PlayButtonActive(episode: episode, podcast: podcast);
         } else {
           return const PlayButtonInactive();
         }
@@ -55,11 +55,11 @@ class PlayButtonActive extends StatelessWidget {
   const PlayButtonActive({
     super.key,
     required this.episode,
-    this.flag,
+    required this.podcast,
   });
 
   final EpisodeEntity episode;
-  final String? flag;
+  final PodcastEntity podcast;
 
   @override
   Widget build(BuildContext context) {
@@ -83,11 +83,11 @@ class PlayButtonActive extends StatelessWidget {
           // source error?
           try {
             if (context.mounted) {
-              // Let's save position of previous episode before changing to new one
+              // Save position of previous episode before changing to new one
               if (BlocProvider.of<EpisodePlaybackCubit>(context).state !=
                   null) {
                 final previousEpisode =
-                    BlocProvider.of<EpisodePlaybackCubit>(context).state!;
+                    BlocProvider.of<EpisodePlaybackCubit>(context).state!.values.first;
                 previousEpisode.position = currentPosition;
                 episodeBox.put(previousEpisode);
               }
@@ -103,11 +103,7 @@ class PlayButtonActive extends StatelessWidget {
 
             if (context.mounted) {
               BlocProvider.of<EpisodePlaybackCubit>(context)
-                  .setPlaybackEpisode(episode);
-              // Is this episode from one of the flagged list (ie: Favourites)?
-              // We need to know this so that a tap on the mini player overlay
-              // will use the list of episodes this episode was played from.
-              BlocProvider.of<ShowFlaggedListCubit>(context).setFlag(flag);
+                  .setPlaybackEpisode({podcast: episode});
             }
           } on PlayerException {
             if (context.mounted) {
