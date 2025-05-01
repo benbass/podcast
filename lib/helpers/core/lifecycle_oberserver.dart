@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../injection.dart';
+import '../database/delete_episodes.dart';
 import '../player/audiohandler.dart';
 import 'connectivity_manager.dart';
 
@@ -12,6 +13,7 @@ class MyAppLifecycleObserver extends WidgetsBindingObserver {
       // App is being closed
       getIt<MyAudioHandler>().dispose();
       getIt<ConnectivityManager>().dispose();
+      deleteEpisodes();
     }
   }
 }
