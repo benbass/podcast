@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/audioplayer_overlays/widgets/mini_player_widget.dart';
 
 OverlayEntry? overlayEntry;
@@ -17,14 +16,11 @@ OverlayEntry _createOverlayEntry(BuildContext context, {required Widget child}) 
   );
 }
 
-void showOverlayPlayerMin(
-    BuildContext context, PodcastEntity podcast) async {
+void showOverlayPlayerMin(BuildContext context) async {
   overlayState = Overlay.of(context);
   overlayEntry = _createOverlayEntry(
       context,
-      child: MiniPlayerWidget(
-        podcast: podcast,
-      ));
+      child: const MiniPlayerWidget());
 
   overlayState!.insert(overlayEntry!);
 }
