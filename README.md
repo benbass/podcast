@@ -39,9 +39,9 @@ Done: Search for podcasts and view description and episodes, view episode descri
 ## Todo
     - App name
     - UI design is not final
-    - Playlists and favourites
+    - Playlists
+    - Downloading episodes
     - Player (skip to previous and skip to next episode: playlists must be implemented first)
     - Share on social media or as link
     - Unit tests
-    - Perform actions on episodes for subscribed podcaast and save to database
     - ...
