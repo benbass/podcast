@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
-import 'package:podcast/application/episodes_cubit/episodes_cubit.dart';
-import 'package:podcast/application/show_flagged_list/show_flagged_list_cubit.dart';
+
 import 'package:podcast/domain/usecases/episode_usecases.dart';
 
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
@@ -17,20 +16,20 @@ import '../../custom_widgets/page_transition.dart';
 import '../../episode_details_page/episode_details_page.dart';
 
 class MiniPlayerWidget extends StatelessWidget {
-  final PodcastEntity podcast;
   const MiniPlayerWidget({
     super.key,
-    required this.podcast,
   });
 
   final double kPlayerHeight = 80.0;
 
   @override
   Widget build(BuildContext context) {
-    final EpisodeEntity episode =
+    final Map<PodcastEntity, EpisodeEntity> episodeInfo =
         BlocProvider.of<EpisodePlaybackCubit>(context).state!;
-    bool areReadEpisodesVisible =
-        context.watch<PodcastBloc>().state.areReadEpisodesVisible;
+    final episode = episodeInfo.entries.first.value;
+    final podcast = episodeInfo.keys.first;
+    String filterStatus =
+        context.watch<PodcastBloc>().state.episodesFilterStatus.name;
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -42,31 +41,24 @@ class MiniPlayerWidget extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () async {
-                // The EpisodeDetailsPage is a PageView depending on a list of episodes saved in EpisodesCubit state.
-                // If user called a new list of episodes after clicking on Play, the current EpisodesCubit doesn't contain the episode being played.
+                // The EpisodeDetailsPage is a PageView depending on a specific list of episodes.
+                // If user called a new list of episodes after clicking on Play, this new list doesn't contain the episode being played.
                 // (And the state of PodcastBloc also changed).
-                // That's why we need to check this now and set the state of EpisodesCubit with the list of episodes that contains the episode being played.
-                // We also set the PodcastBloc state with the podcast that was passed as the overlay was created.
+                // That's why we need to check this now and get the list of episodes that contains the episode being played.
+                // We also set the PodcastBloc state with the podcast the playback episode belongs to.
                 // Once done, we can navigate to the EpisodeDetailsPage.
-                EpisodeEntity episodeToDisplay = episode;
-                List<EpisodeEntity> currentEpisodes =
-                    BlocProvider.of<EpisodesCubit>(context, listen: false)
-                        .state;
 
-                if (!currentEpisodes.contains(episodeToDisplay)) {
-                  await _resetEpisodesAndPodcast(
-                    context: context,
-                    episodeToDisplay: episodeToDisplay,
-                    areReadEpisodesVisible: areReadEpisodesVisible,
-                  );
-                }
+                await _resetEpisodesAndPodcast(
+                  context: context,
+                  episodeToDisplay: episode,
+                  filterStatus: filterStatus,
+                );
 
                 if (context.mounted) {
                   Navigator.of(context).push(
                     ScaleRoute(
                       page: EpisodeDetailsPage(
-                        episode: episodeToDisplay,
-                        podcast: podcast,
+                        episode: episode,
                       ),
                     ),
                   );
@@ -187,33 +179,24 @@ class MiniPlayerWidget extends StatelessWidget {
   _resetEpisodesAndPodcast({
     required BuildContext context,
     required EpisodeEntity episodeToDisplay,
-    required bool areReadEpisodesVisible,
+    required String filterStatus,
   }) async {
-    List<EpisodeEntity> episodes = [];
-    // Depending on value of flag, we want to get either the flagged or un-flagged episodes.
-    String? flag = BlocProvider.of<ShowFlaggedListCubit>(context).state;
-    if (flag != null) {
-      final map =
-          await getIt<EpisodeUseCases>().getFlaggedEpisodes(flag: flag).first;
-      episodes = map.values.expand((episodes) => episodes).toList();
-    } else {
-      episodes = await getIt<EpisodeUseCases>()
-          .getEpisodes(
-            subscribed: podcast.subscribed,
-            feedId: podcast.pId,
-            podcastTitle: podcast.title,
-            showRead: areReadEpisodesVisible,
-            refresh: false,
-          )
-          .first;
-    }
+    final podcast =
+        BlocProvider.of<EpisodePlaybackCubit>(context).state!.entries.first.key;
+    late List<EpisodeEntity> episodes;
+    episodes = await getIt<EpisodeUseCases>()
+        .getEpisodes(
+          subscribed: podcast.subscribed,
+          feedId: podcast.pId,
+          podcastTitle: podcast.title,
+          filterStatus: filterStatus,
+          refresh: false,
+        )
+        .first;
 
-    episodeToDisplay =
-        episodes.firstWhere((element) => element.eId == episodeToDisplay.eId);
-    if (context.mounted) {
+    if (context.mounted && !episodes.contains(episodeToDisplay)) {
       BlocProvider.of<PodcastBloc>(context)
           .add(PodcastTappedEvent(podcast: podcast));
-      BlocProvider.of<EpisodesCubit>(context).setEpisodes(episodes);
     }
   }
 }
