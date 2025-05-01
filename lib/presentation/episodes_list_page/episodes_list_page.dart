@@ -6,9 +6,8 @@ import 'package:podcast/injection.dart';
 
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card_for_list.dart';
-import '../../application/episodes_cubit/episodes_cubit.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
-import '../custom_widgets/failure_dialog.dart';
+import '../custom_widgets/failure_widget.dart';
 import '../custom_widgets/page_transition.dart';
 import '../podcast_details_page/podcast_details_page.dart';
 import 'widgets/row_icon_buttons_episodes.dart';
@@ -18,27 +17,11 @@ class EpisodesListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<PodcastBloc, PodcastState>(
-      listener: (context, state) {
-        if (state.status == PodcastStatus.failure) {
-          showDialog(
-            context: context,
-            builder: (context) => const FailureDialog(
-                message: "Error loading episodes. Please try again."),
-          ).whenComplete(() {
-            if (context.mounted) {
-              Navigator.pop(context);
-            }
-          });
-        }
-      },
-      child: _buildPage(context),
-    );
+    return _buildPage(context);
   }
 
   Widget _buildPage(BuildContext context) {
     PodcastState state = context.watch<PodcastBloc>().state;
-    BlocProvider.of<EpisodesCubit>(context).setEpisodes([]);
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -94,7 +77,7 @@ class EpisodesListPage extends StatelessWidget {
               ),
             ),
             StreamBuilder<List<EpisodeEntity>>(
-              initialData: const [],
+                initialData: const [],
                 // The method getEpisodes checks the subscribed flag of
                 // the podcast and returns the correct stream
                 // (from objectBox database or from the remote server)
@@ -102,7 +85,7 @@ class EpisodesListPage extends StatelessWidget {
                   subscribed: state.currentPodcast.subscribed,
                   feedId: state.currentPodcast.pId,
                   podcastTitle: state.currentPodcast.title,
-                  showRead: state.areReadEpisodesVisible,
+                  filterStatus: state.episodesFilterStatus.name,
                   refresh: false,
                 ),
                 builder: (context, snapshot) {
@@ -112,6 +95,11 @@ class EpisodesListPage extends StatelessWidget {
                         child: CircularProgressIndicator(),
                       ),
                     );
+                  } else if (snapshot.hasError) {
+                    return SliverFillRemaining(
+                        child: Center(
+                      child: buildFailureWidget(message: 'Error loading the episodes'),
+                    ));
                   } else {
                     return SliverPadding(
                       padding: const EdgeInsets.only(bottom: 80.0),
@@ -119,7 +107,6 @@ class EpisodesListPage extends StatelessWidget {
                         itemCount: snapshot.hasData ? snapshot.data!.length : 0,
                         itemBuilder: (context, index) {
                           List<EpisodeEntity> episodes = snapshot.data ?? [];
-                          BlocProvider.of<EpisodesCubit>(context).setEpisodes(episodes);
                           final item = episodes[index];
                           return EpisodeCardForList(
                             episode: item,
