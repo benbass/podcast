@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../helpers/core/format_pubdate_string.dart';
 import '../../helpers/core/image_provider.dart';
-import '../../helpers/database/handle_episode.dart';
-import 'action_feedback/action_feedback.dart';
+import '../../helpers/core/show_episode_actions_dialog.dart';
+import 'episode_actions_row.dart';
 import 'episode_progress_indicator.dart';
 import 'page_transition.dart';
 import '../episode_details_page/episode_details_page.dart';
@@ -18,18 +17,15 @@ class EpisodeCard extends StatelessWidget {
     super.key,
     required this.episode,
     required this.podcast,
-    this.flag,
   });
 
   final EpisodeEntity episode;
   final PodcastEntity podcast;
-  final String? flag;
 
   @override
   Widget build(BuildContext context) {
     var themeData = Theme.of(context);
     double dimension = 120.0;
-    //episode.id != 0 ? episodeBox.get(episode.id) : episode;
     return FutureBuilder<ImageProvider>(
         future: MyImageProvider(
                 url: episode.image.isNotEmpty
@@ -42,10 +38,11 @@ class EpisodeCard extends StatelessWidget {
           final ImageProvider imageProvider = snapshot.hasData
               ? snapshot.data!
               : const AssetImage('assets/placeholder.png');
-          return BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
+          return BlocBuilder<EpisodePlaybackCubit,
+              Map<PodcastEntity, EpisodeEntity>?>(
             builder: (context, currentlyPlayingEpisodeState) {
               final isCurrentlyPlaying =
-                  currentlyPlayingEpisodeState?.eId == episode.eId;
+                  currentlyPlayingEpisodeState?.values.first.eId == episode.eId;
               return Card(
                 key: ValueKey(episode.eId),
                 color: themeData.colorScheme.primaryContainer,
@@ -81,9 +78,9 @@ class EpisodeCard extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(
                             6.0,
-                            10.0,
+                            5.0,
                             0.0,
-                            2.0,
+                            0.0,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,9 +103,10 @@ class EpisodeCard extends StatelessWidget {
                                   const SizedBox(
                                     width: 40,
                                   ),
+                                  if (episode.isSubscribed)
                                   IconButton(
                                     onPressed: () =>
-                                        _showEpisodeActionsDialog(context),
+                                        showEpisodeActionsDialog(context, episode),
                                     icon: const Icon(
                                       Icons.more_horiz_rounded,
                                     ),
@@ -145,13 +143,11 @@ class EpisodeCard extends StatelessWidget {
   }
 
   void _navigateToEpisodeDetails(BuildContext context) {
-    Navigator.push(
+      Navigator.push(
       context,
       ScaleRoute(
         page: EpisodeDetailsPage(
           episode: episode,
-          podcast: podcast,
-          flag: flag,
         ),
       ),
     );
@@ -160,7 +156,7 @@ class EpisodeCard extends StatelessWidget {
   Widget _buildEpisodeImage(
       ImageProvider imageProvider,
       bool isCurrentlyPlaying,
-      EpisodeEntity? currentlyPlayingEpisode,
+      Map<PodcastEntity, EpisodeEntity>? currentlyPlayingEpisode,
       ThemeData themeData,
       double dimension) {
     return Container(
@@ -201,107 +197,10 @@ class EpisodeCard extends StatelessWidget {
 
   Widget _buildEpisodeIconsRow(BuildContext context) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.6,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        spacing: 40,
-        children: [
-          const Spacer(),
-          Icon(
-            episode.read ? Icons.check_rounded : null,
-            size: 30.0,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          const Spacer(),
-          Icon(
-            episode.favorite ? Icons.star_rounded : Icons.star_border_rounded,
-            size: 30.0,
-            color: episode.favorite
-                ? Theme.of(context).colorScheme.primary
-                : Colors.white12,
-          ),
-          Icon(
-            Icons.save_alt_rounded,
-            size: 30.0,
-            color: episode.filePath != null
-                ? Theme.of(context).colorScheme.primary
-                : Colors.white12,
-          ),
-        ],
-      ),
+      width: MediaQuery.of(context).size.width * 0.62,
+      height: 40.0,
+      child: EpisodeActionsRow(episode: episode, showSpacer: false,),
     );
   }
 
-  void _performAction(
-    String flag,
-    dynamic value,
-    BuildContext context,
-  ) {
-    switch (flag) {
-      case "favorite":
-        episode.favorite = !value;
-        episodeBox.put(episode);
-        updateEpisodeOnFlagChanged(context, episode);
-        break;
-      case "read":
-        episode.read = !value;
-        episodeBox.put(episode);
-        updateEpisodeOnFlagChanged(context, episode);
-        break;
-      case "download":
-        //episode.filePath = value;
-        //episodeBox.put(episode);
-        //deleteEpisodeFromDb();
-        break;
-      case "share":
-        break;
-      default:
-    }
-
-  }
-
-  void _showEpisodeActionsDialog(BuildContext context) {
-    final List<Map<String, dynamic>> menuItems = [
-      {
-        "title": episode.favorite ? "Unmark as favorite" : "Mark as favorite",
-        "onPressed": () {
-          final bool isFavorite = episode.favorite;
-          _performAction("favorite", isFavorite, context);
-          Navigator.pop(context);
-          ActionFeedback.show(context, icon: episode.favorite ? Icons.star : Icons.star_border);
-        }
-      },
-      if (episode.isSubscribed)
-        {
-          "title": episode.read ? "unmark as read" : "Mark as read",
-          "onPressed": () {
-            final bool isRead = episode.read;
-            _performAction("read", isRead, context);
-            Navigator.pop(context);
-            ActionFeedback.show(context, icon: episode.read ? Icons.check : Icons.radio_button_unchecked);
-          }
-        },
-      {"title": "Download", "onPressed": () {}},
-      {"title": "Share", "onPressed": () {}}
-    ];
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (var menuItem in menuItems)
-                TextButton(
-                  onPressed: () => menuItem["onPressed"](),
-                  child: Text(menuItem["title"]),
-                ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 }
