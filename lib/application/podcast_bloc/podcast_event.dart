@@ -11,13 +11,13 @@ sealed class PodcastEvent extends Equatable {
 // Podcast Local
 final class LoadSubscribedPodcastsEvent extends PodcastEvent {}
 
-final class ToggleUnreadEpisodesVisibilityEvent extends PodcastEvent {
-  final bool areReadEpisodesVisible;
-  const ToggleUnreadEpisodesVisibilityEvent({
-    required this.areReadEpisodesVisible,
+final class ToggleEpisodesFilterStatusEvent extends PodcastEvent {
+  final String filterStatus;
+  const ToggleEpisodesFilterStatusEvent({
+    required this.filterStatus,
   });
   @override
-  List<Object> get props => [areReadEpisodesVisible];
+  List<Object> get props => [filterStatus];
 }
 
 final class SubscribeToPodcastEvent extends PodcastEvent {
