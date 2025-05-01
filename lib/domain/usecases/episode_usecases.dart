@@ -13,14 +13,14 @@ class EpisodeUseCases {
     required bool subscribed,
     required int feedId,
     required String podcastTitle,
-    required bool showRead,
+    required String filterStatus,
     required bool refresh,
   }) {
     return episodeRepository.getEpisodes(
       subscribed: subscribed,
       feedId: feedId,
       podcastTitle: podcastTitle,
-      showRead: showRead,
+      filterStatus: filterStatus,
       refresh: refresh,
     );
   }
@@ -28,7 +28,4 @@ class EpisodeUseCases {
   Stream<int> unreadLocalEpisodesCount({required int feedId}) {
     return episodeRepository.unreadLocalEpisodesCount(feedId: feedId);
   }
-
-  Stream<Map<String, List<EpisodeEntity>>> getFlaggedEpisodes({required String flag}) => episodeRepository.getFlaggedEpisodes(flag: flag);
-
 }
