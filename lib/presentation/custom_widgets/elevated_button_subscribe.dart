@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
-import '../../application/episodes_cubit/episodes_cubit.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/usecases/episode_usecases.dart';
@@ -68,21 +68,21 @@ class ElevatedButtonSubscribe extends StatelessWidget {
   /// SUBSCRIBE
   _handleEpisodes(BuildContext context) async {
     // Make sure we have episodes when we subscribe before calling the episode list page
-    List<EpisodeEntity> episodes = BlocProvider.of<EpisodesCubit>(context)
+    /*List<EpisodeEntity> episodes = BlocProvider.of<EpisodesCubit>(context)
         .state
         .where((episode) => episode.feedId == podcast.pId)
-        .toList();
-    if (episodes.isEmpty) {
-      episodes = await getIt<EpisodeUseCases>()
+        .toList();*/
+    //if (episodes.isEmpty) {
+      List<EpisodeEntity> episodes = await getIt<EpisodeUseCases>()
           .getEpisodes(
             subscribed: false,
             feedId: podcast.pId,
             podcastTitle: podcast.title,
-            showRead: true,
+            filterStatus: "all",
             refresh: false,
           )
           .first;
-    }
+    //}
     // Set flag isSubscribed to true
     for (var episode in episodes) {
       episode.isSubscribed = true;
