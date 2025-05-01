@@ -16,14 +16,14 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
     required bool subscribed,
     required int feedId,
     required String podcastTitle,
-    required bool showRead,
+    required String filterStatus,
     required bool refresh,
   }) {
     return episodeLocalDatasource.getEpisodes(
       subscribed: subscribed,
       feedId: feedId,
       podcastTitle: podcastTitle,
-      showRead: showRead,
+      filterStatus: filterStatus,
       refresh: refresh,
     );
   }
@@ -31,11 +31,5 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   @override
   Stream<int> unreadLocalEpisodesCount({required int feedId}) {
     return episodeLocalDatasource.unreadLocalEpisodesCount(feedId: feedId);
-  }
-
-  @override
-  Stream<Map<String, List<EpisodeEntity>>> getFlaggedEpisodes(
-      {required String flag}) {
-    return episodeLocalDatasource.getFlaggedEpisodes(flag: flag);
   }
 }
