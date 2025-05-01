@@ -9,7 +9,6 @@ import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../injection.dart';
 import '../custom_widgets/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
-import '../flagged_episodes_page/flagged_episodes_page.dart';
 import '../podcast_details_page/podcast_details_page.dart';
 import '../podcasts_search_page/widgets/podcast_card.dart';
 import 'widgets/subscribed_podcast_card.dart';
@@ -82,51 +81,16 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildButtons(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              ScaleRoute(page: const FlaggedEpisodesPage(flag: "Favorites")),
-            );
-          },
-          icon: const Icon(Icons.star_rounded),
-        ),
-        IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              ScaleRoute(page: const FlaggedEpisodesPage(flag: "Downloads")),
-            );
-          },
-          icon: const Icon(Icons.file_download_outlined),
-        ),
-        IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              ScaleRoute(page: const FlaggedEpisodesPage(flag: "In Progress")),
-            );
-          },
-          icon: const Icon(Icons.incomplete_circle_outlined),
-        ),
-        const SizedBox(
-          width: 30.0,
-        ),
-        IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              ScaleRoute(
-                page: const PodcastsSearchPage(),
-              ),
-            );
-          },
-          icon: const Icon(Icons.search_rounded),
-        ),
-      ],
+    return IconButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          ScaleRoute(
+            page: const PodcastsSearchPage(),
+          ),
+        );
+      },
+      icon: const Icon(Icons.search_rounded),
     );
   }
 
