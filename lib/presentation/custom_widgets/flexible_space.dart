@@ -19,7 +19,7 @@ import 'episode_progress_indicator.dart';
 /// This widget displays details about a selected podcast or episode,
 /// depending on which entity (podcast or episode) is provided.
 class FlexibleSpace extends StatelessWidget {
-  final PodcastEntity podcast; // If null, widget displays episode details.
+  final PodcastEntity podcast;
   final EpisodeEntity? episode; // If null, widget displays podcast details.
   final String title;
   final String? flag;
@@ -41,9 +41,9 @@ class FlexibleSpace extends StatelessWidget {
       collapsedHeight: 90,
       expandedHeight: MediaQuery.of(context).size.height / 3,
       pinned: true,
-      leading: null,
+    /*  leading: null,
       automaticallyImplyLeading:
-          false, // we remove the default back-button, together with leading: null
+          false,*/ // we remove the default back-button, together with leading: null
       flexibleSpace: FlexibleSpaceBar(
         background: Padding(
           padding: const EdgeInsets.only(
@@ -66,13 +66,13 @@ class FlexibleSpace extends StatelessWidget {
                 Positioned(
                   bottom: 12,
                   right: 12,
-                  child: PlayButton(episode: episode!, flag: flag),
+                  child: PlayButton(episode: episode!, podcast: podcast),
                 ),
               if (episode != null)
-                BlocBuilder<EpisodePlaybackCubit, EpisodeEntity?>(
+                BlocBuilder<EpisodePlaybackCubit, Map<PodcastEntity, EpisodeEntity>?>(
                   builder: (context, currentlyPlayingEpisodeState) {
                     final isCurrentlyPlaying =
-                        currentlyPlayingEpisodeState?.eId == episode!.eId;
+                        currentlyPlayingEpisodeState?.values.first.eId == episode!.eId;
                     return Positioned(
                       bottom: 20,
                       left: 12,
@@ -158,16 +158,6 @@ class FlexibleSpace extends StatelessWidget {
     );
   }
 
-  /// Builds a semi-transparent black overlay.
-  Widget _buildGradientOverlay() {
-    return Container(
-      padding: const EdgeInsets.all(4.0),
-      decoration: const BoxDecoration(
-        color: Colors.black26,
-      ),
-    );
-  }
-
   /// Builds the title content with back button and title text.
   Widget _buildTitleContent(BuildContext context) {
     return SizedBox(
@@ -177,7 +167,7 @@ class FlexibleSpace extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Spacer(
+          /*const Spacer(
             flex: 3,
           ),
           IconButton(
@@ -187,13 +177,13 @@ class FlexibleSpace extends StatelessWidget {
                 if (audioHandler.player.processingState ==
                         ProcessingState.ready &&
                     overlayEntry == null) {
-                  showOverlayPlayerMin(context, podcast);
+                  showOverlayPlayerMin(context);
                 }
               }
               Navigator.of(context).pop();
             },
             icon: const BackButtonIcon(),
-          ),
+          ),*/
           const Spacer(flex: 4),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
