@@ -1,6 +1,7 @@
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
+import 'package:podcast/domain/entities/podcast_entity.dart';
 import '../../injection.dart';
 import '../../presentation/audioplayer_overlays/audioplayer_overlays.dart';
 import '../player/audiohandler.dart';
@@ -16,7 +17,7 @@ ProcessingState.completed: playback is completed
 typedef ResetPlaybackEpisodeCallback = void Function();
 
 class PlayerStatesListener {
-  EpisodeEntity? Function()? _getCurrentEpisode;
+  Map<PodcastEntity, EpisodeEntity>? Function()? _getCurrentEpisode;
   ResetPlaybackEpisodeCallback? _resetPlaybackEpisode;
   final AudioPlayer player = getIt<MyAudioHandler>().player;
 
@@ -24,7 +25,8 @@ class PlayerStatesListener {
     player.playerStateStream.listen(_handlePlayerStateChanged);
   }
 
-  void setGetCurrentEpisode(EpisodeEntity? Function() getter) {
+  void setGetCurrentEpisode(
+      Map<PodcastEntity, EpisodeEntity>? Function() getter) {
     _getCurrentEpisode = getter;
   }
 
@@ -34,7 +36,9 @@ class PlayerStatesListener {
   }
 
   _handlePlayerStateChanged(PlayerState playerState) {
-    final EpisodeEntity? currentEpisode = _getCurrentEpisode?.call();
+    final Map<PodcastEntity, EpisodeEntity>? currentPlaybackEpisode =
+        _getCurrentEpisode?.call();
+    final EpisodeEntity? currentEpisode = currentPlaybackEpisode?.values.first;
     if (currentEpisode == null) return;
     switch (playerState.processingState) {
       case ProcessingState.completed:
