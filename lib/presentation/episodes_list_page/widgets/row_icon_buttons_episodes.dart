@@ -47,14 +47,10 @@ class RowIconButtonsEpisodes extends StatelessWidget {
         if (state.currentPodcast.subscribed)
           IconButton(
             onPressed: () {
-              podcastBloc.add(
-                ToggleUnreadEpisodesVisibilityEvent(
-                  areReadEpisodesVisible: !state.areReadEpisodesVisible,
-                ),
-              );
+              _showFilterDialog(context, podcastBloc, state);
             },
             icon: Icon(
-              state.areReadEpisodesVisible
+              state.episodesFilterStatus.name == "read"
                   ? Icons.filter_alt_off_outlined
                   : Icons.filter_alt_outlined,
               size: 30,
@@ -62,5 +58,69 @@ class RowIconButtonsEpisodes extends StatelessWidget {
           ),
       ],
     );
+  }
+
+  _showFilterDialog(
+      BuildContext context, PodcastBloc podcastBloc, PodcastState state) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Filter Episodes"),
+            content: const Text("Select the filter option"),
+            actionsAlignment: MainAxisAlignment.center,
+            actionsOverflowAlignment: OverflowBarAlignment.center,
+            alignment: Alignment.center,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  podcastBloc.add(
+                    ToggleEpisodesFilterStatusEvent(
+                      filterStatus: state.episodesFilterStatus.name == "hideRead" ? "all" : "hideRead",
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  state.episodesFilterStatus.name == "hideRead"
+                      ? "Show read episodes"
+                      : "Hide read episodes",
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              TextButton(
+                onPressed: () {},
+                child: const Text(
+                  "Show only unfinished",
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  podcastBloc.add(
+                    ToggleEpisodesFilterStatusEvent(
+                      filterStatus: state.episodesFilterStatus.name == "favorites" ? "all" : "favorites",
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  state.episodesFilterStatus.name == "favorites"
+                      ? "Show all": "Show only favorites",
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              TextButton(
+                onPressed: () {},
+                child: const Text(
+                  "Show only downloaded",
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          );
+        });
   }
 }
