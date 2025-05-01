@@ -12,14 +12,30 @@ import '../models/episode_model.dart';
 /// Local data source = objectBox database
 abstract class _BaseEpisodeLocalDatasource {
   Stream<List<EpisodeEntity>> _getEpisodesByFeedId(int feedId,
-      {required bool showRead}) {
-    // If showRead is true (initial is false), we show all episodes, otherwise only unread ones
-    final queryBuilder = episodeBox.query(EpisodeEntity_.feedId
-        .equals(feedId)
-        .and(showRead
-            ? EpisodeEntity_.read.notNull()
-            : EpisodeEntity_.read.equals(false)))
-      ..order(EpisodeEntity_.datePublished, flags: Order.descending);
+      {required String filterStatus}) {
+    late QueryBuilder<EpisodeEntity> queryBuilder;
+    if (filterStatus == "favorites") {
+      queryBuilder = episodeBox.query(EpisodeEntity_.feedId
+          .equals(feedId)
+          .and(EpisodeEntity_.favorite.equals(true)))
+        ..order(EpisodeEntity_.datePublished, flags: Order.descending);
+    } else if (filterStatus == "downloaded") {
+      queryBuilder = episodeBox.query(EpisodeEntity_.feedId
+          .equals(feedId)
+          .and(EpisodeEntity_.filePath.notNull()))
+        ..order(EpisodeEntity_.datePublished, flags: Order.descending);
+    } else if (filterStatus == "unfinished") {
+      queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId).and(
+          (EpisodeEntity_.position > 0)
+              .and(EpisodeEntity_.read.equals(false))));
+    } else {
+      queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId).and(
+          filterStatus == "hideRead"
+              ? EpisodeEntity_.read.equals(false)
+              : EpisodeEntity_.read.notNull()));
+    }
+
+    queryBuilder.order(EpisodeEntity_.datePublished, flags: Order.descending);
     final results = queryBuilder
         .watch(triggerImmediately: true)
         .map((query) => query.find());
@@ -32,53 +48,15 @@ abstract class EpisodeLocalDatasource extends _BaseEpisodeLocalDatasource {
     required bool subscribed,
     required int feedId,
     required String podcastTitle,
-    required bool showRead,
+    required String filterStatus,
     required bool refresh,
   });
   Stream<int> unreadLocalEpisodesCount(
       {required int feedId}); // this is only needed for subscribed = true
-  Stream<Map<String, List<EpisodeEntity>>> getFlaggedEpisodes(
-      {required String flag});
 }
 
 class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     implements EpisodeLocalDatasource {
-  @override
-  Stream<Map<String, List<EpisodeEntity>>> getFlaggedEpisodes(
-      {required String flag}) {
-    late QueryBuilder<EpisodeEntity> queryBuilder;
-    if (flag == "Favorites") {
-      queryBuilder = episodeBox.query(EpisodeEntity_.favorite.equals(true))
-        ..order(EpisodeEntity_.datePublished, flags: Order.descending);
-    } else if (flag == "Downloads") {
-      queryBuilder = episodeBox.query(EpisodeEntity_.filePath.notNull())
-        ..order(EpisodeEntity_.datePublished, flags: Order.descending);
-    } else if (flag == "In Progress") {
-      queryBuilder = episodeBox.query(
-          (EpisodeEntity_.position > 0).and(EpisodeEntity_.read.equals(false)));
-    } else if (flag == "Read") {
-      queryBuilder = episodeBox.query(
-          (EpisodeEntity_.position > 0).and(EpisodeEntity_.read.equals(true)));
-    } else {
-      queryBuilder = episodeBox.query(EpisodeEntity_.id.equals(-100));
-    }
-
-    return queryBuilder
-        .watch(triggerImmediately: true)
-        .map((query) => query.find())
-        .map((episodes) {
-      final Map<String, List<EpisodeEntity>> groupedEpisodes = {};
-      for (final episode in episodes) {
-        final podcastTitle = episode.podcastTitle;
-        if (groupedEpisodes.containsKey(podcastTitle)) {
-          groupedEpisodes[podcastTitle]!.add(episode);
-        } else {
-          groupedEpisodes[podcastTitle] = [episode];
-        }
-      }
-      return groupedEpisodes;
-    });
-  }
 
   Future<List<EpisodeEntity>> _fetchRemoteEpisodes(
       {required int feedId, required String podcastTitle}) async {
@@ -86,7 +64,8 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     try {
       // Fetch episodes from the remote data source.
       remoteEpisodes = await getIt<EpisodeRemoteDataSource>()
-          .fetchRemoteEpisodesByFeedId(feedId: feedId, podcastTitle: podcastTitle);
+          .fetchRemoteEpisodesByFeedId(
+              feedId: feedId, podcastTitle: podcastTitle);
     } catch (e) {
       remoteEpisodes = [];
     }
@@ -95,7 +74,9 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     final localEpisodes = _getLocalEpisodesByFeedId(feedId: feedId);
 
     // Create a map of local episodes for efficient lookup by episode ID.
-    final localEpisodeMap = {for (final episode in localEpisodes) episode.eId: episode};
+    final localEpisodeMap = {
+      for (final episode in localEpisodes) episode.eId: episode
+    };
 
     // Merge remote episodes with local data, prioritizing local versions if available.
     return remoteEpisodes.map((remoteEpisode) {
@@ -110,20 +91,20 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     required bool subscribed,
     required int feedId,
     required String podcastTitle,
-    required bool showRead,
+    required String filterStatus,
     required bool refresh,
   }) async* {
     if (!subscribed) {
-      yield* _fetchRemoteEpisodes(
-              feedId: feedId, podcastTitle: podcastTitle)
-          .asStream();
+      final episodes = await _fetchRemoteEpisodes(
+          feedId: feedId, podcastTitle: podcastTitle);
+      episodeBox.putMany(episodes);
     } else {
       if (refresh) {
-        await _getNewEpisodesByFeedId(
+        await _getAndSaveNewEpisodesByFeedId(
             feedId: feedId, podcastTitle: podcastTitle);
       }
-      yield* _getEpisodesByFeedId(feedId, showRead: showRead);
     }
+    yield* _getEpisodesByFeedId(feedId, filterStatus: filterStatus);
   }
 
   @override
@@ -146,22 +127,26 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
 
   // Helper function to get local episode IDs for a given feed ID.
   Set<int> _getLocalEpisodeIdsByFeedId({required int feedId}) {
-    return _getLocalEpisodesByFeedId(feedId: feedId).map((ep) => ep.eId).toSet();
+    return _getLocalEpisodesByFeedId(feedId: feedId)
+        .map((ep) => ep.eId)
+        .toSet();
   }
 
-  Future<void> _getNewEpisodesByFeedId(
+  Future<void> _getAndSaveNewEpisodesByFeedId(
       {required int feedId, required String podcastTitle}) async {
     List<EpisodeEntity> remoteEpisodes = [];
     try {
       // Fetch episodes from remote for the given podcast feed ID.
       remoteEpisodes = await getIt<EpisodeRemoteDataSource>()
-          .fetchRemoteEpisodesByFeedId(feedId: feedId, podcastTitle: podcastTitle);
+          .fetchRemoteEpisodesByFeedId(
+              feedId: feedId, podcastTitle: podcastTitle);
     } catch (e) {
       remoteEpisodes = [];
     }
 
     // Get the IDs of episodes currently stored locally for this feed ID.
-    final Set<int> localEpisodeIds = _getLocalEpisodeIdsByFeedId(feedId: feedId);
+    final Set<int> localEpisodeIds =
+        _getLocalEpisodeIdsByFeedId(feedId: feedId);
 
     // Filter out remote episodes that are already in the database.
     final List<EpisodeEntity> newEpisodes = remoteEpisodes
