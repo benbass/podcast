@@ -68,6 +68,7 @@ class EpisodesListPage extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (state.currentPodcast.subscribed)
                     const RowIconButtonsEpisodes(),
                     const SizedBox(
                       height: 12,
