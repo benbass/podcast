@@ -74,7 +74,6 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               _buildTrendingPodcasts(context),
-              const SizedBox(height: _spacing * 2),
             ],
           ),
         ));
@@ -97,7 +96,7 @@ class HomePage extends StatelessWidget {
   Widget _buildTrendingPodcasts(BuildContext context) {
     PodcastState state = context.watch<PodcastBloc>().state;
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0, left: _spacing, right: _spacing),
+      padding: const EdgeInsets.fromLTRB(_spacing, 8.0, _spacing, 140.0),
       child: Container(
         height: MediaQuery.of(context).size.height * 0.2,
         decoration: BoxDecoration(
