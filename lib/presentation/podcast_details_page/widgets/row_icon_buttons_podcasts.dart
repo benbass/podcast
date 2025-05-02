@@ -36,13 +36,11 @@ class RowIconButtonsPodcasts extends StatelessWidget {
                 if (((connectionType != 'none' && !podcast.subscribed) ||
                         podcast.subscribed) &&
                     context.mounted) {
-                  Navigator.push(
-                    context,
+                  Navigator.of(context).pushAndRemoveUntil(
                     ScaleRoute(
-                      page: Builder(builder: (context) {
-                        return const EpisodesListPage();
-                      }),
+                      page: const EpisodesListPage(),
                     ),
+                    ModalRoute.withName('/'),
                   );
                 } else {
                   if (context.mounted) {
