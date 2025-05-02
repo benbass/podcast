@@ -117,7 +117,7 @@ class EpisodeDetailsPage extends StatelessWidget {
                                     ),
                                     SliverPadding(
                                       padding: const EdgeInsets.fromLTRB(
-                                          20.0, 20.0, 20.0, 0.0),
+                                          20.0, 20.0, 8.0, 0.0),
                                       sliver: SliverToBoxAdapter(
                                         child: Row(
                                           mainAxisAlignment:
