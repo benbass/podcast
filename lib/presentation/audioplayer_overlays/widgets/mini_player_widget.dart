@@ -55,12 +55,11 @@ class MiniPlayerWidget extends StatelessWidget {
                 );
 
                 if (context.mounted) {
-                  Navigator.of(context).push(
+                  Navigator.of(context).pushAndRemoveUntil(
                     ScaleRoute(
-                      page: EpisodeDetailsPage(
-                        episode: episode,
-                      ),
-                    ),
+                      page: EpisodeDetailsPage(episode: episode),
+                  ),
+                    ModalRoute.withName('/'),
                   );
                 }
               },
