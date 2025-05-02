@@ -104,30 +104,33 @@ class EpisodeCard extends StatelessWidget {
                                     width: 40,
                                   ),
                                   if (episode.isSubscribed)
-                                  IconButton(
-                                    onPressed: () =>
-                                        showEpisodeActionsDialog(context, episode),
-                                    icon: const Icon(
-                                      Icons.more_horiz_rounded,
+                                    IconButton(
+                                      onPressed: () => showEpisodeActionsDialog(
+                                          context, episode),
+                                      icon: const Icon(
+                                        Icons.more_horiz_rounded,
+                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  EpisodeProgressIndicator(
-                                    themeData: themeData,
-                                    episode: episode,
-                                    isCurrentlyPlaying: isCurrentlyPlaying,
-                                    currentlyPlayingEpisode:
-                                        currentlyPlayingEpisodeState,
-                                  ),
-                                  if (episode.isSubscribed)
-                                    _buildEpisodeIconsRow(context),
-                                ],
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width - 140,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    EpisodeProgressIndicator(
+                                      themeData: themeData,
+                                      episode: episode,
+                                      isCurrentlyPlaying: isCurrentlyPlaying,
+                                      currentlyPlayingEpisode:
+                                          currentlyPlayingEpisodeState,
+                                    ),
+                                    if (episode.isSubscribed)
+                                      _buildEpisodeIconsRow(context),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -143,7 +146,7 @@ class EpisodeCard extends StatelessWidget {
   }
 
   void _navigateToEpisodeDetails(BuildContext context) {
-      Navigator.push(
+    Navigator.push(
       context,
       ScaleRoute(
         page: EpisodeDetailsPage(
@@ -196,11 +199,14 @@ class EpisodeCard extends StatelessWidget {
   }
 
   Widget _buildEpisodeIconsRow(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.62,
-      height: 40.0,
-      child: EpisodeActionsRow(episode: episode, showSpacer: false,),
+    return Expanded(
+      child: SizedBox(
+        height: 40.0,
+        child: EpisodeActionsRow(
+          episode: episode,
+          showSpacer: false,
+        ),
+      ),
     );
   }
-
 }
