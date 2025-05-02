@@ -19,6 +19,7 @@ import '../audioplayer_overlays/audioplayer_overlays.dart';
 import '../custom_widgets/failure_widget.dart';
 import '../custom_widgets/flexible_space.dart';
 import '../custom_widgets/page_transition.dart';
+import '../podcast_details_page/podcast_details_page.dart';
 import 'widgets/podcast_website_link.dart';
 
 class EpisodeDetailsPage extends StatelessWidget {
@@ -184,9 +185,27 @@ class EpisodeDetailsPage extends StatelessWidget {
                                                 podcastState
                                                     .currentPodcast.link!
                                                     .contains('://'))
-                                              PodcastWebsiteLink(
-                                                  link: podcastState
-                                                      .currentPodcast.link!),
+                                              Row(
+                                                children: [
+                                                  PodcastWebsiteLink(
+                                                      link: podcastState
+                                                          .currentPodcast.link!),
+                                                  const SizedBox(
+                                                    width: 30,
+                                                  ),
+                                                  IconButton(
+                                                    onPressed: () => Navigator.push(
+                                                        context,
+                                                        ScaleRoute(
+                                                          page: const PodcastDetailsPage(),
+                                                        )),
+                                                    icon: const Icon(
+                                                      Icons.info_outline_rounded,
+                                                      size: 30,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                           ],
                                         ),
                                       ),
