@@ -7,7 +7,9 @@ import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
+import 'package:podcast/presentation/custom_widgets/page_transition.dart';
 import 'package:podcast/presentation/custom_widgets/play_button.dart';
+import 'package:podcast/presentation/episodes_list_page/episodes_list_page.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../helpers/core/image_provider.dart';
@@ -41,9 +43,9 @@ class FlexibleSpace extends StatelessWidget {
       collapsedHeight: 90,
       expandedHeight: MediaQuery.of(context).size.height / 3,
       pinned: true,
-    /*  leading: null,
+      leading: null,
       automaticallyImplyLeading:
-          false,*/ // we remove the default back-button, together with leading: null
+          false, // we remove the default back-button, together with leading: null
       flexibleSpace: FlexibleSpaceBar(
         background: Padding(
           padding: const EdgeInsets.only(
@@ -69,10 +71,12 @@ class FlexibleSpace extends StatelessWidget {
                   child: PlayButton(episode: episode!, podcast: podcast),
                 ),
               if (episode != null)
-                BlocBuilder<EpisodePlaybackCubit, Map<PodcastEntity, EpisodeEntity>?>(
+                BlocBuilder<EpisodePlaybackCubit,
+                    Map<PodcastEntity, EpisodeEntity>?>(
                   builder: (context, currentlyPlayingEpisodeState) {
                     final isCurrentlyPlaying =
-                        currentlyPlayingEpisodeState?.values.first.eId == episode!.eId;
+                        currentlyPlayingEpisodeState?.values.first.eId ==
+                            episode!.eId;
                     return Positioned(
                       bottom: 20,
                       left: 12,
@@ -167,7 +171,7 @@ class FlexibleSpace extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /*const Spacer(
+          const Spacer(
             flex: 3,
           ),
           IconButton(
@@ -180,10 +184,15 @@ class FlexibleSpace extends StatelessWidget {
                   showOverlayPlayerMin(context);
                 }
               }
-              Navigator.of(context).pop();
+              Navigator.of(context).pushAndRemoveUntil(
+                ScaleRoute(
+                  page: const EpisodesListPage(),
+                ),
+                ModalRoute.withName('/'),
+              );
             },
             icon: const BackButtonIcon(),
-          ),*/
+          ),
           const Spacer(flex: 4),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
