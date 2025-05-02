@@ -11,7 +11,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/application/textfield_cubit/text_field_cubit.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
+import 'package:podcast/presentation/episodes_list_page/episodes_list_page.dart';
 import 'package:podcast/presentation/homepage/homepage.dart';
+import 'package:podcast/presentation/podcast_details_page/podcast_details_page.dart';
+import 'package:podcast/presentation/podcasts_search_page/podcasts_search_page.dart';
 import 'package:podcast/theme.dart';
 import 'application/episode_playback_cubit/episode_playback_cubit.dart';
 import 'application/podcast_bloc/podcast_bloc.dart';
@@ -74,7 +77,13 @@ void main() async {
             Locale('fr', 'FR'),
           ],
           theme: AppTheme.lightTheme,
-          home: const HomePage(),
+          initialRoute: '/',
+          routes: {
+            '/': (context) => const HomePage(),
+            '/podcastDetails': (context) => const PodcastDetailsPage(),
+            '/podcastSearch': (context) => const PodcastsSearchPage(),
+            '/episodesList': (context) => const EpisodesListPage(),
+          },
         ),
       ),
     ),
