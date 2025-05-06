@@ -28,7 +28,6 @@ void initAwesomeNotifications(MyAudioHandler audioHandler) {
     // debug: true,
   );
 
-  NotificationController.myAudioHandler = audioHandler; // TODO: Ersetzen durch dependency injection!!!!
   // Only after at least the action method is set, the notification events are delivered
   AwesomeNotifications().setListeners(
     onActionReceivedMethod: NotificationController.onActionReceivedMethod,
