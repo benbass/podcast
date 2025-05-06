@@ -1,8 +1,16 @@
-import 'dart:ui';
-
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-void createNotification(bool isPausingState) async {
+import 'package:podcast/domain/entities/episode_entity.dart';
+import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../domain/entities/podcast_entity.dart';
+
+void createNotification(BuildContext context, bool isPausingState, int position) async {
+    final EpisodeEntity episode = context.read<EpisodePlaybackCubit>().state!.values.first;
+    final PodcastEntity podcast = context.read<EpisodePlaybackCubit>().state!.keys.first;
+    final String imageFilePath = podcast.artworkFilePath ?? "";
+
 
     // part of string for correct icon depending on boolean provided by the audioHandler methods (playTrack, pauseTrack, resumeTrack...)
     String iconKey = !isPausingState ? 'pause' : 'play';
@@ -14,13 +22,16 @@ void createNotification(bool isPausingState) async {
 
     AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: 10,
+        id: 11,
         channelKey: 'basic_channel',
         category: NotificationCategory.Transport,
-        title: "currentTrack.trackName",
-        body: "currentTrack.trackArtistNames",
+        title: episode.podcastTitle,
+        body: episode.title,
+        duration: Duration(seconds: episode.duration ?? 0),
+        progress: position / (episode.duration ?? 0) * 100,
         playbackSpeed: 1,
-
+        largeIcon: 'file://$imageFilePath',
+        bigPicture: 'file://$imageFilePath',
         icon: "resource://drawable/launcher_icon", // App icon
         backgroundColor: const Color(0x00FFFFFF), //Color(0xFFFF8100),
         autoDismissible: false,
