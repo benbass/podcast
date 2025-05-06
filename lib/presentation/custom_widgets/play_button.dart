@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:podcast/helpers/notifications/create_notification.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../core/globals.dart';
@@ -104,7 +105,9 @@ class PlayButtonActive extends StatelessWidget {
             if (context.mounted) {
               BlocProvider.of<EpisodePlaybackCubit>(context)
                   .setPlaybackEpisode({podcast: episode});
+              createNotification(context, false, episode.position);
             }
+
           } on PlayerException {
             if (context.mounted) {
               showOverlayError(context,
