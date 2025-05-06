@@ -1,8 +1,10 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:podcast/helpers/player/audiohandler.dart';
 
+import '../../injection.dart';
+
+@pragma("vm:entry-point")
 class NotificationController {
-  static MyAudioHandler? myAudioHandler;
 /*
   /// Use this method to detect when a new notification or a schedule is created
   @pragma("vm:entry-point")
@@ -26,16 +28,15 @@ class NotificationController {
   @pragma("vm:entry-point")
   static Future <void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     if (receivedAction.buttonKeyPressed == 'SKIPPREV') {
-      //di.sl<PlayerControlsBloc>().add(PreviousButtonInNotificationPressed());
+      // to be implemented
     } else if (receivedAction.buttonKeyPressed == 'RESUMEPAUSE') {
-      NotificationController.myAudioHandler!.player.playerState.playing ?
-      NotificationController.myAudioHandler?.pause() : NotificationController.myAudioHandler?.play();
+      getIt<MyAudioHandler>().handlePlayPause();
     }
     else if (receivedAction.buttonKeyPressed == 'SKIPNEXT') {
-      //di.sl<PlayerControlsBloc>().add(NextButtonInNotificationPressed());
+      // to be implemented
     }
     else if (receivedAction.buttonKeyPressed == 'STOP') {
-      NotificationController.myAudioHandler?.stop();
+      getIt<MyAudioHandler>().stop();
     }
 
   }
