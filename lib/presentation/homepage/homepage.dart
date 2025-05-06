@@ -6,8 +6,6 @@ import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../helpers/listeners/player_listener.dart';
 import '../../helpers/listeners/connectivity_listener.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
-import '../../helpers/notifications/initialize_awesome_notifications.dart';
-import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../custom_widgets/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
@@ -23,16 +21,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if(!getIt.isRegistered<MyAudioHandler>()) {
-      // Initialize the audio handler
-      MyAudioHandler audioHandler = MyAudioHandler(context);
-      getIt.registerLazySingleton<MyAudioHandler>(() => MyAudioHandler(context));
-      // Initialize Awesome Notifications
-      initAwesomeNotifications(audioHandler);
-    }
-
-
-    // Init listener for player states and Listen for changes (e.g., playing, paused, buffering)
+        // Init listener for player states and Listen for changes (e.g., playing, paused, buffering)
     PlayerStatesListener playerStatesListener = getIt<PlayerStatesListener>();
     // Inject methods to this listener
     // Episode is set to null when and only when player state is completed
