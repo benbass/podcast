@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/format_duration.dart';
+import '../../../helpers/notifications/create_notification.dart';
 import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
 
@@ -36,10 +37,15 @@ class PlaybackPositionSlider extends StatelessWidget {
                   ?.inSeconds
                   .toDouble() ??
                   0.0,
-              onChanged: (value) => getIt<MyAudioHandler>()
-                  .player
-                  .seek(Duration(seconds: value.toInt())),
-            ),
+              onChanged: (value)
+              {
+                final bool playerState = getIt<MyAudioHandler>().player.playing;
+                getIt<MyAudioHandler>().cancelNotification();
+                      getIt<MyAudioHandler>()
+                          .player
+                          .seek(Duration(seconds: value.toInt()));
+                createNotification(context, playerState, value.toInt());
+                    }),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(
