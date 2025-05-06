@@ -86,15 +86,17 @@ class PodcastsSearchPage extends StatelessWidget {
               width: 0.0,
             ),
           ),
-          onTap: (index) {
+          onTap: (index) async {
             podcastBloc.add(
                 PodcastTappedEvent(podcast: state.queryResultPodcasts[index]));
-            Navigator.push(
+            if(context.mounted) {
+              Navigator.push(
               context,
               ScaleRoute(
                 page: const PodcastDetailsPage(),
               ),
             );
+            }
           },
           children: List.generate(
             state.queryResultPodcasts.length,
