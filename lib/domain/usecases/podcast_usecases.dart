@@ -20,6 +20,10 @@ class PodcastUseCases {
     return podcastRepository.fetchPodcastByFeedId(feedId);
   }
 
+  Future<PodcastEntity> savePodcastAndArtwork(PodcastEntity podcast) async {
+    return await podcastRepository.savePodcastAndArtwork(podcast);
+  }
+
   Future<bool> subscribeToPodcast(PodcastEntity podcast) async {
     return await podcastRepository.subscribeToPodcast(podcast);
   }
