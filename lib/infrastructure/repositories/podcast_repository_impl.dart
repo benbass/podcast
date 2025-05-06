@@ -33,41 +33,56 @@ class PodcastRepositoryImpl implements PodcastRepository {
     return podcast;
   }
 
+  /// Cache podcast and artwork to file for unsubscribed podcasts
   @override
-  Future<bool> subscribeToPodcast(PodcastEntity podcast) async {
+  Future<PodcastEntity> savePodcastAndArtwork(PodcastEntity podcast) async {
+    // Check if podcast is already in db, if so return it
+    final savedPodcasts = podcastBox.getAll();
+    for (var savedPodcast in savedPodcasts) {
+      if (savedPodcast.pId == podcast.pId) {
+        return savedPodcast;
+      }
+    }
+
+    int id = 0;
     try {
       // Save artwork to file.
       final String artworkFilePath =
           await saveArtworkToFile(podcast.artwork) ?? "null";
+      if (artworkFilePath != "null") {
+        // Update the artwork status of the podcast.
+        final PodcastEntity podcastWithArtwork = podcast.copyWith(
+          artworkFilePath: artworkFilePath,
+          subscribed: false,
+        );
+        // Persist the updated podcast data.
+        id = podcastBox.put(podcastWithArtwork);
+      } else {
+        id = podcastBox.put(podcast);
+      }
+      return podcastBox.get(id)!;
+    } catch (e) {
+      print("Error caching artwork and podcast: $e");
+    }
+    return podcast;
+  }
 
+  @override
+  Future<bool> subscribeToPodcast(PodcastEntity podcast) async {
+    try {
       // Update the subscribed status of the podcast.
-      final subscribedPodcast =
-          _markPodcastAsSubscribed(podcast, artworkFilePath);
+      final unsubscribedPodcast = podcastBox.get(podcast.id)!;
+
+      unsubscribedPodcast.artworkFilePath = unsubscribedPodcast.artworkFilePath;
+      unsubscribedPodcast.subscribed = true;
 
       // Persist the updated podcast data.
-      podcastBox.put(subscribedPodcast);
+      podcastBox.put(unsubscribedPodcast);
 
       return true;
     } catch (e) {
       //print("Error subscribing to podcast: $e");
       return false;
-    }
-  }
-
-  /// returns a podcast with the subscribed flag = true.
-  PodcastEntity _markPodcastAsSubscribed(
-      PodcastEntity podcast, String? filePath) {
-    if (filePath != "null") {
-      final PodcastEntity subscribedPodcast = podcast.copyWith(
-        subscribed: true,
-        artworkFilePath: filePath,
-      );
-      return subscribedPodcast;
-    } else {
-      final PodcastEntity subscribedPodcast = podcast.copyWith(
-        subscribed: true,
-      );
-      return subscribedPodcast;
     }
   }
 
