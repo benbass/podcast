@@ -23,6 +23,8 @@ import 'core/objectbox.dart';
 import 'helpers/core/lifecycle_oberserver.dart';
 import 'injection.dart' as di;
 import 'injection.dart';
+import 'helpers/notifications/initialize_awesome_notifications.dart';
+import 'helpers/player/audiohandler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +38,11 @@ void main() async {
   // Initialize the lifecycle observer
   final observer = MyAppLifecycleObserver();
   WidgetsBinding.instance.addObserver(observer);
+
+  // Initialize the audio handler
+  final audioHandler = MyAudioHandler();
+  // Initialize Awesome Notifications
+  initAwesomeNotifications(audioHandler);
 
   // Design status and bottom bar
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -55,9 +62,11 @@ void main() async {
               create: (BuildContext context) => getIt<EpisodePlaybackCubit>()),
           BlocProvider(
               create: (BuildContext context) => getIt<TextFieldCubit>()),
-          BlocProvider(create: (BuildContext context) => getIt<PodcastBloc>()..add(LoadSubscribedPodcastsEvent())),
+          BlocProvider(
+              create: (BuildContext context) =>
+                  getIt<PodcastBloc>()..add(LoadSubscribedPodcastsEvent())),
         ],
-        child: MyApp(),
+        child: const MyApp(),
       ),
     ),
   );
