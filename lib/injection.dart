@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:podcast/domain/repositories/podcast_repository.dart';
 import 'package:podcast/domain/usecases/podcast_usecases.dart';
 import 'package:podcast/helpers/listeners/player_listener.dart';
-import 'package:podcast/helpers/player/audiohandler.dart';
 import 'package:podcast/infrastructure/repositories/podcast_repository_impl.dart';
 
 import 'application/episode_playback_cubit/episode_playback_cubit.dart';
@@ -56,6 +55,5 @@ Future<void> init() async {
 
   // Core
   getIt.registerLazySingleton(() => ConnectivityManager());
-  getIt.registerLazySingleton<MyAudioHandler>(() => MyAudioHandler());
   getIt.registerLazySingleton<PlayerStatesListener>(() => PlayerStatesListener());
 }
