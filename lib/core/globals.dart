@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
@@ -8,6 +9,7 @@ const String baseUrl = 'https://api.podcastindex.org/api/1.0';
 late ObjectBox objectBox;
 late Box<PodcastEntity> podcastBox;
 late Box<EpisodeEntity> episodeBox;
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 /// For testing: create a fake episode
 DateTime now = DateTime.now();
