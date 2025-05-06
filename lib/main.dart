@@ -23,8 +23,6 @@ import 'core/objectbox.dart';
 import 'helpers/core/lifecycle_oberserver.dart';
 import 'injection.dart' as di;
 import 'injection.dart';
-import 'helpers/notifications/initialize_awesome_notifications.dart';
-import 'helpers/player/audiohandler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,14 +33,9 @@ void main() async {
   podcastBox = objectBox.store.box<PodcastEntity>();
   episodeBox = objectBox.store.box<EpisodeEntity>();
 
-
-  // Initialize the audio handler
-  final audioHandler = MyAudioHandler();
   // Initialize the lifecycle observer
   final observer = MyAppLifecycleObserver();
   WidgetsBinding.instance.addObserver(observer);
-  // Initialize Awesome Notifications
-  initAwesomeNotifications(audioHandler);
 
   // Design status and bottom bar
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -64,28 +57,40 @@ void main() async {
               create: (BuildContext context) => getIt<TextFieldCubit>()),
           BlocProvider(create: (BuildContext context) => getIt<PodcastBloc>()..add(LoadSubscribedPodcastsEvent())),
         ],
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en', 'US'),
-            Locale('de', 'DE'),
-            Locale('fr', 'FR'),
-          ],
-          theme: AppTheme.lightTheme,
-          initialRoute: '/',
-          routes: {
-            '/': (context) => const HomePage(),
-            '/podcastDetails': (context) => const PodcastDetailsPage(),
-            '/podcastSearch': (context) => const PodcastsSearchPage(),
-            '/episodesList': (context) => const EpisodesListPage(),
-          },
-        ),
+        child: MyApp(),
       ),
     ),
   );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      navigatorKey: navigatorKey,
+      debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', 'US'),
+        Locale('de', 'DE'),
+        Locale('fr', 'FR'),
+      ],
+      theme: AppTheme.lightTheme,
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomePage(),
+        '/podcastDetails': (context) => const PodcastDetailsPage(),
+        '/podcastSearch': (context) => const PodcastsSearchPage(),
+        '/episodesList': (context) => const EpisodesListPage(),
+      },
+    );
+  }
 }
