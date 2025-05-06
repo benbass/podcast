@@ -23,8 +23,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
         ) {
     /// LOCAL
     on<LoadSubscribedPodcastsEvent>(_onLoadSubscribedPodcastsEvent);
-    on<ToggleEpisodesFilterStatusEvent>(
-        _onToggleEpisodesFilterStatusEvent);
+    on<ToggleEpisodesFilterStatusEvent>(_onToggleEpisodesFilterStatusEvent);
     on<SubscribeToPodcastEvent>(_onSubscribeToPodcastEvent);
     on<UnSubscribeFromPodcastEvent>(_onUnSubscribeToPodcastEvent);
     on<UpdateQueryEvent>(_onUpdateQueryEvent);
@@ -59,7 +58,9 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   }
 
   void _onToggleEpisodesFilterStatusEvent(event, emit) {
-    emit(state.copyWith(episodesFilterStatus: EpisodesFilterStatus.values.byName(event.filterStatus)));
+    emit(state.copyWith(
+        episodesFilterStatus:
+            EpisodesFilterStatus.values.byName(event.filterStatus)));
   }
 
   // FutureOr here because subscribing also fetches the episodes from remote
@@ -69,6 +70,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     try {
       // Save to db
       await podcastUseCases.subscribeToPodcast(event.podcast);
+
       // update subscribed podcasts list with latest db version
       List<PodcastEntity> subscribedPodcasts =
           await podcastUseCases.getSubscribedPodcasts();
@@ -155,10 +157,18 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   }
 
   Future<void> _onPodcastTappedEvent(event, emit) async {
-    emit(state.copyWith(
-      currentPodcast: event.podcast,
-      episodesFilterStatus: EpisodesFilterStatus.hideRead,
-    ));
+    if (!event.podcast.subscribed) {
+      final PodcastEntity podcast =
+          await podcastUseCases.savePodcastAndArtwork(event.podcast);
+      emit(state.copyWith(
+        currentPodcast: podcast,
+      ));
+    } else {
+      emit(state.copyWith(
+        currentPodcast: event.podcast,
+        episodesFilterStatus: EpisodesFilterStatus.hideRead,
+      ));
+    }
   }
 
   FutureOr<void> _onFetchTrendingPodcastsEvent(event, emit) async {
