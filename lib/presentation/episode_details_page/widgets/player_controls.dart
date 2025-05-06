@@ -8,7 +8,6 @@ import '../../../domain/entities/episode_entity.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
-import '../../audioplayer_overlays/audioplayer_overlays.dart';
 
 class PlayerControls extends StatelessWidget {
   const PlayerControls({
@@ -56,13 +55,7 @@ class PlayerControls extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () {
-                      getIt<MyAudioHandler>().stop().then((_) {
-                        if (context.mounted) {
-                          BlocProvider.of<EpisodePlaybackCubit>(context)
-                              .setPlaybackEpisode(null);
-                          removeOverlay();
-                        }
-                      });
+                      getIt<MyAudioHandler>().stop();
                     },
                     icon: const Icon(
                       Icons.stop_rounded,
@@ -75,6 +68,7 @@ class PlayerControls extends StatelessWidget {
                         final isPlaying = stream.data?.playing;
                         return IconButton(
                           onPressed: () {
+                            getIt<MyAudioHandler>().cancelNotification();
                             getIt<MyAudioHandler>().handlePlayPause();
                           },
                           icon: Icon(
