@@ -68,11 +68,6 @@ class ElevatedButtonSubscribe extends StatelessWidget {
   /// SUBSCRIBE
   _handleEpisodes(BuildContext context) async {
     // Make sure we have episodes when we subscribe before calling the episode list page
-    /*List<EpisodeEntity> episodes = BlocProvider.of<EpisodesCubit>(context)
-        .state
-        .where((episode) => episode.feedId == podcast.pId)
-        .toList();*/
-    //if (episodes.isEmpty) {
       List<EpisodeEntity> episodes = await getIt<EpisodeUseCases>()
           .getEpisodes(
             subscribed: false,
@@ -82,7 +77,6 @@ class ElevatedButtonSubscribe extends StatelessWidget {
             refresh: false,
           )
           .first;
-    //}
     // Set flag isSubscribed to true
     for (var episode in episodes) {
       episode.isSubscribed = true;
