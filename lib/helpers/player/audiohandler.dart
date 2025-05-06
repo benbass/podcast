@@ -1,7 +1,11 @@
 import 'dart:async';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/helpers/notifications/create_notification.dart';
+
+import '../../core/globals.dart';
+import '../../presentation/audioplayer_overlays/audioplayer_overlays.dart';
 
 /*
 ProcessingState.idle: player is idle and didn't load any audio file.
@@ -11,6 +15,7 @@ ProcessingState.ready: player ready for playback. >>> Use this for pause state
 player.playing: player ia playing audio file.
 ProcessingState.completed: playback is completed
  */
+
 
 class MyAudioHandler {
   final player = AudioPlayer(); // Instance of the JustAudio player.
@@ -32,30 +37,53 @@ class MyAudioHandler {
   }
 */
 
+  /// NOTIFICATION ///
+  void cancelNotification() {
+    AwesomeNotifications().cancel(11);
+  }
 
   // Start audio playback.
   Future<void> play() async {
     await player.play();
-    createNotification(false);
+    final context = navigatorKey.currentContext;
+    if (context != null && context.mounted) {
+      createNotification(context, false, player.position.inSeconds);
+    }
   }
 
   // Stop audio playback.
   Future<void> stop() async {
     await player.stop();
+    cancelNotification();
+
+    final context = navigatorKey.currentContext;
+    if (context != null && context.mounted) {
+      removeOverlay();
+    }
   }
 
   // Pause audio playback.
   Future<void> pause() async {
     await player.pause();
-    createNotification(true);
+    final context = navigatorKey.currentContext;
+    if (context != null && context.mounted) {
+      createNotification(context, true, player.position.inSeconds);
+    }
   }
 
   // Handling Play and Pause
   void handlePlayPause() {
+    final context = navigatorKey.currentContext;
+    bool isPaused = false;
     if (player.playing) {
       player.pause();
+      isPaused = true;
     } else {
       player.play();
+      isPaused = false;
+    }
+    if (context != null && context.mounted) {
+      createNotification(context, isPaused, player.position.inSeconds);
     }
   }
 
@@ -64,7 +92,7 @@ class MyAudioHandler {
   void seekForward() {
     Duration position = player.position;
     Duration newPosition = position + _seekValue;
-    if(newPosition > player.duration!){
+    if (newPosition > player.duration!) {
       newPosition = player.duration!;
     }
     player.seek(newPosition);
@@ -74,7 +102,7 @@ class MyAudioHandler {
   void seekBackward() {
     Duration position = player.position;
     Duration newPosition = position - _seekValue;
-    if (newPosition < const Duration(seconds: 0)){
+    if (newPosition < const Duration(seconds: 0)) {
       newPosition = const Duration(seconds: 0);
     }
     player.seek(newPosition);
