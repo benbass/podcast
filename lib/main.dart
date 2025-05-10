@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/application/textfield_cubit/text_field_cubit.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
+import 'package:podcast/helpers/notifications/notifications_controller.dart';
 import 'package:podcast/presentation/episodes_list_page/episodes_list_page.dart';
 import 'package:podcast/presentation/homepage/homepage.dart';
 import 'package:podcast/presentation/podcast_details_page/podcast_details_page.dart';
@@ -40,9 +41,11 @@ void main() async {
   WidgetsBinding.instance.addObserver(observer);
 
   // Initialize the audio handler
-  final audioHandler = MyAudioHandler();
+  MyAudioHandler();
   // Initialize Awesome Notifications
-  initAwesomeNotifications(audioHandler);
+  initAwesomeNotifications();
+  // Initialize the notification controller
+  NotificationController();
 
   // Design status and bottom bar
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -76,6 +79,7 @@ class MyApp extends StatelessWidget {
   const MyApp({
     super.key,
   });
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
