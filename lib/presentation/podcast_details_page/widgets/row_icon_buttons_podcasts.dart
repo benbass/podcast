@@ -60,6 +60,13 @@ class RowIconButtonsPodcasts extends StatelessWidget {
           ],
         ),
         IconButton(
+          onPressed: () {},
+          icon: const Icon(
+            Icons.settings_rounded,
+            size: 30,
+          ),
+        ),
+        IconButton(
           onPressed: () {
             // share podcast link
           },
