@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:podcast/helpers/core/audio_download_service.dart';
 
-import '../../core/globals.dart';
 import '../../injection.dart';
+import '../../main.dart';
 import '../database/delete_episodes.dart';
 import '../database/delete_podcasts.dart';
+import '../notifications/notifications_controller.dart';
 import '../player/audiohandler.dart';
 import 'connectivity_manager.dart';
 
@@ -22,13 +24,19 @@ class MyAppLifecycleObserver extends WidgetsBindingObserver {
       if (!bool) {
         _showErrorDialog("A problem occurred while cleaning the app storage from unneeded data\nWe will try again at the next app closing.");
       }
+      final Map<int, AudioDownloadService> notifications = NotificationController().activeDownloads;
+      if (notifications.isNotEmpty) {
+        notifications.forEach((notificationId, audioDownloadService) {
+          audioDownloadService.dispose();
+        });
+      }
     }
   }
 
   void _showErrorDialog(String errorMessage) {
     // We are not in the Widget-tree anymore, so we use the global navigatorKey.
     // We show an Overlay-Dialog over all other widgets.
-    navigatorKey.currentState?.overlay?.insert(
+    MyApp.navigatorKey.currentState?.overlay?.insert(
       OverlayEntry(
         builder: (context) => AlertDialog(
           title: const Text('Error!'),
