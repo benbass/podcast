@@ -6,6 +6,42 @@ import 'package:podcast/domain/entities/episode_entity.dart';
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 
+void cancelNotificationDownload(notificationId) {
+  AwesomeNotifications().cancel(notificationId);
+}
+
+void createNotificationDownload(double progress, String savePath, String episodeTitle, int notificationId) async {
+  AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      id: notificationId,
+      channelKey: 'progress_channel',
+      category: NotificationCategory.Progress,
+      notificationLayout: NotificationLayout.ProgressBar,
+      title: 'Downloading episode',
+      body: episodeTitle,
+      progress: progress,
+      autoDismissible: true,
+      showWhen: false,
+      locked: true,
+      backgroundColor: const Color(0x00FFFFFF),
+      payload: {
+        'savePath': savePath,
+        'notificationId': notificationId.toString(),},
+    ),
+    actionButtons: [
+      NotificationActionButton(
+        key: 'CANCEL',
+        label: 'Cancel download',
+        autoDismissible: false,
+        showInCompactView: true,
+        enabled: true,
+        isDangerousOption: true,
+        actionType: ActionType.KeepOnTop,
+      ),
+      ],
+  );
+}
+
 void createNotification(BuildContext context, bool isPausingState, int position) async {
     final EpisodeEntity episode = context.read<EpisodePlaybackCubit>().state!.values.first;
     final PodcastEntity podcast = context.read<EpisodePlaybackCubit>().state!.keys.first;
