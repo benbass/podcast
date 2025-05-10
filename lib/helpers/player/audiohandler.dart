@@ -4,7 +4,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/helpers/notifications/create_notification.dart';
 
-import '../../core/globals.dart';
+import '../../main.dart';
 import '../../presentation/audioplayer_overlays/audioplayer_overlays.dart';
 
 /*
@@ -45,7 +45,7 @@ class MyAudioHandler {
   // Start audio playback.
   Future<void> play() async {
     await player.play();
-    final context = navigatorKey.currentContext;
+    final context = MyApp.navigatorKey.currentContext;
     if (context != null && context.mounted) {
       createNotification(context, false, player.position.inSeconds);
     }
@@ -56,7 +56,7 @@ class MyAudioHandler {
     await player.stop();
     cancelNotification();
 
-    final context = navigatorKey.currentContext;
+    final context = MyApp.navigatorKey.currentContext;
     if (context != null && context.mounted) {
       removeOverlay();
     }
@@ -65,7 +65,7 @@ class MyAudioHandler {
   // Pause audio playback.
   Future<void> pause() async {
     await player.pause();
-    final context = navigatorKey.currentContext;
+    final context = MyApp.navigatorKey.currentContext;
     if (context != null && context.mounted) {
       createNotification(context, true, player.position.inSeconds);
     }
@@ -73,7 +73,7 @@ class MyAudioHandler {
 
   // Handling Play and Pause
   void handlePlayPause() {
-    final context = navigatorKey.currentContext;
+    final context = MyApp.navigatorKey.currentContext;
     bool isPaused = false;
     if (player.playing) {
       player.pause();
