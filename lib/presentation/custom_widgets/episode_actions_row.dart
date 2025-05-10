@@ -25,7 +25,7 @@ class EpisodeActionsRow extends StatelessWidget {
         IconButton(
           onPressed: () {
             final bool isFavorite = episode.favorite;
-            performActionOnEpisode(episode, "favorite", isFavorite, context);
+            performActionOnEpisode(episode, "favorite", isFavorite);
             ActionFeedback.show(context,
                 icon: episode.favorite ? Icons.star : Icons.star_border);
           },
@@ -70,7 +70,7 @@ class EpisodeActionsRow extends StatelessWidget {
                           filePath = null;
                         }
                         performActionOnEpisode(
-                            episode, "download", filePath, context);
+                            episode, "download", filePath);
                         Navigator.pop(context);
                       },
                       child: Text(
