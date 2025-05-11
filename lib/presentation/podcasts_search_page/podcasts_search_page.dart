@@ -5,7 +5,7 @@ import 'package:podcast/presentation/podcasts_search_page/widgets/podcast_card.d
 
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../application/textfield_cubit/text_field_cubit.dart';
-import '../custom_widgets/failure_dialog.dart';
+import '../custom_widgets/dialogs/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
 import '../podcast_details_page/podcast_details_page.dart';
 import 'widgets/search_textfield.dart';
