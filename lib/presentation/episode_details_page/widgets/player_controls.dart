@@ -6,6 +6,7 @@ import 'package:podcast/presentation/episode_details_page/widgets/playback_posit
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../domain/entities/podcast_entity.dart';
+import '../../../helpers/notifications/utilities_notifications.dart';
 import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
 
@@ -68,7 +69,7 @@ class PlayerControls extends StatelessWidget {
                         final isPlaying = stream.data?.playing;
                         return IconButton(
                           onPressed: () {
-                            getIt<MyAudioHandler>().cancelNotification();
+                            UtilitiesNotifications.cancelNotificationPlayback();
                             getIt<MyAudioHandler>().handlePlayPause();
                           },
                           icon: Icon(
