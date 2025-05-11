@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/podcast_details_page/widgets/podcast_category.dart';
 import 'package:podcast/presentation/podcast_details_page/widgets/row_icon_buttons_podcasts.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
-import '../custom_widgets/failure_dialog.dart';
+import '../custom_widgets/dialogs/failure_dialog.dart';
 import '../custom_widgets/flexible_space.dart';
 
 class PodcastDetailsPage extends StatelessWidget {
