@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/episode_entity.dart';
-import '../../helpers/core/perform_action_on_episode.dart';
+import '../../helpers/audio_download/audio_file_utility.dart';
+import '../../helpers/core/episode_action_helper.dart';
 import 'action_feedback/action_feedback.dart';
 
 class EpisodeActionsRow extends StatelessWidget {
@@ -25,7 +26,7 @@ class EpisodeActionsRow extends StatelessWidget {
         IconButton(
           onPressed: () {
             final bool isFavorite = episode.favorite;
-            performActionOnEpisode(episode, "favorite", isFavorite);
+            EpisodeActionHelper.performActionOnEpisode(episode, "favorite", isFavorite);
             ActionFeedback.show(context,
                 icon: episode.favorite ? Icons.star : Icons.star_border);
           },
@@ -49,7 +50,7 @@ class EpisodeActionsRow extends StatelessWidget {
                       ? "Delete the downloaded file?"
                       : "Download the episode?"),
                   content: Text(episode.filePath != null
-                      ? "This cannot be undone."
+                      ? "The file will be deleted from your device."
                       : "This will download the file to your device."),
                   actions: [
                     TextButton(
@@ -60,18 +61,8 @@ class EpisodeActionsRow extends StatelessWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        // TODO: Handle download/delete
-                        String? filePath = episode.filePath;
-                        if (filePath == null) {
-                          // implement logic for download and set filePath as String for performActionOnEpisode
-                          filePath = "file path on device";
-                        } else {
-                          // implement logic for delete and set filePath as null for performActionOnEpisode
-                          filePath = null;
-                        }
-                        performActionOnEpisode(
-                            episode, "download", filePath);
                         Navigator.pop(context);
+                        AudioFileUtility.handleDownloadOnPressed(episode);
                       },
                       child: Text(
                           episode.filePath != null ? "Delete" : "Download"),
@@ -97,4 +88,6 @@ class EpisodeActionsRow extends StatelessWidget {
       ],
     );
   }
+
+
 }
