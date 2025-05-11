@@ -12,11 +12,11 @@ import 'package:podcast/presentation/custom_widgets/play_button.dart';
 import 'package:podcast/presentation/episodes_list_page/episodes_list_page.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
-import '../../helpers/core/image_provider.dart';
+import '../../helpers/core/utilities/image_provider.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
-import 'episode_progress_indicator.dart';
+import 'episode_playback_progress_indicator.dart';
 
 /// This widget displays details about a selected podcast or episode,
 /// depending on which entity (podcast or episode) is provided.
@@ -80,7 +80,7 @@ class FlexibleSpace extends StatelessWidget {
                     return Positioned(
                       bottom: 20,
                       left: 12,
-                      child: EpisodeProgressIndicator(
+                      child: EpisodePlaybackProgressIndicator(
                         themeData: themeData,
                         episode: episode!,
                         isCurrentlyPlaying: isCurrentlyPlaying,
