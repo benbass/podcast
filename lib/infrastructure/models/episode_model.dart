@@ -1,7 +1,7 @@
 import 'package:html/parser.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 
-import '../../helpers/core/format_pubdate_string.dart';
+import '../../helpers/core/utilities/format_utilities.dart';
 
 class EpisodeModel extends EpisodeEntity {
   EpisodeModel({
@@ -40,7 +40,7 @@ class EpisodeModel extends EpisodeEntity {
       description: parse(json['description']).documentElement?.text ?? "",
       guid: json['guid'],
       datePublished: json['datePublished'], // timestamp
-      datePublishedPretty: extractDataFromDateString(json['datePublishedPretty']),
+      datePublishedPretty: FormatUtilities.extractDataFromDateString(json['datePublishedPretty']),
       enclosureUrl: json['enclosureUrl'],
       enclosureLength: json['enclosureLength'],
       duration: json['duration'] ?? 0,
