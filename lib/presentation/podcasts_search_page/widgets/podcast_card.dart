@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:podcast/helpers/core/image_provider.dart';
+import 'package:podcast/helpers/core/utilities/image_provider.dart';
 import '../../../domain/entities/podcast_entity.dart';
 
 class PodcastCard extends StatelessWidget {
