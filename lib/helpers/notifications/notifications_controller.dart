@@ -1,10 +1,10 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:podcast/helpers/notifications/create_notification.dart';
-import 'package:podcast/helpers/player/audiohandler.dart';
 
+import 'package:podcast/helpers/player/audiohandler.dart';
 import '../../injection.dart';
-import '../core/audio_download_service.dart';
+import '../audio_download/audio_download_service.dart';
+import 'utilities_notifications.dart';
 
 @pragma("vm:entry-point")
 class NotificationController {
@@ -26,7 +26,7 @@ class NotificationController {
   // Method to unregister a AudioDownloadService instance
   void unregisterDownload(int notificationId) {
     activeDownloads.remove(notificationId);
-    cancelNotificationDownload(notificationId);
+    UtilitiesNotifications.cancelNotificationDownload(notificationId);
     debugPrint("Download unregistered with id: $notificationId");
   }
 
