@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:podcast/helpers/notifications/create_notification.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../core/globals.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/core/connectivity_manager.dart';
+import '../../helpers/notifications/utilities_notifications.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
-import 'failure_dialog.dart';
+import 'dialogs/failure_dialog.dart';
 
 class PlayButton extends StatelessWidget {
   const PlayButton({
@@ -105,7 +105,7 @@ class PlayButtonActive extends StatelessWidget {
             if (context.mounted) {
               BlocProvider.of<EpisodePlaybackCubit>(context)
                   .setPlaybackEpisode({podcast: episode});
-              createNotification(context, false, episode.position);
+              UtilitiesNotifications.createNotificationPlayback(context, false, episode.position);
             }
 
           } on PlayerException {
