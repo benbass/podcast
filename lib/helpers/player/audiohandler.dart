@@ -1,11 +1,10 @@
 import 'dart:async';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:podcast/helpers/notifications/create_notification.dart';
 
 import '../../main.dart';
 import '../../presentation/audioplayer_overlays/audioplayer_overlays.dart';
+import '../notifications/utilities_notifications.dart';
 
 /*
 ProcessingState.idle: player is idle and didn't load any audio file.
@@ -38,23 +37,21 @@ class MyAudioHandler {
 */
 
   /// NOTIFICATION ///
-  void cancelNotification() {
-    AwesomeNotifications().cancel(11);
-  }
+
 
   // Start audio playback.
   Future<void> play() async {
     await player.play();
     final context = MyApp.navigatorKey.currentContext;
     if (context != null && context.mounted) {
-      createNotification(context, false, player.position.inSeconds);
+      UtilitiesNotifications.createNotificationPlayback(context, false, player.position.inSeconds);
     }
   }
 
   // Stop audio playback.
   Future<void> stop() async {
     await player.stop();
-    cancelNotification();
+    UtilitiesNotifications.cancelNotificationPlayback();
 
     final context = MyApp.navigatorKey.currentContext;
     if (context != null && context.mounted) {
@@ -67,7 +64,7 @@ class MyAudioHandler {
     await player.pause();
     final context = MyApp.navigatorKey.currentContext;
     if (context != null && context.mounted) {
-      createNotification(context, true, player.position.inSeconds);
+      UtilitiesNotifications.createNotificationPlayback(context, true, player.position.inSeconds);
     }
   }
 
@@ -83,7 +80,7 @@ class MyAudioHandler {
       isPaused = false;
     }
     if (context != null && context.mounted) {
-      createNotification(context, isPaused, player.position.inSeconds);
+      UtilitiesNotifications.createNotificationPlayback(context, isPaused, player.position.inSeconds);
     }
   }
 
