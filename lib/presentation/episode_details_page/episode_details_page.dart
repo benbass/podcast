@@ -10,9 +10,8 @@ import 'package:podcast/presentation/episodes_list_page/episodes_list_page.dart'
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../domain/usecases/episode_usecases.dart';
-import '../../helpers/core/format_duration.dart';
-import '../../helpers/core/format_pubdate_string.dart';
-import '../../helpers/core/show_episode_actions_dialog.dart';
+import '../../helpers/core/utilities/format_utilities.dart';
+import '../custom_widgets/dialogs/episode_actions_dialog.dart';
 import '../../helpers/listeners/player_listener.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
@@ -125,16 +124,20 @@ class EpisodeDetailsPage extends StatelessWidget {
                                               MainAxisAlignment.spaceBetween,
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Text(formatTimestamp(
-                                                episodeToDisplay
-                                                    .datePublished)),
+                                            Text(
+                                                FormatUtilities.formatTimestamp(
+                                                    episodeToDisplay
+                                                        .datePublished)),
                                             Expanded(
                                               child: EpisodeActionsRow(
                                                   episode: episode),
                                             ),
                                             if (episode.isSubscribed)
                                               IconButton(
-                                                onPressed: () => showEpisodeActionsDialog(context, episode),
+                                                onPressed: () =>
+                                                    EpisodeActionsDialog
+                                                        .showEpisodeActionsDialog(
+                                                            context, episode),
                                                 icon: const Icon(
                                                   Icons.more_horiz_rounded,
                                                 ),
@@ -150,7 +153,8 @@ class EpisodeDetailsPage extends StatelessWidget {
                                           child: Text(
                                             episodeToDisplay.duration! == 0
                                                 ? ""
-                                                : intToDurationFormatted(
+                                                : FormatUtilities
+                                                    .intToDurationFormatted(
                                                     episodeToDisplay.duration!,
                                                   ),
                                           ),
@@ -189,18 +193,22 @@ class EpisodeDetailsPage extends StatelessWidget {
                                                 children: [
                                                   PodcastWebsiteLink(
                                                       link: podcastState
-                                                          .currentPodcast.link!),
+                                                          .currentPodcast
+                                                          .link!),
                                                   const SizedBox(
                                                     width: 30,
                                                   ),
                                                   IconButton(
-                                                    onPressed: () => Navigator.push(
-                                                        context,
-                                                        ScaleRoute(
-                                                          page: const PodcastDetailsPage(),
-                                                        )),
+                                                    onPressed: () =>
+                                                        Navigator.push(
+                                                            context,
+                                                            ScaleRoute(
+                                                              page:
+                                                                  const PodcastDetailsPage(),
+                                                            )),
                                                     icon: const Icon(
-                                                      Icons.info_outline_rounded,
+                                                      Icons
+                                                          .info_outline_rounded,
                                                       size: 30,
                                                     ),
                                                   ),
