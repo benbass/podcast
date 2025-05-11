@@ -5,7 +5,7 @@ import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/infrastructure/datasources/episode_datasources.dart';
 import '../../domain/repositories/podcast_repository.dart';
 
-import '../../helpers/core/save_artwork_to_file.dart';
+import '../../helpers/core/utilities/artwork_to_file.dart';
 import '../datasources/podcast_datasources.dart';
 
 class PodcastRepositoryImpl implements PodcastRepository {
@@ -48,7 +48,7 @@ class PodcastRepositoryImpl implements PodcastRepository {
     try {
       // Save artwork to file.
       final String artworkFilePath =
-          await saveArtworkToFile(podcast.artwork) ?? "null";
+          await ArtworkToFile.saveArtworkToFile(podcast.artwork) ?? "null";
       if (artworkFilePath != "null") {
         // Update the artwork status of the podcast.
         final PodcastEntity podcastWithArtwork = podcast.copyWith(
