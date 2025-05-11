@@ -5,12 +5,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
-import 'package:podcast/helpers/core/perform_action_on_episode.dart';
-import 'package:podcast/helpers/notifications/create_notification.dart';
-import 'package:podcast/main.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/episode_entity.dart';
+import '../notifications/utilities_notifications.dart';
 import '../notifications/notifications_controller.dart';
 
 class DownloadException implements Exception {
@@ -19,7 +17,6 @@ class DownloadException implements Exception {
 }
 
 class AudioDownloadService {
-  BuildContext context = MyApp.navigatorKey.currentContext!;
   final EpisodeEntity episode;
   Dio dio = Dio();
   final CancelToken cancelToken = CancelToken();
@@ -27,7 +24,8 @@ class AudioDownloadService {
   final int notificationId;
   bool isDownloading = false;
 
-  AudioDownloadService(this.episode) : notificationId = Random().nextInt(100000) + 11 {
+  AudioDownloadService(this.episode)
+      : notificationId = Random().nextInt(100000) + 1 {
     NotificationController().registerDownload(notificationId, this);
   }
 
@@ -42,12 +40,12 @@ class AudioDownloadService {
         onReceiveProgress: (received, total) {
           progress = received / total * 100;
           if (total <= 0) return;
-          createNotificationDownload(
+          UtilitiesNotifications.createNotificationDownload(
               progress, savePath, episodeTitle, notificationId);
         },
       ).whenComplete(() {
         isDownloading = false;
-        cancelNotificationDownload(notificationId);
+        UtilitiesNotifications.cancelNotificationDownload(notificationId);
         NotificationController().unregisterDownload(notificationId);
       });
     } on DioException catch (e) {
@@ -73,7 +71,7 @@ class AudioDownloadService {
   }
 
   /// Download episode to device and return filePath
-  Future<String> _filePathOnDevice(EpisodeEntity episode) async {
+  Future<String> filePathOnDevice(EpisodeEntity episode) async {
     final String audioUrl = episode.enclosureUrl;
     final int fileSize = episode.enclosureLength;
     final String episodeTitle = episode.title;
@@ -132,63 +130,10 @@ class AudioDownloadService {
     }
   }
 
-  void dispose(){
+  void dispose() {
     dio.close();
     if (isDownloading) {
       NotificationController().unregisterDownload(notificationId);
     }
-}
-
-  void showDownloadDialog() {
-    Navigator.pop(context); // close previous dialog
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-            title: Text(episode.filePath == null
-                ? "Download episode audio file to device"
-                : "Delete episode audio file"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("Cancel"),
-              ),
-              TextButton(
-                onPressed: () async {
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                  }
-                  if (episode.filePath == null) {
-                    try {
-                      String savePath = await _filePathOnDevice(episode);
-                      if (File(savePath).existsSync()) {
-                        performActionOnEpisode(episode, "download", savePath);
-                      }
-                    } on DownloadException catch (e) {
-                      // Handle download error
-                      debugPrint(e.message);
-                    } catch (e) {
-                      // Handle any other potential error
-                      debugPrint("An error occured: $e");
-                    }
-                  } else {
-                    File file = File(episode.filePath!);
-                    if (file.existsSync()) {
-                      try {
-                        file.delete();
-                        performActionOnEpisode(episode, "delete", null);
-                      } catch (e) {
-                        debugPrint("Error deleting file: $e");
-                      }
-                    }
-                  }
-                },
-                child: Text(episode.filePath == null ? "Download" : "Delete"),
-              ),
-            ]);
-      },
-    );
   }
 }
