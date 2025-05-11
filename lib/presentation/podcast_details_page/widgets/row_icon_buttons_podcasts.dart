@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/core/connectivity_manager.dart';
 import '../../../injection.dart';
-import '../../custom_widgets/failure_dialog.dart';
+import '../../custom_widgets/dialogs/failure_dialog.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../../episodes_list_page/episodes_list_page.dart';
 
