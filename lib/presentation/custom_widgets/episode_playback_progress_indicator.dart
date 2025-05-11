@@ -5,7 +5,7 @@ import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 
-class EpisodeProgressIndicator extends StatelessWidget {
+class EpisodePlaybackProgressIndicator extends StatelessWidget {
   final ThemeData themeData;
   final EpisodeEntity episode;
   final bool isCurrentlyPlaying;
@@ -14,7 +14,7 @@ class EpisodeProgressIndicator extends StatelessWidget {
   final double? paddingVert;
   final double? dimension;
   final double? strokeWidth;
-  const EpisodeProgressIndicator({
+  const EpisodePlaybackProgressIndicator({
     super.key,
     required this.themeData,
     required this.episode,
