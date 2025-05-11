@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:podcast/helpers/notifications/utilities_notifications.dart';
 import '../../../domain/entities/episode_entity.dart';
-import '../../../helpers/core/format_duration.dart';
-import '../../../helpers/notifications/create_notification.dart';
+import '../../../helpers/core/utilities/format_utilities.dart';
 import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
 
@@ -23,7 +23,7 @@ class PlaybackPositionSlider extends StatelessWidget {
         Duration(seconds: episode.duration ?? 0);
         final Duration remainingDuration = totalDuration - position;
         String formattedRemainingDuration =
-        remainingDurationFormatted(remainingDuration);
+        FormatUtilities.remainingDurationFormatted(remainingDuration);
         return Column(
           children: [
             Slider(
@@ -40,11 +40,11 @@ class PlaybackPositionSlider extends StatelessWidget {
               onChanged: (value)
               {
                 final bool playerState = getIt<MyAudioHandler>().player.playing;
-                getIt<MyAudioHandler>().cancelNotification();
+                UtilitiesNotifications.cancelNotificationPlayback();
                       getIt<MyAudioHandler>()
                           .player
                           .seek(Duration(seconds: value.toInt()));
-                createNotification(context, playerState, value.toInt());
+                UtilitiesNotifications.createNotificationPlayback(context, playerState, value.toInt());
                     }),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -52,7 +52,7 @@ class PlaybackPositionSlider extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    durationWithMillisecondsRemovedFormatted(position),
+                    FormatUtilities.durationWithMillisecondsRemovedFormatted(position),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
