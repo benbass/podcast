@@ -4,10 +4,10 @@ import 'package:podcast/presentation/homepage/widgets/scaling_carousel_sliver.da
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../helpers/listeners/player_listener.dart';
-import '../../helpers/listeners/connectivity_listener.dart';
+import '../custom_widgets/dialogs/connectivity_dialogs.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../injection.dart';
-import '../custom_widgets/failure_dialog.dart';
+import '../custom_widgets/dialogs/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
 import '../podcast_details_page/podcast_details_page.dart';
 import '../podcasts_search_page/widgets/podcast_card.dart';
@@ -32,7 +32,7 @@ class HomePage extends StatelessWidget {
         .setGetCurrentEpisode(() => context.read<EpisodePlaybackCubit>().state);
 
     // Listen for connectivity changes
-    listenToConnectivity(context);
+    ConnectivityDialog.showConnectivityDialogs(context);
 
     return BlocListener<PodcastBloc, PodcastState>(
       listener: (context, state) {
