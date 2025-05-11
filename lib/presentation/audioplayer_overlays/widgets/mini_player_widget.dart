@@ -9,7 +9,7 @@ import '../../../application/episode_playback_cubit/episode_playback_cubit.dart'
 import '../../../application/podcast_bloc/podcast_bloc.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../domain/entities/podcast_entity.dart';
-import '../../../helpers/core/image_provider.dart';
+import '../../../helpers/core/utilities/image_provider.dart';
 import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
 import '../../custom_widgets/page_transition.dart';
