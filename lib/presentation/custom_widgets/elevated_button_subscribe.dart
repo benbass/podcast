@@ -9,7 +9,7 @@ import '../../domain/usecases/episode_usecases.dart';
 import '../../helpers/core/connectivity_manager.dart';
 import '../../injection.dart';
 import '../../objectbox.g.dart';
-import 'failure_dialog.dart';
+import 'dialogs/failure_dialog.dart';
 
 class ElevatedButtonSubscribe extends StatelessWidget {
   final PodcastEntity podcast;
