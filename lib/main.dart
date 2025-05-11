@@ -24,7 +24,7 @@ import 'core/objectbox.dart';
 import 'helpers/core/lifecycle_oberserver.dart';
 import 'injection.dart' as di;
 import 'injection.dart';
-import 'helpers/notifications/initialize_awesome_notifications.dart';
+import 'helpers/notifications/utilities_notifications.dart';
 import 'helpers/player/audiohandler.dart';
 
 void main() async {
@@ -43,7 +43,7 @@ void main() async {
   // Initialize the audio handler
   MyAudioHandler();
   // Initialize Awesome Notifications
-  initAwesomeNotifications();
+  UtilitiesNotifications.initAwesomeNotifications();
   // Initialize the notification controller
   NotificationController();
 
