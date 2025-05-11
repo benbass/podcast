@@ -4,11 +4,11 @@ import 'package:podcast/domain/entities/podcast_entity.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
-import '../../helpers/core/format_pubdate_string.dart';
-import '../../helpers/core/image_provider.dart';
-import '../../helpers/core/show_episode_actions_dialog.dart';
+import '../../helpers/core/utilities/format_utilities.dart';
+import '../../helpers/core/utilities/image_provider.dart';
+import 'dialogs/episode_actions_dialog.dart';
 import 'episode_actions_row.dart';
-import 'episode_progress_indicator.dart';
+import 'episode_playback_progress_indicator.dart';
 import 'page_transition.dart';
 import '../episode_details_page/episode_details_page.dart';
 
@@ -105,8 +105,9 @@ class EpisodeCard extends StatelessWidget {
                                   ),
                                   if (episode.isSubscribed)
                                     IconButton(
-                                      onPressed: () => showEpisodeActionsDialog(
-                                          context, episode),
+                                      onPressed: () => EpisodeActionsDialog
+                                          .showEpisodeActionsDialog(
+                                              context, episode),
                                       icon: const Icon(
                                         Icons.more_horiz_rounded,
                                       ),
@@ -120,7 +121,7 @@ class EpisodeCard extends StatelessWidget {
                                       MainAxisAlignment.spaceAround,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    EpisodeProgressIndicator(
+                                    EpisodePlaybackProgressIndicator(
                                       themeData: themeData,
                                       episode: episode,
                                       isCurrentlyPlaying: isCurrentlyPlaying,
@@ -189,7 +190,7 @@ class EpisodeCard extends StatelessWidget {
           height: 10,
         ),
         Text(
-          formatTimestamp(
+          FormatUtilities.formatTimestamp(
             episode.datePublished,
           ),
           style: themeData.textTheme.bodyMedium,
