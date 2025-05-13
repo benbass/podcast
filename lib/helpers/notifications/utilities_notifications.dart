@@ -29,9 +29,8 @@ class UtilitiesNotifications{
           icon: "resource://drawable/launcher_icon",
         ),
         NotificationChannel(
-          groupKey: 'basic_channel_group',
-          channelGroupKey: 'basic_channel_group',
-          channelKey: 'progress_channel',
+          groupKey: NotificationController.notificationGroupKey,
+          channelKey: NotificationController.notificationChannelKey,
           channelName: 'Podcast downloading',
           channelDescription: 'Notification channel for the Podcast Player Downloads',
           defaultColor: const Color(0xFFFF8100),
@@ -60,44 +59,8 @@ class UtilitiesNotifications{
 
   }
 
-  static void cancelNotificationDownload(notificationId) {
-    AwesomeNotifications().cancel(notificationId);
-  }
-
   static void cancelNotificationPlayback() {
     AwesomeNotifications().cancel(1);
-  }
-
-  static void createNotificationDownload(double progress, String savePath, String episodeTitle, int notificationId) async {
-    AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: notificationId,
-        channelKey: 'progress_channel',
-        category: NotificationCategory.Progress,
-        notificationLayout: NotificationLayout.ProgressBar,
-        title: 'Downloading episode',
-        body: episodeTitle,
-        progress: progress,
-        autoDismissible: true,
-        showWhen: false,
-        locked: true,
-        backgroundColor: const Color(0x00FFFFFF),
-        payload: {
-          'savePath': savePath,
-          'notificationId': notificationId.toString(),},
-      ),
-      actionButtons: [
-        NotificationActionButton(
-          key: 'CANCEL',
-          label: 'Cancel download',
-          autoDismissible: false,
-          showInCompactView: true,
-          enabled: true,
-          isDangerousOption: true,
-          actionType: ActionType.KeepOnTop,
-        ),
-      ],
-    );
   }
 
   static void createNotificationPlayback(BuildContext context, bool isPausingState, int position) async {
