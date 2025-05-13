@@ -111,4 +111,13 @@ class EpisodeEntity {
       podcastTitle: podcastTitle ?? this.podcastTitle,
     );
   }
+
+  // Implement equality based on the unique ID
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is EpisodeEntity && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
