@@ -2,9 +2,8 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 
 import 'package:podcast/helpers/player/audiohandler.dart';
+import '../audio_download/audio_download_queue_manager.dart';
 import '../../injection.dart';
-import '../audio_download/audio_download_service.dart';
-import 'utilities_notifications.dart';
 
 @pragma("vm:entry-point")
 class NotificationController {
@@ -13,31 +12,12 @@ class NotificationController {
   factory NotificationController() => _instance;
   NotificationController._internal();
 
-  // Map to save the AudioDownloadService instances by notificationId
-  final Map<int, AudioDownloadService> activeDownloads = {};
-
-  // Method to register a AudioDownloadService instance
-  void registerDownload(
-      int notificationId, AudioDownloadService audioDownloadService) {
-    activeDownloads[notificationId] = audioDownloadService;
-    debugPrint("Download registered with id: $notificationId");
-  }
-
-  // Method to unregister a AudioDownloadService instance
-  void unregisterDownload(int notificationId) {
-    activeDownloads.remove(notificationId);
-    UtilitiesNotifications.cancelNotificationDownload(notificationId);
-    debugPrint("Download unregistered with id: $notificationId");
-  }
-
-  void _cancelDownload(int notificationId, String savePath) {
-    final AudioDownloadService? audioDownloadService =
-        activeDownloads[notificationId];
-    if (audioDownloadService != null) {
-      audioDownloadService.cancelDownload(savePath);
-      unregisterDownload(notificationId);
-    }
-  }
+  static const String notificationChannelKey = "download_channel";
+  static const String notificationGroupKey = "download_channel_group'";
+  // Keys for action "Show queue"
+  static const String showQueueActionKey = "show_download_queue";
+  static const String _notificationPayloadActionKey = 'action';
+  static const String _showQueueAction = 'show_queue';
 
 /*
   /// Use this method to detect when a new notification or a schedule is created
@@ -72,18 +52,13 @@ class NotificationController {
       // to be implemented
     } else if (receivedAction.buttonKeyPressed == 'STOP') {
       getIt<MyAudioHandler>().stop();
-    } else if (receivedAction.buttonKeyPressed == 'CANCEL') {
-      final String? notificationIdString =
-          receivedAction.payload?['notificationId'];
-      final String? savePath = receivedAction.payload?['savePath'];
-      if (notificationIdString != null && savePath != null) {
-        try {
-          final int notificationId = int.parse(notificationIdString);
-          NotificationController()._cancelDownload(notificationId, savePath);
-        } catch (e) {
-          debugPrint("Error parsing notificationId: $e");
-        }
-      }
+    } else if (receivedAction.payload?[_notificationPayloadActionKey] ==
+            _showQueueAction ||
+        receivedAction.buttonKeyPressed == showQueueActionKey) {
+      // Also check the buttonKeyPressed for redundancy
+      debugPrint("NotificationController: Show Queue action received.");
+      // Call the callback in the DownloadQueueManager, if set
+      AudioDownloadQueueManager().onShowQueuePage?.call();
     }
   }
 }
