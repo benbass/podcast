@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +7,6 @@ import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/episode_entity.dart';
-import '../notifications/utilities_notifications.dart';
-import '../notifications/notifications_controller.dart';
 
 class DownloadException implements Exception {
   final String message;
@@ -20,61 +17,51 @@ class AudioDownloadService {
   final EpisodeEntity episode;
   Dio dio = Dio();
   final CancelToken cancelToken = CancelToken();
-  double progress = 0;
-  final int notificationId;
-  bool isDownloading = false;
 
-  AudioDownloadService(this.episode)
-      : notificationId = Random().nextInt(100000) + 1 {
-    NotificationController().registerDownload(notificationId, this);
-  }
+  // Callbacks for progress and completion
+  final Function(double)? onProgressUpdate;
+  final Function()? onDownloadComplete;
 
-  Future<void> _downloadFile(String url, String savePath, episodeTitle) async {
-    isDownloading = true;
-    progress = 0;
+  AudioDownloadService(this.episode,
+      {this.onProgressUpdate, this.onDownloadComplete});
+
+  Future<void> _downloadFile(String url, String savePath) async {
     try {
       await dio.download(
         url,
         savePath,
         cancelToken: cancelToken,
         onReceiveProgress: (received, total) {
-          progress = received / total * 100;
           if (total <= 0) return;
-          UtilitiesNotifications.createNotificationDownload(
-              progress, savePath, episodeTitle, notificationId);
+          double currentProgress = received / total;
+          // Notify the callback about the progress
+          onProgressUpdate?.call(currentProgress);
         },
-      ).whenComplete(() {
-        isDownloading = false;
-        UtilitiesNotifications.cancelNotificationDownload(notificationId);
-        NotificationController().unregisterDownload(notificationId);
-      });
+      );
+      // Notify the Callback about the completion, only if the download was successful
+      onDownloadComplete?.call();
     } on DioException catch (e) {
-      isDownloading = false;
+      dispose();
       throw DownloadException("Failed to download file: $e");
     } catch (e) {
-      isDownloading = false;
+      dispose();
       throw DownloadException("An error occurred: $e");
     }
   }
 
   String _removeQueryParameters(String url) {
-    // Find the index of the first '?' character
     int questionMarkIndex = url.indexOf('?');
-
-    // If '?' is found, remove everything from that index onwards
     if (questionMarkIndex != -1) {
       return url.substring(0, questionMarkIndex);
     } else {
-      // If no '?' is found, return the original URL
       return url;
     }
   }
 
   /// Download episode to device and return filePath
-  Future<String> filePathOnDevice(EpisodeEntity episode) async {
+  Future<String> filePathOnDevice() async {
     final String audioUrl = episode.enclosureUrl;
     final int fileSize = episode.enclosureLength;
-    final String episodeTitle = episode.title;
 
     // Download directory for episode will be sub directory "episodes" in app directory
     Directory appDir = await getApplicationDocumentsDirectory();
@@ -89,7 +76,7 @@ class AudioDownloadService {
     // Use a UUID as the file name to avoid conflicts
     final fileName = const Uuid().v4();
 
-    // Remove query parameters from URL before getting the extension
+    // Clean URL from query parameters before getting the extension
     final cleanedAudioUrl = _removeQueryParameters(audioUrl);
 
     // Get file extension from the url
@@ -101,39 +88,46 @@ class AudioDownloadService {
     final file = File(filePath);
     if (file.existsSync() && file.lengthSync() == fileSize) {
       // Already downloaded
+      onDownloadComplete?.call(); // Notify the Callback about the completion
       return filePath;
     } else {
       try {
+        debugPrint(
+            'Starting Dio download. CancelToken hash passed: ${cancelToken.hashCode}');
         // File not downloaded, download it!
-        await _downloadFile(audioUrl, filePath, episodeTitle);
+        await _downloadFile(audioUrl, filePath);
+      } on DioException catch (e) {
+        if (e.type == DioExceptionType.cancel) {
+          try {
+            // Dio should have deleted the partial file if download was cancelled, but just in case
+            if (await file.exists()) {
+              await file.delete();
+            }
+          } catch (deleteError) {
+            debugPrint('Error deleting partial file: $deleteError');
+          }
+          throw DownloadException("Cancelled");
+        } else {
+          throw DownloadException("Failed: ${e.message}");
+        }
       } catch (e) {
-        rethrow; // Rethrow the exception for the caller to handle
-      }
+        rethrow;
+      } finally {}
       return filePath; // Now downloaded!
     }
   }
 
-  Future<void> _deletePartialDownload(String savePath) async {
-    final file = File(savePath);
-    if (await file.exists()) {
-      await file.delete();
-      debugPrint('Partial download $notificationId deleted');
-    }
-  }
-
-  void cancelDownload(String savePath) {
+  void cancelDownload() async {
     if (!cancelToken.isCancelled) {
       cancelToken.cancel("Cancelled by user");
-      debugPrint("Download $notificationId cancelled by user");
-      _deletePartialDownload(savePath);
-      dispose();
+      onDownloadComplete?.call(); // Notify the Callback about the cancellation
     }
   }
 
   void dispose() {
-    dio.close();
-    if (isDownloading) {
-      NotificationController().unregisterDownload(notificationId);
+    if (!cancelToken.isCancelled) {
+      cancelToken.cancel("Cancelled by dispose");
     }
+    dio.close();
   }
 }
