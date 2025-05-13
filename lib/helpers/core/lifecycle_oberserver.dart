@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:podcast/helpers/audio_download/audio_download_service.dart';
+import 'package:podcast/helpers/audio_download/audio_download_queue_manager.dart';
 
 import '../../injection.dart';
 import '../../main.dart';
 import '../database/episode_cleanup.dart';
 import '../database/unsubscribed_podcast_cleanup.dart';
-import '../notifications/notifications_controller.dart';
 import '../player/audiohandler.dart';
 import 'connectivity_manager.dart';
 
@@ -24,12 +23,8 @@ class MyAppLifecycleObserver extends WidgetsBindingObserver {
       if (!bool) {
         _showErrorDialog("A problem occurred while cleaning the app storage from unneeded data\nWe will try again at the next app closing.");
       }
-      final Map<int, AudioDownloadService> notifications = NotificationController().activeDownloads;
-      if (notifications.isNotEmpty) {
-        notifications.forEach((notificationId, audioDownloadService) {
-          audioDownloadService.dispose();
-        });
-      }
+      // Implements cancellation and deletion of all partial files: the following does not work as expected
+      // AudioDownloadQueueManager().cancelAllDownloads();
     }
   }
 
