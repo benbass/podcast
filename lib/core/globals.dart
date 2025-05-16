@@ -8,6 +8,7 @@ const String baseUrl = 'https://api.podcastindex.org/api/1.0';
 late ObjectBox objectBox;
 late Box<PodcastEntity> podcastBox;
 late Box<EpisodeEntity> episodeBox;
+const String kCurrentDownloadFilePath = "current_download_filepath";
 
 /// For testing: create a fake episode
 DateTime now = DateTime.now();
