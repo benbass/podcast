@@ -4,8 +4,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../core/globals.dart';
 import '../../domain/entities/episode_entity.dart';
 
 class DownloadException implements Exception {
@@ -26,6 +28,10 @@ class AudioDownloadService {
       {this.onProgressUpdate, this.onDownloadComplete});
 
   Future<void> _downloadFile(String url, String savePath) async {
+    // Save the current download path in SharedPreferences
+    // in case partial download must be cleaned up
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(kCurrentDownloadFilePath, savePath);
     try {
       await dio.download(
         url,
