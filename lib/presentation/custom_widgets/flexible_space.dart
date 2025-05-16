@@ -16,6 +16,7 @@ import '../../helpers/core/utilities/image_provider.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
+import '../episodes_list_page/widgets/animated_download_icon.dart';
 import 'episode_playback_progress_indicator.dart';
 
 /// This widget displays details about a selected podcast or episode,
@@ -54,7 +55,11 @@ class FlexibleSpace extends StatelessWidget {
           child: Stack(
             children: [
               _buildBackgroundImage(imageUrl),
-              //_buildGradientOverlay(),
+              const Positioned(
+                top: 70,
+                left: 12,
+                child: AnimatedDownloadIcon(size: 42),
+              ),
               if (episode == null)
                 Positioned(
                   top: 12,
