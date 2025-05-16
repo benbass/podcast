@@ -23,8 +23,7 @@ class MyAppLifecycleObserver extends WidgetsBindingObserver {
       if (!bool) {
         _showErrorDialog("A problem occurred while cleaning the app storage from unneeded data\nWe will try again at the next app closing.");
       }
-      // Implements cancellation and deletion of all partial files: the following does not work as expected
-      // AudioDownloadQueueManager().cancelAllDownloads();
+      AudioDownloadQueueManager().cancelAllDownloads();
     }
   }
 
