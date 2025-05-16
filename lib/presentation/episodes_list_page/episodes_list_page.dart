@@ -5,6 +5,7 @@ import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:podcast/injection.dart';
 
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
+import 'package:podcast/presentation/episodes_list_page/widgets/animated_download_icon.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card_for_list.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../custom_widgets/failure_widget.dart';
@@ -66,10 +67,11 @@ class EpisodesListPage extends StatelessWidget {
                             size: 30,
                           ),
                         ),
+                        const AnimatedDownloadIcon(),
                       ],
                     ),
                     if (state.currentPodcast.subscribed)
-                    const RowIconButtonsEpisodes(),
+                      const RowIconButtonsEpisodes(),
                     const SizedBox(
                       height: 12,
                     ),
@@ -99,7 +101,8 @@ class EpisodesListPage extends StatelessWidget {
                   } else if (snapshot.hasError) {
                     return SliverFillRemaining(
                         child: Center(
-                      child: buildFailureWidget(message: 'Error loading the episodes'),
+                      child: buildFailureWidget(
+                          message: 'Error loading the episodes'),
                     ));
                   } else {
                     return SliverPadding(
