@@ -9,6 +9,7 @@ class AudioDownloadQueuePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var themeData = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Download Queue"),
@@ -20,10 +21,51 @@ class AudioDownloadQueuePage extends StatelessWidget {
             itemCount: items.length,
             itemBuilder: (context, index) {
               final item = items[index];
-              return ListTile(
-                title: Text(item.episode.title),
-                subtitle: Text(_getStatusText(item)),
-                trailing: _buildActionButtons(context, item),
+              return Card(
+                key: ValueKey(item.id),
+                color: themeData.colorScheme.primaryContainer,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    side: item.status == DownloadStatus.downloading
+                        ? BorderSide(
+                            color: themeData.colorScheme.secondary,
+                            width: 2.0,
+                          )
+                        : BorderSide.none),
+                elevation: 5.0,
+                shadowColor: Colors.black,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                            maxWidth:
+                            MediaQuery.of(context).size.width * 0.8,
+                            minWidth:
+                            MediaQuery.of(context).size.width * 0.6),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.episode.title,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
+                              maxLines: 2,
+                              style: themeData.textTheme.displayMedium,
+                            ),
+                            const SizedBox(
+                              height: 8.0,
+                            ),
+                            Text(_getStatusText(item)),
+                          ],
+                        ),
+                      ),
+                      const Spacer(),
+                      _buildActionButtons(context, item),
+                    ],
+                  ),
+                ),
               );
             },
           );
@@ -34,6 +76,8 @@ class AudioDownloadQueuePage extends StatelessWidget {
 
   String _getStatusText(QueuedAudioDownload item) {
     switch (item.status) {
+      case DownloadStatus.none:
+        return "";
       case DownloadStatus.pending:
         return "Pending...";
       case DownloadStatus.downloading:
