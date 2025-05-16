@@ -205,7 +205,6 @@ class EpisodeCard extends StatelessWidget {
         height: 40.0,
         child: EpisodeActionsRow(
           episode: episode,
-          showSpacer: false,
         ),
       ),
     );
