@@ -42,6 +42,7 @@ class QueuedAudioDownload {
 }
 
 enum DownloadStatus {
+  none,
   pending,
   downloading,
   completed,
