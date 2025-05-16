@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/homepage/widgets/scaling_carousel_sliver.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../domain/queued_audio_download/queued_audio_download.dart';
+import '../../helpers/audio_download/audio_download_queue_manager.dart';
 import '../../helpers/listeners/player_listener.dart';
 import '../custom_widgets/dialogs/connectivity_dialogs.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../injection.dart';
 import '../custom_widgets/dialogs/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
+import '../episodes_list_page/widgets/animated_download_icon.dart';
 import '../podcast_details_page/podcast_details_page.dart';
 import '../podcasts_search_page/widgets/podcast_card.dart';
 import 'widgets/subscribed_podcast_card.dart';
@@ -19,9 +23,69 @@ class HomePage extends StatelessWidget {
 
   static const double _spacing = 20.0;
 
+  Future<void> _showExitConfirmationDialog(BuildContext context) async {
+    final downloadManager = AudioDownloadQueueManager();
+
+    final bool hasActiveDownloads = downloadManager.downloadItems.any((item) =>
+        item.status == DownloadStatus.downloading ||
+        item.status == DownloadStatus.pending);
+
+    if (hasActiveDownloads) {
+      final bool? shouldPop = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Downloads aktiv'),
+          content: const Text(
+              'Downloads are still running or downloads are waiting in the queue. Do you really want to close the app? The downloads will be cancelled.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Close the app'),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldPop == true) {
+        // User confirmed the exit, close the app
+        SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+      } else {
+        // Do nothing, user canceled the app closing.
+      }
+    } else {
+      final bool? shouldPop = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Do you really want to close the app?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Close the app'),
+            ),
+          ],
+        ),
+      );
+      if (shouldPop == true) {
+        SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+      } else {}
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-        // Init listener for player states and Listen for changes (e.g., playing, paused, buffering)
+    // Init listener for player states and Listen for changes (e.g., playing, paused, buffering)
     PlayerStatesListener playerStatesListener = getIt<PlayerStatesListener>();
     // Inject methods to this listener
     // Episode is set to null when and only when player state is completed
@@ -34,17 +98,25 @@ class HomePage extends StatelessWidget {
     // Listen for connectivity changes
     ConnectivityDialog.showConnectivityDialogs(context);
 
-    return BlocListener<PodcastBloc, PodcastState>(
-      listener: (context, state) {
-        if (state.status == PodcastStatus.failure) {
-          showDialog(
-            context: context,
-            builder: (context) => const FailureDialog(
-                message: "'Unexpected error. Please restart the app."),
-          );
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          await _showExitConfirmationDialog(context);
         }
       },
-      child: _buildPage(context),
+      child: BlocListener<PodcastBloc, PodcastState>(
+        listener: (context, state) {
+          if (state.status == PodcastStatus.failure) {
+            showDialog(
+              context: context,
+              builder: (context) => const FailureDialog(
+                  message: "'Unexpected error. Please restart the app."),
+            );
+          }
+        },
+        child: _buildPage(context),
+      ),
     );
   }
 
@@ -80,16 +152,21 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildButtons(BuildContext context) {
-    return IconButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          ScaleRoute(
-            page: const PodcastsSearchPage(),
-          ),
-        );
-      },
-      icon: const Icon(Icons.search_rounded),
+    return Row(
+      children: [
+        const AnimatedDownloadIcon(),
+        IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              ScaleRoute(
+                page: const PodcastsSearchPage(),
+              ),
+            );
+          },
+          icon: const Icon(Icons.search_rounded),
+        ),
+      ],
     );
   }
 
@@ -126,10 +203,10 @@ class HomePage extends StatelessWidget {
                           .map(
                             (e) => InkWell(
                                 onTap: () async {
-                                  if(context.mounted) {
+                                  if (context.mounted) {
                                     context
-                                      .read<PodcastBloc>()
-                                      .add(PodcastTappedEvent(podcast: e));
+                                        .read<PodcastBloc>()
+                                        .add(PodcastTappedEvent(podcast: e));
                                     Navigator.push(
                                       context,
                                       ScaleRoute(
@@ -150,7 +227,7 @@ class HomePage extends StatelessWidget {
     PodcastState state = context.watch<PodcastBloc>().state;
     // Define the empty state widget
     Widget emptyStateWidget = Padding(
-      padding: const EdgeInsets.symmetric(vertical: _spacing*10),
+      padding: const EdgeInsets.symmetric(vertical: _spacing * 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -168,7 +245,6 @@ class HomePage extends StatelessWidget {
               ],
             ),
           ),
-
         ],
       ),
     );
@@ -198,8 +274,8 @@ class HomePage extends StatelessWidget {
                 itemCount: podcasts.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
-                  crossAxisSpacing: _spacing*0.5,
-                  mainAxisSpacing: _spacing*0.5,
+                  crossAxisSpacing: _spacing * 0.5,
+                  mainAxisSpacing: _spacing * 0.5,
                   childAspectRatio: 1.0,
                 ),
                 itemBuilder: (BuildContext context, int index) {
