@@ -52,6 +52,8 @@ void main() async {
   // Initialize the Queue Manager
   final audioDownloadQueueManager = AudioDownloadQueueManager();
 
+  await AudioDownloadQueueManager.cleanupLastPartialDownload();
+
   // Set the callback for the "Show Queue" action in the notification
   audioDownloadQueueManager.onShowQueuePage = () {
     MyApp.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const AudioDownloadQueuePage()));
