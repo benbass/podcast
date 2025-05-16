@@ -1,10 +1,12 @@
 import 'dart:collection';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:podcast/domain/queued_audio_download/queued_audio_download.dart';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/core/globals.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'audio_download_service.dart';
 import '../notifications/notifications_controller.dart';
@@ -35,27 +37,42 @@ class AudioDownloadQueueManager with ChangeNotifier {
 
   // Method to add an episode to the download queue
   void addEpisodeToQueue(EpisodeEntity episode) {
-    // Check if episode is already in the queue
-    bool alreadyExists =
-        _downloadItems.any((item) => item.episode.id == episode.id);
+    final existingItemIndex = _downloadItems.indexWhere((item) => item.episode.id == episode.id);
 
-    if (!alreadyExists) {
-      final newQueuedDownload = QueuedAudioDownload(episode: episode);
-      _downloadItems.add(newQueuedDownload);
-      _pendingQueue.add(newQueuedDownload);
-      debugPrint("Episode added to download queue: ${episode.title}");
-      notifyListeners(); // Inform the UI about the change
-
-      _processNextInQueue(); // Try to start the next download
-      _updateQueueNotification(); // Update the notification
+    if (existingItemIndex != -1) {
+      // Item already exists in the list
+      final existingItem = _downloadItems[existingItemIndex];
+      if (existingItem.status == DownloadStatus.cancelled || existingItem.status == DownloadStatus.failed) {
+        // Case: Item already exists and was cancelled or failed -> Re-add it
+        debugPrint("Re-queueing previously cancelled episode: ${episode.title}");
+        // Remove the old, cancelled item from the list
+        _downloadItems.removeAt(existingItemIndex);
+        // Add the episode as a new item
+        _addNewDownloadToQueues(episode);
+      } else {
+        // Case: Item already exists and is not cancelled or did not fail (pending, downloading, completed)
+        debugPrint(
+            "Episode already in queue with status '${existingItem.status}': ${episode.title}");
+      }
     } else {
-      debugPrint(
-          "Episode already in queue or currently downloading: ${episode.title}");
+      // Case: Item does not exist in the list. Just add it to the queue
+      debugPrint("Adding new episode to download queue: ${episode.title}");
+      _addNewDownloadToQueues(episode);
     }
   }
 
+  // Helper method to add an episode to the download queue
+  void _addNewDownloadToQueues(EpisodeEntity episode) {
+    final newQueuedDownload = QueuedAudioDownload(episode: episode);
+    _downloadItems.add(newQueuedDownload);
+    _pendingQueue.add(newQueuedDownload);
+    notifyListeners(); // Inform the UI about the change
+    _processNextInQueue(); // Try to start the next download
+    _updateQueueNotification(); // Update the notification
+  }
+
   // Method to start the next download in the queue
-  void _processNextInQueue() {
+  void _processNextInQueue() async {
     if (_isProcessing || _pendingQueue.isEmpty) {
       if (_downloadItems.every((item) =>
           item.status != DownloadStatus.pending &&
@@ -103,10 +120,12 @@ class AudioDownloadQueueManager with ChangeNotifier {
       debugPrint(
           'ERROR: Item with ID ${_currentDownloadItem!.id} not found in _downloadItems after removing from pendingQueue!');
     }
-
-    _currentDownloadItem!.downloadService!.filePathOnDevice().then((filePath) {
+    final prefs = await SharedPreferences.getInstance();
+    _currentDownloadItem!.downloadService!.filePathOnDevice().then((filePath) async {
       // Download successful
       _updateEpisodeFilePathInDb(_currentDownloadItem!.episode, filePath);
+      // Remove the file path of the current download item from the shared preferences
+      await prefs.remove(kCurrentDownloadFilePath);
       _updateDownloadItemStatus(
           _currentDownloadItem!.id, DownloadStatus.completed,
           filePath: filePath);
@@ -115,7 +134,7 @@ class AudioDownloadQueueManager with ChangeNotifier {
       _isProcessing = false;
       _processNextInQueue();
       _updateQueueNotification();
-    }).catchError((error) {
+    }).catchError((error) async {
       // Download failed or cancelled
       debugPrint(
           "Download failed or cancelled for: ${_currentDownloadItem!.episode.title} - $error");
@@ -125,6 +144,7 @@ class AudioDownloadQueueManager with ChangeNotifier {
         status = DownloadStatus.cancelled;
       }
 
+      await prefs.remove(kCurrentDownloadFilePath);
       _updateDownloadItemStatus(_currentDownloadItem!.id, status);
       _currentDownloadItem?.downloadService?.dispose();
       _currentDownloadItem = null;
@@ -181,6 +201,7 @@ class AudioDownloadQueueManager with ChangeNotifier {
     final completed = _downloadItems
         .where((item) => item.status == DownloadStatus.completed)
         .length;
+    final cancelled = _downloadItems.where((item) => item.status == DownloadStatus.cancelled).length;
 
     if (pendingOrDownloading.isEmpty && total > 0 && completed == total) {
       // All Downloads completed
@@ -196,7 +217,7 @@ class AudioDownloadQueueManager with ChangeNotifier {
         ? "Downloading: ${_currentDownloadItem?.episode.title ?? 'Unknown'}"
         : "Download Queue";
     final String body = _isProcessing
-        ? "($completed/$total) - ${(progress * 100).toStringAsFixed(0)}%"
+        ? "(${completed+1}/${total-cancelled}) - ${(progress * 100).toStringAsFixed(0)}%"
         : "$completed/$total items in queue";
     final double currentProgress = _isProcessing ? (progress * 100) : 0;
 
@@ -272,13 +293,38 @@ class AudioDownloadQueueManager with ChangeNotifier {
     _updateQueueNotification();
   }
 
+   static Future<void> cleanupLastPartialDownload() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? lastDownloadFilePath = prefs.getString(kCurrentDownloadFilePath);
+
+    if (lastDownloadFilePath != null) {
+      debugPrint("Found potential partial file to clean up: $lastDownloadFilePath");
+      try {
+        final file = File(lastDownloadFilePath);
+        if (await file.exists()) {
+          await file.delete();
+          debugPrint("Successfully deleted partial file: $lastDownloadFilePath");
+        } else {
+          debugPrint("Partial file not found (already deleted or wrong path): $lastDownloadFilePath");
+        }
+      } catch (e) {
+        debugPrint("Error deleting partial file $lastDownloadFilePath: $e");
+      } finally {
+        // In jedem Fall den Eintrag entfernen, um nicht wiederholt zu versuchen
+        await prefs.remove(kCurrentDownloadFilePath);
+        debugPrint("Removed current_download_filepath after cleanup attempt.");
+      }
+    } else {
+      debugPrint("No partial file path found in SharedPreferences for cleanup.");
+    }
+  }
+
   @override
   void dispose() {
     cancelAllDownloads();
     // Note: Here we don't dispose the AudioDownloadService instances,
     // since they will be disposed after the download is completed/failed/cancelled in _processNextInQueue().
     // And because cancelAllDownloads() was called here, downloads are cancelled, causing _processNextInQueue() to be called again
-    // where the service instances will be disposed.
     super.dispose();
   }
 }
