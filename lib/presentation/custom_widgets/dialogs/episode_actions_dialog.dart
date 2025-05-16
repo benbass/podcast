@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 
 import 'package:podcast/helpers/core/episode_action_helper.dart';
 import '../../../domain/entities/episode_entity.dart';
+import '../../../helpers/audio_download/audio_file_utility.dart';
 import '../action_feedback/action_feedback.dart';
 import 'audio_file_dialog.dart';
 
-class EpisodeActionsDialog{
-  static void showEpisodeActionsDialog(BuildContext context, EpisodeEntity episode) {
+class EpisodeActionsDialog {
+  static void showEpisodeActionsDialog(
+      BuildContext context, EpisodeEntity episode) {
     // Reset for debugging purposes
     /* episode.filePath = null;
   episodeBox.put(episode);*/
+
+    Map<String, bool> downloadStatus = AudioFileUtility.getDownloadStatus(episode);
 
     final List<Map<String, dynamic>> menuItems = [
       if (episode.isSubscribed)
@@ -20,7 +24,8 @@ class EpisodeActionsDialog{
             EpisodeActionHelper.performActionOnEpisode(episode, "read", isRead);
             Navigator.pop(context);
             ActionFeedback.show(context,
-                icon: episode.read ? Icons.check : Icons.radio_button_unchecked);
+                icon:
+                    episode.read ? Icons.check : Icons.radio_button_unchecked);
           }
         },
       {"title": "Share", "onPressed": () {}},
@@ -28,16 +33,25 @@ class EpisodeActionsDialog{
         "title": episode.favorite ? "Unmark as favorite" : "Mark as favorite",
         "onPressed": () {
           final bool isFavorite = episode.favorite;
-          EpisodeActionHelper.performActionOnEpisode(episode, "favorite", isFavorite);
+          EpisodeActionHelper.performActionOnEpisode(
+              episode, "favorite", isFavorite);
           Navigator.pop(context);
           ActionFeedback.show(context,
               icon: episode.favorite ? Icons.star : Icons.star_border);
         }
       },
       {
-        "title": episode.filePath == null ? "Download" : "Delete",
+        "title": downloadStatus["isDownloading"] == true
+            ? "Downloading..."
+            : downloadStatus["isPending"] == true
+                ? "Pending..."
+                : episode.filePath == null
+                    ? "Download"
+                    : "Delete",
         "onPressed": () {
-          AudioFileDialog.showAudioFileDialog(context, episode);
+          (downloadStatus["isDownloading"] == true || downloadStatus["isPending"] == true)
+              ? null
+              : AudioFileDialog.showAudioFileDialog(context, episode);
         },
       },
     ];
@@ -61,8 +75,4 @@ class EpisodeActionsDialog{
       },
     );
   }
-
-
 }
-
-
