@@ -128,16 +128,18 @@ class EpisodeDetailsPage extends StatelessWidget {
                                                 FormatUtilities.formatTimestamp(
                                                     episodeToDisplay
                                                         .datePublished)),
-                                            Expanded(
-                                              child: EpisodeActionsRow(
-                                                  episode: episode),
-                                            ),
-                                            if (episode.isSubscribed)
+                                            if (episodeToDisplay.isSubscribed)
+                                              Expanded(
+                                                child: EpisodeActionsRow(
+                                                    episode: episodeToDisplay),
+                                              ),
+                                            const SizedBox(width: 20),
+                                            if (episodeToDisplay.isSubscribed)
                                               IconButton(
                                                 onPressed: () =>
                                                     EpisodeActionsDialog
                                                         .showEpisodeActionsDialog(
-                                                            context, episode),
+                                                            context, episodeToDisplay),
                                                 icon: const Icon(
                                                   Icons.more_horiz_rounded,
                                                 ),
@@ -147,8 +149,8 @@ class EpisodeDetailsPage extends StatelessWidget {
                                       ),
                                     ),
                                     SliverPadding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            20.0, 0.0, 0.0, 20.0),
+                                        padding: EdgeInsets.fromLTRB(
+                                            20.0, episodeToDisplay.isSubscribed ? 0.0 : 20.0, 0.0, 20.0),
                                         sliver: SliverToBoxAdapter(
                                           child: Text(
                                             episodeToDisplay.duration! == 0
