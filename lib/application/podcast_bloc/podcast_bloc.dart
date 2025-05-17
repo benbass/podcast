@@ -58,9 +58,12 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   }
 
   void _onToggleEpisodesFilterStatusEvent(event, emit) {
-    emit(state.copyWith(
-        episodesFilterStatus:
-            EpisodesFilterStatus.values.byName(event.filterStatus)));
+    emit(
+      state.copyWith(
+          episodesFilterStatus:
+              EpisodesFilterStatus.values.byName(event.filterStatus),
+          filterText: event.filterText),
+    );
   }
 
   // FutureOr here because subscribing also fetches the episodes from remote
