@@ -18,6 +18,7 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
     required String podcastTitle,
     required String filterStatus,
     required bool refresh,
+    String? filterText,
   }) {
     return episodeLocalDatasource.getEpisodes(
       subscribed: subscribed,
@@ -25,6 +26,7 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
       podcastTitle: podcastTitle,
       filterStatus: filterStatus,
       refresh: refresh,
+      filterText: filterText,
     );
   }
 
