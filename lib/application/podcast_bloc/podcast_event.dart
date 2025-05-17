@@ -13,8 +13,10 @@ final class LoadSubscribedPodcastsEvent extends PodcastEvent {}
 
 final class ToggleEpisodesFilterStatusEvent extends PodcastEvent {
   final String filterStatus;
+  final String? filterText;
   const ToggleEpisodesFilterStatusEvent({
     required this.filterStatus,
+    this.filterText,
   });
   @override
   List<Object> get props => [filterStatus];
