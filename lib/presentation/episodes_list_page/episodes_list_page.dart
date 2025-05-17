@@ -90,6 +90,7 @@ class EpisodesListPage extends StatelessWidget {
                   podcastTitle: state.currentPodcast.title,
                   filterStatus: state.episodesFilterStatus.name,
                   refresh: false,
+                  filterText: state.filterText,
                 ),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
