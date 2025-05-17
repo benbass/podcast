@@ -7,6 +7,7 @@ abstract class EpisodeRepository {
     required String podcastTitle,
     required String filterStatus,
     required bool refresh,
+    String? filterText,
   });
   Stream<int> unreadLocalEpisodesCount({required int feedId});
 }
