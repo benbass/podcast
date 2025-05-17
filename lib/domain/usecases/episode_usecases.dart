@@ -15,6 +15,7 @@ class EpisodeUseCases {
     required String podcastTitle,
     required String filterStatus,
     required bool refresh,
+    String? filterText,
   }) {
     return episodeRepository.getEpisodes(
       subscribed: subscribed,
@@ -22,6 +23,7 @@ class EpisodeUseCases {
       podcastTitle: podcastTitle,
       filterStatus: filterStatus,
       refresh: refresh,
+      filterText: filterText,
     );
   }
 
