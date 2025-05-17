@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../core/globals.dart';
 import '../../domain/entities/episode_entity.dart';
@@ -12,7 +13,7 @@ import '../models/episode_model.dart';
 /// Local data source = objectBox database
 abstract class _BaseEpisodeLocalDatasource {
   Stream<List<EpisodeEntity>> _getEpisodesByFeedId(int feedId,
-      {required String filterStatus}) {
+      {required String filterStatus, String? filterText,}) {
     late QueryBuilder<EpisodeEntity> queryBuilder;
     if (filterStatus == "favorites") {
       queryBuilder = episodeBox.query(EpisodeEntity_.feedId
@@ -28,6 +29,10 @@ abstract class _BaseEpisodeLocalDatasource {
       queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId).and(
           (EpisodeEntity_.position > 0)
               .and(EpisodeEntity_.read.equals(false))));
+    } else if (filterStatus == "filterByText") {
+      queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId).and(
+          (EpisodeEntity_.title.contains(filterText!))
+              .or(EpisodeEntity_.description.contains(filterText))));
     } else {
       queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId).and(
           filterStatus == "hideRead"
@@ -50,6 +55,7 @@ abstract class EpisodeLocalDatasource extends _BaseEpisodeLocalDatasource {
     required String podcastTitle,
     required String filterStatus,
     required bool refresh,
+    String? filterText,
   });
   Stream<int> unreadLocalEpisodesCount(
       {required int feedId}); // this is only needed for subscribed = true
@@ -57,7 +63,6 @@ abstract class EpisodeLocalDatasource extends _BaseEpisodeLocalDatasource {
 
 class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     implements EpisodeLocalDatasource {
-
   Future<List<EpisodeEntity>> _fetchRemoteEpisodes(
       {required int feedId, required String podcastTitle}) async {
     List<EpisodeEntity> remoteEpisodes = [];
@@ -93,6 +98,7 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     required String podcastTitle,
     required String filterStatus,
     required bool refresh,
+    String? filterText,
   }) async* {
     if (!subscribed) {
       final episodes = await _fetchRemoteEpisodes(
@@ -104,7 +110,7 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
             feedId: feedId, podcastTitle: podcastTitle);
       }
     }
-    yield* _getEpisodesByFeedId(feedId, filterStatus: filterStatus);
+    yield* _getEpisodesByFeedId(feedId, filterStatus: filterStatus, filterText: filterText);
   }
 
   @override
@@ -220,7 +226,7 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
 
       return episodes;
     } else {
-      print(
+      debugPrint(
           "Error Episode datasource fetchEpisodesAsStreamByFeedId: ${response.statusCode}");
       // If the server did not return a 200 OK response,
       // then throw an exception.
