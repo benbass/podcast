@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/podcast_bloc/podcast_bloc.dart';
+import 'iconbutton_with_popup_text.dart';
 
 class RowIconButtonsEpisodes extends StatelessWidget {
   const RowIconButtonsEpisodes({
@@ -15,15 +16,7 @@ class RowIconButtonsEpisodes extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        IconButton(
-          onPressed: () {
-            // full text search
-          },
-          icon: const Icon(
-            Icons.search_rounded,
-            size: 30,
-          ),
-        ),
+        const IconButtonWithPopupText(),
         IconButton(
           onPressed: () {
             // activate select on list items
@@ -78,7 +71,10 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                 onPressed: () {
                   podcastBloc.add(
                     ToggleEpisodesFilterStatusEvent(
-                      filterStatus: state.episodesFilterStatus.name == "hideRead" ? "all" : "hideRead",
+                      filterStatus:
+                          state.episodesFilterStatus.name == "hideRead"
+                              ? "all"
+                              : "hideRead",
                     ),
                   );
                   Navigator.of(context).pop();
@@ -91,9 +87,21 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                 ),
               ),
               TextButton(
-                onPressed: () {},
-                child: const Text(
-                  "Show only unfinished",
+                onPressed: () {
+                  podcastBloc.add(
+                    ToggleEpisodesFilterStatusEvent(
+                      filterStatus:
+                          state.episodesFilterStatus.name == "unfinished"
+                              ? "all"
+                              : "unfinished",
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  state.episodesFilterStatus.name == "unfinished"
+                      ? "Show all"
+                      : "Show only unfinished",
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -101,21 +109,37 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                 onPressed: () {
                   podcastBloc.add(
                     ToggleEpisodesFilterStatusEvent(
-                      filterStatus: state.episodesFilterStatus.name == "favorites" ? "all" : "favorites",
+                      filterStatus:
+                          state.episodesFilterStatus.name == "favorites"
+                              ? "all"
+                              : "favorites",
                     ),
                   );
                   Navigator.of(context).pop();
                 },
                 child: Text(
                   state.episodesFilterStatus.name == "favorites"
-                      ? "Show all": "Show only favorites",
+                      ? "Show all"
+                      : "Show only favorites",
                   textAlign: TextAlign.center,
                 ),
               ),
               TextButton(
-                onPressed: () {},
-                child: const Text(
-                  "Show only downloaded",
+                onPressed: () {
+                  podcastBloc.add(
+                    ToggleEpisodesFilterStatusEvent(
+                      filterStatus:
+                          state.episodesFilterStatus.name == "downloaded"
+                              ? "all"
+                              : "downloaded",
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  state.episodesFilterStatus.name == "downloaded"
+                      ? "Show all"
+                      : "Show only downloaded",
                   textAlign: TextAlign.center,
                 ),
               ),
