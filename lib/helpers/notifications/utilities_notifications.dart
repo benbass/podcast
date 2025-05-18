@@ -1,10 +1,8 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import '../../main.dart';
-import 'notifications_controller.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'notifications_controller.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
@@ -61,11 +59,6 @@ class UtilitiesNotifications{
   }
 
   static void cancelNotificationPlayback() {
-    final context = MyApp.navigatorKey.currentContext;
-    if (context != null && context.mounted) {
-      BlocProvider.of<EpisodePlaybackCubit>(context)
-          .setPlaybackEpisode(null);
-    }
     AwesomeNotifications().cancel(1);
   }
 
