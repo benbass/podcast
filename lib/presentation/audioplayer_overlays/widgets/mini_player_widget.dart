@@ -58,7 +58,7 @@ class MiniPlayerWidget extends StatelessWidget {
                   Navigator.of(context).pushAndRemoveUntil(
                     ScaleRoute(
                       page: EpisodeDetailsPage(episode: episode),
-                  ),
+                    ),
                     ModalRoute.withName('/'),
                   );
                 }
@@ -180,6 +180,13 @@ class MiniPlayerWidget extends StatelessWidget {
     required EpisodeEntity episodeToDisplay,
     required String filterStatus,
   }) async {
+    // Remove filterText, if any:
+    BlocProvider.of<PodcastBloc>(context).add(
+      ToggleEpisodesFilterStatusEvent(
+        filterStatus: filterStatus,
+        filterText: "",
+      ),
+    );
     final podcast =
         BlocProvider.of<EpisodePlaybackCubit>(context).state!.entries.first.key;
     late List<EpisodeEntity> episodes;
@@ -190,6 +197,7 @@ class MiniPlayerWidget extends StatelessWidget {
           podcastTitle: podcast.title,
           filterStatus: filterStatus,
           refresh: false,
+          filterText: "",
         )
         .first;
 
