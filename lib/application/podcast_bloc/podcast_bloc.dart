@@ -165,11 +165,14 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
           await podcastUseCases.savePodcastAndArtwork(event.podcast);
       emit(state.copyWith(
         currentPodcast: podcast,
+        episodesFilterStatus: EpisodesFilterStatus.hideRead,
+        filterText: "",
       ));
     } else {
       emit(state.copyWith(
         currentPodcast: event.podcast,
         episodesFilterStatus: EpisodesFilterStatus.hideRead,
+        filterText: "",
       ));
     }
   }
