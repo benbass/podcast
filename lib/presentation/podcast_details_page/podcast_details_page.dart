@@ -33,85 +33,87 @@ class PodcastDetailsPage extends StatelessWidget {
 
   Scaffold _buildPage(BuildContext context) {
     PodcastState state = context.watch<PodcastBloc>().state;
+    if (state.status == PodcastStatus.loading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
       body: SafeArea(
-              child: CustomScrollView(
-                slivers: [
-                  FlexibleSpace(
-                    podcast: state.currentPodcast,
-                    episode: null,
-                    title: state.currentPodcast.title,
+        child: CustomScrollView(
+          slivers: [
+            FlexibleSpace(
+              podcast: state.currentPodcast,
+              episode: null,
+              title: state.currentPodcast.title,
+            ),
+            SliverPadding(
+                padding: const EdgeInsets.fromLTRB(10.0, 0.0, 20.0, 10.0),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ...state.currentPodcast.categories
+                          .map((value) => PodcastCategory(
+                                value: value,
+                              )),
+                    ],
                   ),
-                  SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(10.0, 0.0, 20.0, 10.0),
-                      sliver: SliverToBoxAdapter(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ...state.currentPodcast.categories
-                                .map((value) => PodcastCategory(
-                                      value: value,
-                                    )),
-                          ],
-                        ),
-                      )),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(40.0, 10.0, 40.0, 10.0),
-                    sliver: SliverToBoxAdapter(
-                      child:
-                          RowIconButtonsPodcasts(podcast: state.currentPodcast),
-                    ),
+                )),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(40.0, 10.0, 40.0, 10.0),
+              sliver: SliverToBoxAdapter(
+                child: RowIconButtonsPodcasts(podcast: state.currentPodcast),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
+              sliver: SliverToBoxAdapter(
+                child: Text(
+                  state.currentPodcast.description,
+                  style: const TextStyle(
+                    fontSize: 16,
                   ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
-                    sliver: SliverToBoxAdapter(
-                      child: Text(
-                        state.currentPodcast.description,
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 100.0),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      state.currentPodcast.author,
+                      style: const TextStyle(
+                        fontSize: 16,
                       ),
                     ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 100.0),
-                    sliver: SliverToBoxAdapter(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: Row(
                         children: [
+                          const Icon(
+                            Icons.language,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
                           Text(
-                            state.currentPodcast.author,
+                            state.currentPodcast.language.toUpperCase(),
                             style: const TextStyle(
                               fontSize: 16,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10.0),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.language,
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  state.currentPodcast.language.toUpperCase(),
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
+          ],
+        ),
+      ),
     );
   }
 }
