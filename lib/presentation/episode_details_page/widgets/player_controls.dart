@@ -24,7 +24,8 @@ class PlayerControls extends StatelessWidget {
       child: Center(
         child: Column(
           children: [
-            BlocBuilder<EpisodePlaybackCubit, Map<PodcastEntity, EpisodeEntity>?>(
+            BlocBuilder<EpisodePlaybackCubit,
+                Map<PodcastEntity, EpisodeEntity>?>(
               builder: (context, state) {
                 if (state != null) {
                   return PlaybackPositionSlider(episode: state.values.first);
