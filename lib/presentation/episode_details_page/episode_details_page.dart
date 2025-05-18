@@ -68,6 +68,7 @@ class EpisodeDetailsPage extends StatelessWidget {
                   podcastTitle: podcastState.currentPodcast.title,
                   filterStatus: podcastState.episodesFilterStatus.name,
                   refresh: false,
+                  filterText: podcastState.filterText,
                 ),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
