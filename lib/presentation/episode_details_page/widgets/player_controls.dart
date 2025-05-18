@@ -58,6 +58,9 @@ class PlayerControls extends StatelessWidget {
                   IconButton(
                     onPressed: () {
                       getIt<MyAudioHandler>().stop();
+
+                      BlocProvider.of<EpisodePlaybackCubit>(context)
+                          .setPlaybackEpisode(null);
                     },
                     icon: const Icon(
                       Icons.stop_rounded,
