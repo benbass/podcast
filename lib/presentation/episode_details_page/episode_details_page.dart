@@ -140,7 +140,8 @@ class EpisodeDetailsPage extends StatelessWidget {
                                                 onPressed: () =>
                                                     EpisodeActionsDialog
                                                         .showEpisodeActionsDialog(
-                                                            context, episodeToDisplay),
+                                                            context,
+                                                            episodeToDisplay),
                                                 icon: const Icon(
                                                   Icons.more_horiz_rounded,
                                                 ),
@@ -151,7 +152,12 @@ class EpisodeDetailsPage extends StatelessWidget {
                                     ),
                                     SliverPadding(
                                         padding: EdgeInsets.fromLTRB(
-                                            20.0, episodeToDisplay.isSubscribed ? 0.0 : 20.0, 0.0, 20.0),
+                                            20.0,
+                                            episodeToDisplay.isSubscribed
+                                                ? 0.0
+                                                : 20.0,
+                                            0.0,
+                                            20.0),
                                         sliver: SliverToBoxAdapter(
                                           child: Text(
                                             episodeToDisplay.duration! == 0
@@ -202,13 +208,24 @@ class EpisodeDetailsPage extends StatelessWidget {
                                                     width: 30,
                                                   ),
                                                   IconButton(
-                                                    onPressed: () =>
-                                                        Navigator.push(
-                                                            context,
-                                                            ScaleRoute(
-                                                              page:
-                                                                  const PodcastDetailsPage(),
-                                                            )),
+                                                    onPressed: () {
+                                                      if (getIt<PlayerStatesListener>()
+                                                                  .player
+                                                                  .processingState ==
+                                                              ProcessingState
+                                                                  .ready &&
+                                                          overlayEntry ==
+                                                              null) {
+                                                        showOverlayPlayerMin(
+                                                            context);
+                                                      }
+                                                      Navigator.push(
+                                                          context,
+                                                          ScaleRoute(
+                                                            page:
+                                                                const PodcastDetailsPage(),
+                                                          ));
+                                                    },
                                                     icon: const Icon(
                                                       Icons
                                                           .info_outline_rounded,
