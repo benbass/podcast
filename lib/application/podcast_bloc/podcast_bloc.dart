@@ -160,16 +160,19 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
   }
 
   Future<void> _onPodcastTappedEvent(event, emit) async {
+    emit(state.copyWith(status: PodcastStatus.loading));
     if (!event.podcast.subscribed) {
       final PodcastEntity podcast =
           await podcastUseCases.savePodcastAndArtwork(event.podcast);
       emit(state.copyWith(
+        status: PodcastStatus.success,
         currentPodcast: podcast,
         episodesFilterStatus: EpisodesFilterStatus.hideRead,
         filterText: "",
       ));
     } else {
       emit(state.copyWith(
+        status: PodcastStatus.success,
         currentPodcast: event.podcast,
         episodesFilterStatus: EpisodesFilterStatus.hideRead,
         filterText: "",
