@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
 
-import 'package:podcast/domain/usecases/episode_usecases.dart';
-
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../../application/podcast_bloc/podcast_bloc.dart';
 import '../../../domain/entities/episode_entity.dart';
@@ -42,18 +40,14 @@ class MiniPlayerWidget extends StatelessWidget {
             GestureDetector(
               onTap: () async {
                 // The EpisodeDetailsPage is a PageView depending on a specific list of episodes.
-                // If user called a new list of episodes after clicking on Play, this new list doesn't contain the episode being played.
-                // (And the state of PodcastBloc also changed).
-                // That's why we need to check this now and get the list of episodes that contains the episode being played.
-                // We also set the PodcastBloc state with the podcast the playback episode belongs to.
+                // If user called a different podcast after clicking on Play, the episode being played doesn't exit for this podcast.
+                // We reset the PodcastBloc state with the podcast the playback episode belongs to.
                 // Once done, we can navigate to the EpisodeDetailsPage.
-
-                await _resetEpisodesAndPodcast(
+                await _resetPodcast(
                   context: context,
-                  episodeToDisplay: episode,
+                  podcast: podcast,
                   filterStatus: filterStatus,
                 );
-
                 if (context.mounted) {
                   Navigator.of(context).pushAndRemoveUntil(
                     ScaleRoute(
@@ -175,35 +169,22 @@ class MiniPlayerWidget extends StatelessWidget {
     );
   }
 
-  _resetEpisodesAndPodcast({
+  _resetPodcast({
     required BuildContext context,
-    required EpisodeEntity episodeToDisplay,
+    required PodcastEntity podcast,
     required String filterStatus,
   }) async {
+    final podcastBloc = BlocProvider.of<PodcastBloc>(context);
     // Remove filterText, if any:
-    BlocProvider.of<PodcastBloc>(context).add(
+    podcastBloc.add(
       ToggleEpisodesFilterStatusEvent(
         filterStatus: filterStatus,
         filterText: "",
       ),
     );
-    final podcast =
-        BlocProvider.of<EpisodePlaybackCubit>(context).state!.entries.first.key;
-    late List<EpisodeEntity> episodes;
-    episodes = await getIt<EpisodeUseCases>()
-        .getEpisodes(
-          subscribed: podcast.subscribed,
-          feedId: podcast.pId,
-          podcastTitle: podcast.title,
-          filterStatus: filterStatus,
-          refresh: false,
-          filterText: "",
-        )
-        .first;
-
-    if (context.mounted && !episodes.contains(episodeToDisplay)) {
-      BlocProvider.of<PodcastBloc>(context)
-          .add(PodcastTappedEvent(podcast: podcast));
+    // Reset podcast
+    if (context.mounted) {
+      podcastBloc.add(PodcastTappedEvent(podcast: podcast));
     }
   }
 }
