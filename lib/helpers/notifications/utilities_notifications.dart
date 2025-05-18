@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import '../../main.dart';
 import 'notifications_controller.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -60,13 +61,18 @@ class UtilitiesNotifications{
   }
 
   static void cancelNotificationPlayback() {
+    final context = MyApp.navigatorKey.currentContext;
+    if (context != null && context.mounted) {
+      BlocProvider.of<EpisodePlaybackCubit>(context)
+          .setPlaybackEpisode(null);
+    }
     AwesomeNotifications().cancel(1);
   }
 
   static void createNotificationPlayback(BuildContext context, bool isPausingState, int position) async {
-    final EpisodeEntity episode = context.read<EpisodePlaybackCubit>().state!.values.first;
-    final PodcastEntity podcast = context.read<EpisodePlaybackCubit>().state!.keys.first;
-    final String imageFilePath = podcast.artworkFilePath ?? "";
+    final EpisodeEntity? episode = context.read<EpisodePlaybackCubit>().state?.values.first;
+    final PodcastEntity? podcast = context.read<EpisodePlaybackCubit>().state?.keys.first;
+    final String imageFilePath = podcast?.artworkFilePath ?? "";
 
 
     // part of string for correct icon depending on boolean provided by the audioHandler methods (playTrack, pauseTrack, resumeTrack...)
@@ -82,10 +88,10 @@ class UtilitiesNotifications{
         id: 1,
         channelKey: 'basic_channel',
         category: NotificationCategory.Transport,
-        title: episode.podcastTitle,
-        body: episode.title,
-        duration: Duration(seconds: episode.duration ?? 0),
-        progress: position / (episode.duration ?? 0) * 100,
+        title: episode?.podcastTitle,
+        body: episode?.title,
+        duration: Duration(seconds: episode?.duration ?? 0),
+        progress: position / (episode?.duration ?? 0) * 100,
         playbackSpeed: 1,
         largeIcon: 'file://$imageFilePath',
         bigPicture: 'file://$imageFilePath',
