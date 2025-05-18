@@ -44,10 +44,10 @@ class _IconButtonWithPopupTextState extends State<IconButtonWithPopupText> {
                         onPressed: () {
                           _textController.clear();
                           BlocProvider.of<PodcastBloc>(context).add(
-                            const ToggleEpisodesFilterStatusEvent(
-                              filterStatus: "all",
-                              filterText: null,
-                            ),
+                              const ToggleEpisodesFilterStatusEvent(
+                                filterStatus: "all",
+                                filterText: "",
+                              ),
                           );
                         },
                         icon: Icon(
@@ -57,21 +57,21 @@ class _IconButtonWithPopupTextState extends State<IconButtonWithPopupText> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius:
-                        const BorderRadius.all(Radius.circular(8)),
+                            const BorderRadius.all(Radius.circular(8)),
                         borderSide: BorderSide(
                           color: Theme.of(context).colorScheme.secondary,
                         ),
                       ),
                       border: OutlineInputBorder(
                         borderRadius:
-                        const BorderRadius.all(Radius.circular(8)),
+                            const BorderRadius.all(Radius.circular(8)),
                         borderSide: BorderSide(
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius:
-                        const BorderRadius.all(Radius.circular(8)),
+                            const BorderRadius.all(Radius.circular(8)),
                         borderSide: BorderSide(
                           color: Theme.of(context).colorScheme.onPrimary,
                         ),
@@ -125,16 +125,34 @@ class _IconButtonWithPopupTextState extends State<IconButtonWithPopupText> {
   Widget build(BuildContext context) {
     return Center(
       child: CompositedTransformTarget(
-        // Der "Leader" für die Positionierung
         link: _layerLink,
-        child: IconButton(
-          icon: const Icon(Icons.search_rounded, size: 30),
-          onPressed: () {
-            if (_overlayEntry == null) {
-              _showTextOverlay();
-            } else {
-              _removeOverlay();
-            }
+        child: BlocBuilder<PodcastBloc, PodcastState>(
+          builder: (context, state) {
+            return IconButton(
+              icon: Icon(
+                state.filterText.isNotEmpty
+                    ? Icons.filter_list_off_rounded
+                    : Icons.search_rounded,
+                size: 30,
+              ),
+              onPressed: state.filterText.isNotEmpty
+                  ? () {
+                      _textController.clear();
+                      BlocProvider.of<PodcastBloc>(context).add(
+                        const ToggleEpisodesFilterStatusEvent(
+                          filterStatus: "all",
+                          filterText: "",
+                        ),
+                      );
+                    }
+                  : () {
+                      if (_overlayEntry == null) {
+                        _showTextOverlay();
+                      } else {
+                        _removeOverlay();
+                      }
+                    },
+            );
           },
         ),
       ),
