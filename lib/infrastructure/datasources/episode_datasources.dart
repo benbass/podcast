@@ -31,8 +31,8 @@ abstract class _BaseEpisodeLocalDatasource {
               .and(EpisodeEntity_.read.equals(false))));
     } else if (filterStatus == "filterByText") {
       queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId).and(
-          (EpisodeEntity_.title.contains(filterText!))
-              .or(EpisodeEntity_.description.contains(filterText))));
+          (EpisodeEntity_.title.contains(filterText!, caseSensitive: false))
+              .or(EpisodeEntity_.description.contains(filterText, caseSensitive: false))));
     } else {
       queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId).and(
           filterStatus == "hideRead"
