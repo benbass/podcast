@@ -78,6 +78,8 @@ class EpisodeActionsDialog {
       context: context,
       builder: (context) {
         return AlertDialog(
+          title: const Text("Choose an action for the selected episodes"),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
