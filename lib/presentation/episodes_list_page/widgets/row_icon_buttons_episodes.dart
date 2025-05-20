@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../application/episode_selection_cubit/episode_selection_cubit.dart';
 import '../../../application/podcast_bloc/podcast_bloc.dart';
 import 'iconbutton_with_popup_text.dart';
 
@@ -17,14 +18,21 @@ class RowIconButtonsEpisodes extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         const IconButtonWithPopupText(),
-        IconButton(
-          onPressed: () {
-            // activate select on list items
+        BlocBuilder<EpisodeSelectionCubit, EpisodeSelectionState>(
+          builder: (context, state) {
+            return IconButton(
+              onPressed: () {
+                BlocProvider.of<EpisodeSelectionCubit>(context)
+                    .toggleSelectionMode();
+              },
+              icon: Icon(
+                state.isSelectionModeActive
+                    ? Icons.deselect_rounded
+                    : Icons.select_all_rounded,
+                size: 30,
+              ),
+            );
           },
-          icon: const Icon(
-            Icons.select_all_rounded,
-            size: 30,
-          ),
         ),
         if (state.currentPodcast.subscribed)
           IconButton(
