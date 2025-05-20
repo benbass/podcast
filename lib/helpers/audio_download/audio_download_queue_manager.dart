@@ -51,6 +51,7 @@ class AudioDownloadQueueManager with ChangeNotifier {
         _addNewDownloadToQueues(episode);
       } else {
         // Case: Item already exists and is not cancelled or did not fail (pending, downloading, completed)
+        // We handle this case by specific buttons in the UI
         debugPrint(
             "Episode already in queue with status '${existingItem.status}': ${episode.title}");
       }
@@ -100,8 +101,7 @@ class AudioDownloadQueueManager with ChangeNotifier {
         _updateQueueNotification(progress: progress);
       },
       onDownloadComplete: () {
-        // _updateQueueNotification(); // Wird z.Z. gebraucht um die page aufrufen zu können
-        /// TODO: implement whatever you want to do after the download is complete
+        /// TODO?: implement whatever to do after the download is complete
       },
     );
 
