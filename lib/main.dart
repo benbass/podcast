@@ -20,6 +20,7 @@ import 'package:podcast/presentation/podcasts_search_page/podcasts_search_page.d
 import 'package:podcast/theme.dart';
 import 'package:provider/provider.dart';
 import 'application/episode_playback_cubit/episode_playback_cubit.dart';
+import 'application/episode_selection_cubit/episode_selection_cubit.dart';
 import 'application/podcast_bloc/podcast_bloc.dart';
 import 'core/globals.dart';
 import 'core/objectbox.dart';
@@ -76,6 +77,8 @@ void main() async {
         create: (_) => audioDownloadQueueManager,
         child: MultiBlocProvider(
           providers: [
+            BlocProvider(
+                create: (BuildContext context) => getIt<EpisodeSelectionCubit>()),
             BlocProvider(
                 create: (BuildContext context) => getIt<EpisodePlaybackCubit>()),
             BlocProvider(
