@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../application/episode_selection_cubit/episode_selection_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../helpers/core/utilities/format_utilities.dart';
 import '../../helpers/core/utilities/image_provider.dart';
@@ -38,108 +39,132 @@ class EpisodeCard extends StatelessWidget {
           final ImageProvider imageProvider = snapshot.hasData
               ? snapshot.data!
               : const AssetImage('assets/placeholder.png');
-          return BlocBuilder<EpisodePlaybackCubit,
-              Map<PodcastEntity, EpisodeEntity>?>(
-            builder: (context, currentlyPlayingEpisodeState) {
-              final isCurrentlyPlaying =
-                  currentlyPlayingEpisodeState?.values.first.eId == episode.eId;
-              return Card(
-                key: ValueKey(episode.eId),
-                color: themeData.colorScheme.primaryContainer,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    side: isCurrentlyPlaying
-                        ? BorderSide(
-                            color: themeData.colorScheme.secondary,
-                            width: 2.0,
-                          )
-                        : BorderSide.none),
-                elevation: 5.0,
-                shadowColor: Colors.black,
-                //margin: const EdgeInsets.all(8.0),
-                clipBehavior: Clip.antiAlias,
-                child: SizedBox(
-                  height: dimension,
-                  width: MediaQuery.of(context).size.width,
-                  child: InkWell(
-                    splashColor: Colors.black87,
-                    onTap: () => _navigateToEpisodeDetails(context),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildEpisodeImage(
-                          imageProvider,
-                          isCurrentlyPlaying,
-                          currentlyPlayingEpisodeState,
-                          themeData,
-                          dimension,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                            6.0,
-                            5.0,
-                            0.0,
-                            0.0,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
+          return BlocBuilder<EpisodeSelectionCubit, EpisodeSelectionState>(
+            builder: (context, selectedEpisodesState) {
+              bool isSelected = BlocProvider.of<EpisodeSelectionCubit>(context)
+                  .isEpisodeSelected(episode);
+              Color cardColor = isSelected
+                  ? themeData.colorScheme.secondary
+                  : themeData.colorScheme.primaryContainer;
+              return BlocBuilder<EpisodePlaybackCubit,
+                  Map<PodcastEntity, EpisodeEntity>?>(
+                builder: (context, currentlyPlayingEpisodeState) {
+                  final isCurrentlyPlaying =
+                      currentlyPlayingEpisodeState?.values.first.eId ==
+                          episode.eId;
+                  return Card(
+                    key: ValueKey(episode.eId),
+                    color: cardColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        side: isCurrentlyPlaying
+                            ? BorderSide(
+                                color: themeData.colorScheme.secondary,
+                                width: 2.0,
+                              )
+                            : BorderSide.none),
+                    elevation: 5.0,
+                    shadowColor: Colors.black,
+                    //margin: const EdgeInsets.all(8.0),
+                    clipBehavior: Clip.antiAlias,
+                    child: SizedBox(
+                      height: dimension,
+                      width: MediaQuery.of(context).size.width,
+                      child: InkWell(
+                        splashColor: Colors.black87,
+                        onTap: () {
+                          if (!selectedEpisodesState.isSelectionModeActive) {
+                            _navigateToEpisodeDetails(context);
+                          } else {
+                            BlocProvider.of<EpisodeSelectionCubit>(context)
+                                .toggleEpisodeSelection(episode);
+                          }
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildEpisodeImage(
+                              imageProvider,
+                              isCurrentlyPlaying,
+                              currentlyPlayingEpisodeState,
+                              themeData,
+                              dimension,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                6.0,
+                                5.0,
+                                0.0,
+                                0.0,
+                              ),
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                        maxWidth:
-                                            MediaQuery.of(context).size.width /
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                            maxWidth: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
                                                 2,
-                                        minWidth:
-                                            MediaQuery.of(context).size.width /
+                                            minWidth: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
                                                 2),
-                                    child: _buildEpisodeDetails(themeData),
-                                  ),
-                                  const SizedBox(
-                                    width: 40,
-                                  ),
-                                  if (episode.isSubscribed)
-                                    IconButton(
-                                      onPressed: () => EpisodeActionsDialog
-                                          .showEpisodeActionsDialog(
-                                              context, episode),
-                                      icon: const Icon(
-                                        Icons.more_horiz_rounded,
+                                        child: _buildEpisodeDetails(themeData),
                                       ),
+                                      const SizedBox(
+                                        width: 40,
+                                      ),
+                                      if (episode.isSubscribed)
+                                        IconButton(
+                                          onPressed: () => EpisodeActionsDialog
+                                              .showEpisodeActionsDialog(
+                                                  context, episode),
+                                          icon: const Icon(
+                                            Icons.more_horiz_rounded,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width - 140,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        EpisodePlaybackProgressIndicator(
+                                          themeData: themeData,
+                                          episode: episode,
+                                          isCurrentlyPlaying:
+                                              isCurrentlyPlaying,
+                                          currentlyPlayingEpisode:
+                                              currentlyPlayingEpisodeState,
+                                        ),
+                                        if (episode.isSubscribed)
+                                          _buildEpisodeIconsRow(context),
+                                      ],
                                     ),
+                                  ),
                                 ],
                               ),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width - 140,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    EpisodePlaybackProgressIndicator(
-                                      themeData: themeData,
-                                      episode: episode,
-                                      isCurrentlyPlaying: isCurrentlyPlaying,
-                                      currentlyPlayingEpisode:
-                                          currentlyPlayingEpisodeState,
-                                    ),
-                                    if (episode.isSubscribed)
-                                      _buildEpisodeIconsRow(context),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               );
             },
           );
