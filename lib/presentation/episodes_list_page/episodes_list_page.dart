@@ -7,7 +7,9 @@ import 'package:podcast/injection.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/animated_download_icon.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card_for_list.dart';
+import '../../application/episode_selection_cubit/episode_selection_cubit.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../custom_widgets/dialogs/episode_actions_dialog.dart';
 import '../custom_widgets/failure_widget.dart';
 import '../custom_widgets/page_transition.dart';
 import '../podcast_details_page/podcast_details_page.dart';
@@ -68,6 +70,27 @@ class EpisodesListPage extends StatelessWidget {
                           ),
                         ),
                         const AnimatedDownloadIcon(),
+                        BlocBuilder<EpisodeSelectionCubit,
+                            EpisodeSelectionState>(
+                          builder: (context, state) {
+                            if (state.isSelectionModeActive) {
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 12.0),
+                                child: IconButton(
+                                  onPressed: () {
+                                    EpisodeActionsDialog
+                                        .showSelectedEpisodesActionDialog(
+                                            context, state.selectedEpisodes);
+                                  },
+                                  icon: const Icon(Icons.more_vert_rounded,
+                                      size: 30),
+                                ),
+                              );
+                            } else {
+                              return const SizedBox.shrink();
+                            }
+                          },
+                        ),
                       ],
                     ),
                     if (state.currentPodcast.subscribed)
