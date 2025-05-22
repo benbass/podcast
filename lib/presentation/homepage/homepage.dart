@@ -121,30 +121,18 @@ class HomePage extends StatelessWidget {
   }
 
   Scaffold _buildPage(BuildContext context) {
-    final themeData = Theme.of(context);
     return Scaffold(
-        appBar: AppBar(title: const Text("Podcasts"), actions: [
-          _buildButtons(context),
-        ]),
+        appBar: AppBar(
+          title: const Text("Podcasts"),
+          actions: [
+            _buildButtons(context),
+          ],
+        ),
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _buildMainContent(context),
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: _spacing * 0.5, left: _spacing * 2),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Trending",
-                      textAlign: TextAlign.left,
-                      style: themeData.textTheme.displayLarge!,
-                    ),
-                  ],
-                ),
-              ),
               _buildTrendingPodcasts(context),
             ],
           ),
@@ -171,54 +159,67 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildTrendingPodcasts(BuildContext context) {
+    final themeData = Theme.of(context);
     PodcastState state = context.watch<PodcastBloc>().state;
     return Padding(
       padding: const EdgeInsets.fromLTRB(_spacing, 8.0, _spacing, 140.0),
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.2,
         decoration: BoxDecoration(
-          color: Colors.white.withAlpha(10),
+          color: themeData.colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(10.0),
           boxShadow: const [
             BoxShadow(
               color: Colors.black54,
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: Offset(2, 3),
+              spreadRadius: 0,
+              blurRadius: 5,
+              offset: Offset(0, 6),
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: _spacing),
-          child: state.status == PodcastStatus.loading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : state.trendingPodcasts.isEmpty
-                  ? const SizedBox(
-                      child: Text("No trending podcasts found"),
-                    )
-                  : ScalingCarouselSliver(
-                      items: state.trendingPodcasts
-                          .map(
-                            (e) => InkWell(
-                                onTap: () async {
-                                  if (context.mounted) {
-                                    context
-                                        .read<PodcastBloc>()
-                                        .add(PodcastTappedEvent(podcast: e));
-                                    Navigator.push(
-                                      context,
-                                      ScaleRoute(
-                                        page: const PodcastDetailsPage(),
-                                      ),
-                                    );
-                                  }
-                                },
-                                child: PodcastCard(podcast: e)),
-                          )
-                          .toList()),
-        ),
+        child: state.status == PodcastStatus.loading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : state.trendingPodcasts.isEmpty
+                ? const SizedBox(
+                    child: Text("No trending podcasts found"),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          "Trending",
+                          style: themeData.textTheme.displayLarge!,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: ScalingCarouselSliver(
+                            items: state.trendingPodcasts
+                                .map(
+                                  (e) => InkWell(
+                                      onTap: () async {
+                                        if (context.mounted) {
+                                          context.read<PodcastBloc>().add(
+                                              PodcastTappedEvent(podcast: e));
+                                          Navigator.push(
+                                            context,
+                                            ScaleRoute(
+                                              page: const PodcastDetailsPage(),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: PodcastCard(podcast: e)),
+                                )
+                                .toList()),
+                      ),
+                    ],
+                  ),
       ),
     );
   }
@@ -252,19 +253,19 @@ class HomePage extends StatelessWidget {
     // Helper function to build the grid
     Widget buildGrid(List<dynamic> podcasts) {
       return SizedBox(
-        height: MediaQuery.of(context).size.height * 0.55,
+        height: MediaQuery.of(context).size.height * 0.5,
         child: Padding(
           padding: const EdgeInsets.all(_spacing),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withAlpha(10),
+              color: Theme.of(context).colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(10.0),
               boxShadow: const [
                 BoxShadow(
                   color: Colors.black54,
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: Offset(2, 3),
+                  spreadRadius: 0,
+                  blurRadius: 5,
+                  offset: Offset(0, 6),
                 ),
               ],
             ),
