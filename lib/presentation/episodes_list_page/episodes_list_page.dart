@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcast/application/episode_selection_cubit/episode_selection_cubit.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:podcast/injection.dart';
@@ -19,12 +20,25 @@ class EpisodesListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Stack(
-        children: [
-          EpisodeListWidget(),
-          ConditionalFloatingActionButtons(),
-        ],
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) {
+          if (BlocProvider.of<EpisodeSelectionCubit>(context)
+              .state
+              .isSelectionModeActive) {
+            BlocProvider.of<EpisodeSelectionCubit>(context)
+                .toggleSelectionMode();
+          }
+          return;
+        }
+      },
+      child: const Scaffold(
+        body: Stack(
+          children: [
+            EpisodeListWidget(),
+            ConditionalFloatingActionButtons(),
+          ],
+        ),
       ),
     );
   }
@@ -141,5 +155,3 @@ class EpisodeListWidget extends StatelessWidget {
     );
   }
 }
-
-
