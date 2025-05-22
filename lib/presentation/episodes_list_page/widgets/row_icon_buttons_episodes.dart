@@ -27,8 +27,8 @@ class RowIconButtonsEpisodes extends StatelessWidget {
               },
               icon: Icon(
                 state.isSelectionModeActive
-                    ? Icons.deselect_rounded
-                    : Icons.select_all_rounded,
+                    ? Icons.close_rounded
+                    : Icons.library_add_check_rounded,
                 size: 30,
               ),
             );
