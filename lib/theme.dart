@@ -48,7 +48,7 @@ class AppTheme {
   );
 
   static final TextStyle _appBarText = _headingText.copyWith(
-    fontSize: 16,
+    fontSize: 20,
     fontVariations: <FontVariation>[
       const FontVariation('wght', 500),
     ],
