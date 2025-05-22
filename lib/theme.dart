@@ -134,5 +134,9 @@ class AppTheme {
     listTileTheme: const ListTileThemeData(textColor: _textColor),
     progressIndicatorTheme:
         const ProgressIndicatorThemeData(color: _accentColor),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      backgroundColor: _onPrimaryColor,
+      foregroundColor: _primaryVariantColor,
+    )
   );
 }
