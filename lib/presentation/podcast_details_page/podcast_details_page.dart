@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/podcast_details_page/widgets/podcast_category.dart';
 import 'package:podcast/presentation/podcast_details_page/widgets/row_icon_buttons_podcasts.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../custom_widgets/decoration/box_decoration.dart';
 import '../custom_widgets/dialogs/failure_dialog.dart';
 import '../custom_widgets/flexible_space.dart';
 
@@ -60,54 +61,61 @@ class PodcastDetailsPage extends StatelessWidget {
                   ),
                 )),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(40.0, 10.0, 40.0, 10.0),
+              padding: const EdgeInsets.all(20.0),
               sliver: SliverToBoxAdapter(
-                child: RowIconButtonsPodcasts(podcast: state.currentPodcast),
+                child: Container(
+                    decoration: buildBoxDecoration(context),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child:
+                          RowIconButtonsPodcasts(podcast: state.currentPodcast),
+                    )),
               ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
+              padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 100.0),
               sliver: SliverToBoxAdapter(
-                child: Text(
-                  state.currentPodcast.description,
-                  style: const TextStyle(
-                    fontSize: 16,
+                child: Container(
+                  decoration: buildBoxDecoration(context),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          state.currentPodcast.description,
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(
+                          state.currentPodcast.author,
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.language,
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                state.currentPodcast.language.toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 100.0),
-              sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      state.currentPodcast.author,
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.language,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            state.currentPodcast.language.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ),
