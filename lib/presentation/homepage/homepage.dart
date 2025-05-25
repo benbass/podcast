@@ -7,6 +7,7 @@ import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/queued_audio_download/queued_audio_download.dart';
 import '../../helpers/audio_download/audio_download_queue_manager.dart';
 import '../../helpers/listeners/player_listener.dart';
+import '../custom_widgets/decoration/box_decoration.dart';
 import '../custom_widgets/dialogs/connectivity_dialogs.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../injection.dart';
@@ -164,18 +165,7 @@ class HomePage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(_spacing, 8.0, _spacing, 140.0),
       child: Container(
-        decoration: BoxDecoration(
-          color: themeData.colorScheme.primaryContainer,
-          borderRadius: BorderRadius.circular(10.0),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black54,
-              spreadRadius: 0,
-              blurRadius: 5,
-              offset: Offset(0, 6),
-            ),
-          ],
-        ),
+        decoration: buildBoxDecoration(context),
         child: state.status == PodcastStatus.loading
             ? const Center(
                 child: CircularProgressIndicator(),
