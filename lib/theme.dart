@@ -4,13 +4,13 @@ class AppTheme {
   AppTheme._();
 
   static const Color _primaryColor = Color(0xFFCBD4C2);
-  static const Color _primaryVariantColor = Color(0xFF202531);
-  static const Color _onPrimaryColor = Color(0xFFB2E92E);
+  static const Color _primaryVariantColor = Color(0xFF000814);
+  static const Color _onPrimaryColor = Color(0xFFF28F3B);
 
-  static const Color _appbarColor = Color(0xFF202531);
+  static const Color _appbarColor = Color(0xFF000814);
   static const Color _textColor = Color(0xFFCBD4C2);
-  static const Color _iconColor = Color(0xFFB2E92E);
-  static const Color _accentColor = Color(0xFFFF8100); //Color(0xFFB2E92E);
+  static const Color _iconColor = Color(0xFFF28F3B);
+  static const Color _accentColor = Color(0xFF2D728F); //Color(0xFFB2E92E);
 
   // https://fonts.google.com/specimen/Montserrat
   static const TextStyle _headingText = TextStyle(
