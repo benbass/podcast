@@ -10,12 +10,17 @@ class ActionFeedback extends StatelessWidget {
     return const SizedBox();
   }
 
-  static void show(BuildContext context, {required IconData icon}) {
+  static void show(
+    BuildContext context, {
+    required IconData icon,
+    Offset? tapDownPosition,
+  }) {
     OverlayEntry? overlayEntry;
     overlayEntry = OverlayEntry(
       builder: (context) => ActionFeedbackOverlay(
         icon: icon,
         onDispose: () => overlayEntry?.remove(),
+        tapDownPosition: tapDownPosition,
       ),
     );
     Overlay.of(context).insert(overlayEntry);
