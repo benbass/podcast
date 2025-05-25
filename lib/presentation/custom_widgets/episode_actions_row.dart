@@ -76,17 +76,19 @@ class _EpisodeActionsRowState extends State<EpisodeActionsRow> {
           color: Theme.of(context).colorScheme.primary,
         ),
         const SizedBox(width: 20),
-        IconButton(
-          onPressed: () {
+        GestureDetector(
+          onTap: () {
             final bool isFavorite = widget.episode.favorite;
-            EpisodeActionHelper.performActionOnEpisode(
-                widget.episode, "favorite", isFavorite);
-            ActionFeedback.show(context,
-                icon: widget.episode.favorite ? Icons.star : Icons.star_border);
+            // Wait for the animation to complete before performing the action
+            Future.delayed(const Duration(milliseconds: 800), () {
+              EpisodeActionHelper.performActionOnEpisode(
+                  widget.episode, "favorite", isFavorite);
+            });
           },
-          constraints: const BoxConstraints(),
-          padding: EdgeInsets.zero,
-          icon: Icon(
+          onTapDown: (TapDownDetails details) => ActionFeedback.show(context,
+              icon: widget.episode.favorite ? Icons.star_border : Icons.star,
+              tapDownPosition: details.globalPosition),
+          child: Icon(
             widget.episode.favorite
                 ? Icons.star_rounded
                 : Icons.star_border_rounded,
