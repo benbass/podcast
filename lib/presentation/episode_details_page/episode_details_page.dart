@@ -11,6 +11,7 @@ import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../domain/usecases/episode_usecases.dart';
 import '../../helpers/core/utilities/format_utilities.dart';
+import '../custom_widgets/decoration/box_decoration.dart';
 import '../custom_widgets/dialogs/episode_actions_dialog.dart';
 import '../../helpers/listeners/player_listener.dart';
 import '../../injection.dart';
@@ -117,124 +118,151 @@ class EpisodeDetailsPage extends StatelessWidget {
                                       title: episodeToDisplay.title,
                                     ),
                                     SliverPadding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          20.0, 20.0, 8.0, 0.0),
+                                      padding: const EdgeInsets.all(
+                                        20.0,
+                                      ),
                                       sliver: SliverToBoxAdapter(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                                FormatUtilities.formatTimestamp(
+                                        child: Container(
+                                          decoration:
+                                              buildBoxDecoration(context),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(
+                                              8.0,
+                                            ),
+                                            child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Text(FormatUtilities
+                                                          .formatTimestamp(
+                                                              episodeToDisplay
+                                                                  .datePublished)),
+                                                      if (episodeToDisplay
+                                                          .isSubscribed)
+                                                        Expanded(
+                                                          child: EpisodeActionsRow(
+                                                              episode:
+                                                                  episodeToDisplay),
+                                                        ),
+                                                      const SizedBox(width: 20),
+                                                      if (episodeToDisplay
+                                                          .isSubscribed)
+                                                        IconButton(
+                                                          onPressed: () =>
+                                                              EpisodeActionsDialog
+                                                                  .showEpisodeActionsDialog(
+                                                                      context,
+                                                                      episodeToDisplay),
+                                                          icon: const Icon(
+                                                            Icons
+                                                                .more_horiz_rounded,
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                  if (!episodeToDisplay
+                                                      .isSubscribed)
+                                                    const SizedBox(
+                                                      height: 20.0,
+                                                    ),
+                                                  Text(
                                                     episodeToDisplay
-                                                        .datePublished)),
-                                            if (episodeToDisplay.isSubscribed)
-                                              Expanded(
-                                                child: EpisodeActionsRow(
-                                                    episode: episodeToDisplay),
-                                              ),
-                                            const SizedBox(width: 20),
-                                            if (episodeToDisplay.isSubscribed)
-                                              IconButton(
-                                                onPressed: () =>
-                                                    EpisodeActionsDialog
-                                                        .showEpisodeActionsDialog(
-                                                            context,
-                                                            episodeToDisplay),
-                                                icon: const Icon(
-                                                  Icons.more_horiz_rounded,
-                                                ),
-                                              ),
-                                          ],
+                                                                .duration! ==
+                                                            0
+                                                        ? ""
+                                                        : FormatUtilities
+                                                            .intToDurationFormatted(
+                                                            episodeToDisplay
+                                                                .duration!,
+                                                          ),
+                                                  ),
+                                                ]),
+                                          ),
                                         ),
                                       ),
                                     ),
                                     SliverPadding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            20.0,
-                                            episodeToDisplay.isSubscribed
-                                                ? 0.0
-                                                : 20.0,
-                                            0.0,
-                                            20.0),
-                                        sliver: SliverToBoxAdapter(
-                                          child: Text(
-                                            episodeToDisplay.duration! == 0
-                                                ? ""
-                                                : FormatUtilities
-                                                    .intToDurationFormatted(
-                                                    episodeToDisplay.duration!,
-                                                  ),
-                                          ),
-                                        )),
-                                    SliverPadding(
                                       padding: const EdgeInsets.fromLTRB(
                                           20.0, 0.0, 20.0, 170.0),
                                       sliver: SliverToBoxAdapter(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              episodeToDisplay.description,
-                                              style: const TextStyle(
-                                                fontSize: 16.0,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 16.0),
-                                            if (episodeToDisplay.episodeNr !=
-                                                0) ...[
-                                              Text(
-                                                "${episodeToDisplay.episodeNr}${podcastState.currentPodcast.episodeCount != null ? "/${podcastState.currentPodcast.episodeCount}" : ""}",
-                                              ),
-                                              const SizedBox(height: 16.0),
-                                            ],
-                                            if (podcastState
-                                                        .currentPodcast.link !=
-                                                    null &&
-                                                podcastState.currentPodcast
-                                                    .link!.isNotEmpty &&
-                                                podcastState
-                                                    .currentPodcast.link!
-                                                    .contains('://'))
-                                              Row(
-                                                children: [
-                                                  PodcastWebsiteLink(
-                                                      link: podcastState
-                                                          .currentPodcast
-                                                          .link!),
-                                                  const SizedBox(
-                                                    width: 30,
+                                        child: Container(
+                                          decoration:
+                                              buildBoxDecoration(context),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  episodeToDisplay.description,
+                                                  style: const TextStyle(
+                                                    fontSize: 16.0,
                                                   ),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      if (getIt<PlayerStatesListener>()
-                                                                  .player
-                                                                  .processingState ==
-                                                              ProcessingState
-                                                                  .ready &&
-                                                          overlayEntry ==
-                                                              null) {
-                                                        showOverlayPlayerMin(
-                                                            context);
-                                                      }
-                                                      Navigator.push(
-                                                          context,
-                                                          ScaleRoute(
-                                                            page:
-                                                                const PodcastDetailsPage(),
-                                                          ));
-                                                    },
-                                                    icon: const Icon(
-                                                      Icons
-                                                          .info_outline_rounded,
-                                                      size: 30,
-                                                    ),
+                                                ),
+                                                const SizedBox(height: 16.0),
+                                                if (episodeToDisplay
+                                                        .episodeNr !=
+                                                    0) ...[
+                                                  Text(
+                                                    "${episodeToDisplay.episodeNr}${podcastState.currentPodcast.episodeCount != null ? "/${podcastState.currentPodcast.episodeCount}" : ""}",
                                                   ),
+                                                  const SizedBox(height: 16.0),
                                                 ],
-                                              ),
-                                          ],
+                                                if (podcastState.currentPodcast
+                                                            .link !=
+                                                        null &&
+                                                    podcastState.currentPodcast
+                                                        .link!.isNotEmpty &&
+                                                    podcastState
+                                                        .currentPodcast.link!
+                                                        .contains('://'))
+                                                  Row(
+                                                    children: [
+                                                      PodcastWebsiteLink(
+                                                          link: podcastState
+                                                              .currentPodcast
+                                                              .link!),
+                                                      const SizedBox(
+                                                        width: 30,
+                                                      ),
+                                                      IconButton(
+                                                        onPressed: () {
+                                                          if (getIt<PlayerStatesListener>()
+                                                                      .player
+                                                                      .processingState ==
+                                                                  ProcessingState
+                                                                      .ready &&
+                                                              overlayEntry ==
+                                                                  null) {
+                                                            showOverlayPlayerMin(
+                                                                context);
+                                                          }
+                                                          Navigator.push(
+                                                              context,
+                                                              ScaleRoute(
+                                                                page:
+                                                                    const PodcastDetailsPage(),
+                                                              ));
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons
+                                                              .info_outline_rounded,
+                                                          size: 30,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
