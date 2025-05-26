@@ -40,7 +40,7 @@ class EpisodePlaybackProgressIndicator extends StatelessWidget {
             strokeWidth: strokeWidth ?? 3.0,
             strokeCap: StrokeCap.round,
             value: progress,
-            color: themeData.colorScheme.secondary,
+            color: themeData.colorScheme.primary.withValues(alpha: 0.6),
             backgroundColor: backgroundColor,
           );
         },
@@ -61,7 +61,7 @@ class EpisodePlaybackProgressIndicator extends StatelessWidget {
 
   Color _getBackgroundColor(double progress) {
     if (progress > 0 || (episode.position > 0 && episode.duration != null && episode.duration! > 0)) {
-      return themeData.colorScheme.primary.withValues(alpha: 0.2);
+      return themeData.colorScheme.secondary.withValues(alpha: 0.6);
     }
     return Colors.transparent;
   }
