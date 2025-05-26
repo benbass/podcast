@@ -115,12 +115,11 @@ class EpisodeActionsDialog {
             EpisodeActionHelper.performActionOnEpisode(episode, "read", isRead);
             Navigator.pop(context);
             ActionFeedback.show(context,
-                icon:
-                    episode.read ? Icons.check : Icons.radio_button_unchecked);
+                icon: Icons.check);
           }
         },
       {"title": "Share", "onPressed": () async {
-        final shareResult = await SharePlus.instance.share(
+        await SharePlus.instance.share(
           ShareParams(
             subject: episode.podcastTitle,
             text: "${episode.podcastTitle}\n${episode.title}\n\nLink to episode:\n${episode.enclosureUrl}",
@@ -138,7 +137,7 @@ class EpisodeActionsDialog {
               episode, "favorite", isFavorite);
           Navigator.pop(context);
           ActionFeedback.show(context,
-              icon: episode.favorite ? Icons.star : Icons.star_border);
+              icon: Icons.star);
         }
       },
       {
