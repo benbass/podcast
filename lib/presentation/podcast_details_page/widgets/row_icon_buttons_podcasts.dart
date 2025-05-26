@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/core/connectivity_manager.dart';
 import '../../../injection.dart';
@@ -67,8 +68,13 @@ class RowIconButtonsPodcasts extends StatelessWidget {
           ),
         ),
         IconButton(
-          onPressed: () {
-            // share podcast link
+          onPressed: () async {
+            final shareResult = await SharePlus.instance.share(
+                ShareParams(
+                  subject: podcast.title,
+                  text: "${podcast.title}:\n\n ${podcast.link}",
+                )
+            );
           },
           icon: const Icon(
             Icons.share_rounded,
