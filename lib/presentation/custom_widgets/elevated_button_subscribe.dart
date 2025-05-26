@@ -3,12 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
+import 'package:podcast/presentation/custom_widgets/page_transition.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/usecases/episode_usecases.dart';
 import '../../helpers/core/connectivity_manager.dart';
 import '../../injection.dart';
 import '../../objectbox.g.dart';
+import '../homepage/homepage.dart';
 import 'dialogs/failure_dialog.dart';
 
 class ElevatedButtonSubscribe extends StatelessWidget {
@@ -42,10 +44,12 @@ class ElevatedButtonSubscribe extends StatelessWidget {
           return state.status != PodcastStatus.loading
               ? SizedBox(
                   width: 80,
-                  child: Text(state.currentPodcast.subscribed
-                      ? "Unsubscribe"
-                      : "Subscribe",
-                  textAlign: TextAlign.center,),
+                  child: Text(
+                    state.currentPodcast.subscribed
+                        ? "Unsubscribe"
+                        : "Subscribe",
+                    textAlign: TextAlign.center,
+                  ),
                 )
               : const SizedBox(
                   width: 80,
@@ -68,15 +72,15 @@ class ElevatedButtonSubscribe extends StatelessWidget {
   /// SUBSCRIBE
   _handleEpisodes(BuildContext context) async {
     // Make sure we have episodes when we subscribe before calling the episode list page
-      List<EpisodeEntity> episodes = await getIt<EpisodeUseCases>()
-          .getEpisodes(
-            subscribed: false,
-            feedId: podcast.pId,
-            podcastTitle: podcast.title,
-            filterStatus: "all",
-            refresh: false,
-          )
-          .first;
+    List<EpisodeEntity> episodes = await getIt<EpisodeUseCases>()
+        .getEpisodes(
+          subscribed: false,
+          feedId: podcast.pId,
+          podcastTitle: podcast.title,
+          filterStatus: "all",
+          refresh: false,
+        )
+        .first;
     // Set flag isSubscribed to true
     for (var episode in episodes) {
       episode.isSubscribed = true;
@@ -132,10 +136,37 @@ class ElevatedButtonSubscribe extends StatelessWidget {
   }
 
   _unsubscribe(BuildContext context) async {
-    await _deleteUnFlaggedEpisodes();
-    if (context.mounted) {
-      BlocProvider.of<PodcastBloc>(context)
-          .add(UnSubscribeFromPodcastEvent(id: podcast.id));
-    }
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+            title: const Text("Are you sure you want to unsubscribe?"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await _deleteUnFlaggedEpisodes();
+                  if (context.mounted) {
+                    BlocProvider.of<PodcastBloc>(context)
+                        .add(UnSubscribeFromPodcastEvent(id: podcast.id));
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      SlideRouteWithCurve(
+                        page: const HomePage(),
+                      ),
+                    );
+                  }
+                },
+                child: const Text("Unsubscribe"),
+              ),
+            ]);
+      },
+    );
   }
 }
