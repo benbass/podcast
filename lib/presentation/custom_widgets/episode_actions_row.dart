@@ -149,7 +149,7 @@ class _EpisodeActionsRowState extends State<EpisodeActionsRow> {
               size: 30.0,
               color: widget.episode.filePath != null
                   ? Theme.of(context).colorScheme.primary
-                  : Colors.white12, // Beispiel: Verwende eine neutrale Farbe
+                  : Colors.white12,
             ),
           ),
       ],
