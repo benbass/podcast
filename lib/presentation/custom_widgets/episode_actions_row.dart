@@ -79,15 +79,11 @@ class _EpisodeActionsRowState extends State<EpisodeActionsRow> {
         GestureDetector(
           onTap: () {
             final bool isFavorite = widget.episode.favorite;
-            // Wait for the animation to complete before performing the action
-            Future.delayed(const Duration(milliseconds: 800), () {
-              EpisodeActionHelper.performActionOnEpisode(
-                  widget.episode, "favorite", isFavorite);
-            });
+            EpisodeActionHelper.performActionOnEpisode(
+                widget.episode, "favorite", isFavorite);
           },
           onTapDown: (TapDownDetails details) => ActionFeedback.show(context,
-              icon: widget.episode.favorite ? Icons.star_border : Icons.star,
-              tapDownPosition: details.globalPosition),
+              icon: Icons.star, tapDownPosition: details.globalPosition),
           child: Icon(
             widget.episode.favorite
                 ? Icons.star_rounded
