@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:podcast/helpers/core/episode_action_helper.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../application/episode_selection_cubit/episode_selection_cubit.dart';
 import '../../../core/globals.dart';
 import '../../../domain/entities/episode_entity.dart';
@@ -118,7 +119,17 @@ class EpisodeActionsDialog {
                     episode.read ? Icons.check : Icons.radio_button_unchecked);
           }
         },
-      {"title": "Share", "onPressed": () {}},
+      {"title": "Share", "onPressed": () async {
+        final shareResult = await SharePlus.instance.share(
+          ShareParams(
+            subject: episode.podcastTitle,
+            text: "${episode.podcastTitle}\n${episode.title}\n\nLink to episode:\n${episode.enclosureUrl}",
+          )
+        );
+        if(context.mounted) {
+          Navigator.pop(context);
+        }
+      }},
       {
         "title": episode.favorite ? "Unmark as favorite" : "Mark as favorite",
         "onPressed": () {
