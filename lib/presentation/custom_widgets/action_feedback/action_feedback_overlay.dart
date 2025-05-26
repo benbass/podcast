@@ -31,15 +31,15 @@ class ActionFeedbackOverlayState extends State<ActionFeedbackOverlay>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 300),
     );
 
-    _opacityAnimation = Tween<double>(begin: 0.0, end: 0.7).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOutBack),
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
-    _sizeAnimation = Tween<double>(begin: 50.0, end: 190.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOutBack),
+    _sizeAnimation = Tween<double>(begin: 30.0, end: 90.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
     _controller.forward().then((_) {
@@ -63,17 +63,17 @@ class ActionFeedbackOverlayState extends State<ActionFeedbackOverlay>
     final Offset initialIconCenterPosition = widget.tapDownPosition ??
         Offset(screenSize.width / 2, screenSize.height / 2);
 
-    final Offset targetIconCenterPosition =
-        Offset(screenSize.width / 2, screenSize.height / 2);
+    /*final Offset targetIconCenterPosition =
+        Offset(screenSize.width / 2, screenSize.height / 2);*/
 
     // The Tween animates the center of the icon.
     _positionAnimation = Tween<Offset>(
       begin: initialIconCenterPosition,
-      end: targetIconCenterPosition,
+      end: initialIconCenterPosition,
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeInOutSine,
+        curve: Curves.easeInOutCirc,
       ),
     );
 
@@ -109,7 +109,7 @@ class ActionFeedbackOverlayState extends State<ActionFeedbackOverlay>
               opacity: _opacityAnimation,
               child: Icon(
                 widget.icon,
-                color: Theme.of(context).colorScheme.secondary,
+                color: Theme.of(context).colorScheme.primary,
                 size: currentIconSize,
               ),
             ),
