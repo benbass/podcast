@@ -11,8 +11,16 @@ import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
 
 class PlayerControls extends StatelessWidget {
+  final PageController? pageController;
+  final List<EpisodeEntity> episodeListForNav;
+  final int currentIndexInListForNav;
+  final PodcastEntity podcast;
   const PlayerControls({
     super.key,
+    this.pageController,
+    required this.episodeListForNav,
+    required this.currentIndexInListForNav,
+    required this.podcast,
   });
 
   @override
@@ -40,7 +48,21 @@ class PlayerControls extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      if (currentIndexInListForNav > 0) {
+                        final previousEpisode =
+                            episodeListForNav[currentIndexInListForNav - 1];
+                        await getIt<MyAudioHandler>().handlePlayButtonPressed(context, previousEpisode, podcast);
+                        Future.delayed(const Duration(milliseconds: 50), () {
+                          if (pageController != null && pageController!.hasClients) {
+                            pageController!.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        });
+                      }
+                    },
                     icon: const Icon(
                       Icons.skip_previous_rounded,
                       size: 40,
@@ -94,7 +116,20 @@ class PlayerControls extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      if(currentIndexInListForNav < episodeListForNav.length - 1) {
+                        final nextEpisode = episodeListForNav[currentIndexInListForNav + 1];
+                        await getIt<MyAudioHandler>().handlePlayButtonPressed(context, nextEpisode, podcast);
+                        Future.delayed(const Duration(milliseconds: 50), () {
+                          if (pageController != null && pageController!.hasClients) {
+                            pageController!.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        });
+                      }
+                    },
                     icon: const Icon(
                       Icons.skip_next_rounded,
                       size: 40,
