@@ -142,6 +142,7 @@ class EpisodeListWidget extends StatelessWidget {
                         List<EpisodeEntity> episodes = snapshot.data ?? [];
                         final item = episodes[index];
                         return EpisodeCardForList(
+                          episodes: episodes,
                           episode: item,
                           podcast: state.currentPodcast,
                         );
