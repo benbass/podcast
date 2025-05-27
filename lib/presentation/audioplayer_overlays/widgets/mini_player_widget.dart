@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
+import 'package:podcast/domain/usecases/episode_usecases.dart';
 
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../../application/podcast_bloc/podcast_bloc.dart';
@@ -28,6 +29,14 @@ class MiniPlayerWidget extends StatelessWidget {
     final podcast = episodeInfo.keys.first;
     String filterStatus =
         context.watch<PodcastBloc>().state.episodesFilterStatus.name;
+    final episodes = getIt<EpisodeUseCases>()
+        .getEpisodes(
+        subscribed: podcast.subscribed,
+        feedId: podcast.pId,
+        podcastTitle: podcast.title,
+        filterStatus: filterStatus,
+        refresh: false)
+        .first;
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -51,7 +60,10 @@ class MiniPlayerWidget extends StatelessWidget {
                 if (context.mounted) {
                   Navigator.of(context).pushAndRemoveUntil(
                     ScaleRoute(
-                      page: EpisodeDetailsPage(episode: episode),
+                      page: EpisodeDetailsPage(
+                        initialEpisode: episode,
+                        episodes: await episodes,
+                      ),
                     ),
                     ModalRoute.withName('/'),
                   );
