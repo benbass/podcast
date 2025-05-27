@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:podcast/domain/usecases/episode_usecases.dart';
+import 'package:podcast/injection.dart';
 
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/queued_audio_download/queued_audio_download.dart';
@@ -9,11 +11,12 @@ import '../core/episode_action_helper.dart';
 
 class AudioFileUtility {
   static void handleDownloadOnPressed(EpisodeEntity episode) async {
-    if (episode.filePath == null) {
+    String? filePath = await getIt<EpisodeUseCases>().getDownloadStatus(episodeId: episode.id).first;
+    if (filePath == null) {
       // This starts the download!
       AudioDownloadQueueManager().addEpisodeToQueue(episode);
     } else {
-      File file = File(episode.filePath!);
+      File file = File(filePath);
       if (file.existsSync()) {
         try {
           file.delete();
