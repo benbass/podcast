@@ -16,10 +16,12 @@ import '../episode_details_page/episode_details_page.dart';
 class EpisodeCard extends StatelessWidget {
   const EpisodeCard({
     super.key,
+    required this.episodes,
     required this.episode,
     required this.podcast,
   });
 
+  final List<EpisodeEntity> episodes;
   final EpisodeEntity episode;
   final PodcastEntity podcast;
 
@@ -176,7 +178,8 @@ class EpisodeCard extends StatelessWidget {
       context,
       ScaleRoute(
         page: EpisodeDetailsPage(
-          episode: episode,
+          episodes: episodes,
+          initialEpisode: episode,
         ),
       ),
     );
