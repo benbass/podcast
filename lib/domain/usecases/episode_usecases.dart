@@ -1,5 +1,7 @@
+import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/repositories/episode_repository.dart';
 
+import '../../objectbox.g.dart';
 import '../entities/episode_entity.dart';
 
 class EpisodeUseCases {
@@ -25,6 +27,42 @@ class EpisodeUseCases {
       refresh: refresh,
       filterText: filterText,
     );
+  }
+
+  Stream<bool> getFavoriteStatus({required int episodeId}) {
+    final queryBuilder = episodeBox.query(EpisodeEntity_.id.equals(episodeId));
+    return queryBuilder.watch(triggerImmediately: true).map((query) {
+      final results = query.find();
+      if (results.isNotEmpty) {
+        return results.first.favorite;
+      } else {
+        return false;
+      }
+    });
+  }
+
+  Stream<bool> getReadStatus({required int episodeId}) {
+    final queryBuilder = episodeBox.query(EpisodeEntity_.id.equals(episodeId));
+    return queryBuilder.watch(triggerImmediately: true).map((query) {
+      final results = query.find();
+      if (results.isNotEmpty) {
+        return results.first.read;
+      } else {
+        return false;
+      }
+    });
+  }
+
+  Stream<String?> getDownloadStatus({required int episodeId}) {
+    final queryBuilder = episodeBox.query(EpisodeEntity_.id.equals(episodeId));
+    return queryBuilder.watch(triggerImmediately: true).map((query) {
+      final results = query.find();
+      if (results.isNotEmpty) {
+        return results.first.filePath;
+      } else {
+        return null;
+      }
+    });
   }
 
   Stream<int> unreadLocalEpisodesCount({required int feedId}) {
