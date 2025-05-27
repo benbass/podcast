@@ -4,13 +4,13 @@ import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/audio_download/audio_file_utility.dart';
 
 class AudioFileDialog{
-  static void showAudioFileDialog(BuildContext context, EpisodeEntity episode) {
+  static void showAudioFileDialog(BuildContext context, EpisodeEntity episode, String? filePath) {
     Navigator.pop(context); // close previous dialog
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-            title: Text(episode.filePath == null
+            title: Text(filePath == null
                 ? "Download episode audio file to device"
                 : "Delete episode audio file"),
             actions: [
@@ -25,7 +25,7 @@ class AudioFileDialog{
                   Navigator.pop(context);
                   AudioFileUtility.handleDownloadOnPressed(episode);
                 },
-                child: Text(episode.filePath == null ? "Download" : "Delete"),
+                child: Text(filePath == null ? "Download" : "Delete"),
               ),
             ]);
       },
