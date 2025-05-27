@@ -6,7 +6,9 @@ import 'package:share_plus/share_plus.dart';
 import '../../../application/episode_selection_cubit/episode_selection_cubit.dart';
 import '../../../core/globals.dart';
 import '../../../domain/entities/episode_entity.dart';
+import '../../../domain/usecases/episode_usecases.dart';
 import '../../../helpers/audio_download/audio_file_utility.dart';
+import '../../../injection.dart';
 import '../action_feedback/action_feedback.dart';
 import 'audio_file_dialog.dart';
 
@@ -80,7 +82,8 @@ class EpisodeActionsDialog {
       builder: (context) {
         return AlertDialog(
           title: const Text("Choose an action for the selected episodes"),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,13 +101,16 @@ class EpisodeActionsDialog {
   }
 
   static void showEpisodeActionsDialog(
-      BuildContext context, EpisodeEntity episode) {
+      BuildContext context, EpisodeEntity episode) async {
     // Reset for debugging purposes
     /* episode.filePath = null;
   episodeBox.put(episode);*/
 
     Map<String, bool> downloadStatus =
         AudioFileUtility.getDownloadStatus(episode);
+    final String? filePath = await getIt<EpisodeUseCases>()
+        .getDownloadStatus(episodeId: episode.id)
+        .first;
 
     final List<Map<String, dynamic>> menuItems = [
       if (episode.isSubscribed)
@@ -114,21 +120,22 @@ class EpisodeActionsDialog {
             final bool isRead = episode.read;
             EpisodeActionHelper.performActionOnEpisode(episode, "read", isRead);
             Navigator.pop(context);
-            ActionFeedback.show(context,
-                icon: Icons.check);
+            ActionFeedback.show(context, icon: Icons.check);
           }
         },
-      {"title": "Share", "onPressed": () async {
-        await SharePlus.instance.share(
-          ShareParams(
+      {
+        "title": "Share",
+        "onPressed": () async {
+          await SharePlus.instance.share(ShareParams(
             subject: episode.podcastTitle,
-            text: "${episode.podcastTitle}\n${episode.title}\n\nLink to episode:\n${episode.enclosureUrl}",
-          )
-        );
-        if(context.mounted) {
-          Navigator.pop(context);
+            text:
+                "${episode.podcastTitle}\n${episode.title}\n\nLink to episode:\n${episode.enclosureUrl}",
+          ));
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
         }
-      }},
+      },
       {
         "title": episode.favorite ? "Unmark as favorite" : "Mark as favorite",
         "onPressed": () {
@@ -136,8 +143,7 @@ class EpisodeActionsDialog {
           EpisodeActionHelper.performActionOnEpisode(
               episode, "favorite", isFavorite);
           Navigator.pop(context);
-          ActionFeedback.show(context,
-              icon: Icons.star);
+          ActionFeedback.show(context, icon: Icons.star);
         }
       },
       {
@@ -145,35 +151,41 @@ class EpisodeActionsDialog {
             ? "Downloading..."
             : downloadStatus["isPending"] == true
                 ? "Pending..."
-                : episode.filePath == null
+                : filePath == null
                     ? "Download"
                     : "Delete",
-        "onPressed": () {
+        "onPressed": () async {
           (downloadStatus["isDownloading"] == true ||
                   downloadStatus["isPending"] == true)
               ? null
-              : AudioFileDialog.showAudioFileDialog(context, episode);
+              : {
+                  if (context.mounted)
+                    AudioFileDialog.showAudioFileDialog(
+                        context, episode, filePath)
+                };
         },
       },
     ];
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (var menuItem in menuItems)
-                TextButton(
-                  onPressed: () => menuItem["onPressed"](),
-                  child: Text(menuItem["title"]),
-                ),
-            ],
-          ),
-        );
-      },
-    );
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var menuItem in menuItems)
+                  TextButton(
+                    onPressed: () => menuItem["onPressed"](),
+                    child: Text(menuItem["title"]),
+                  ),
+              ],
+            ),
+          );
+        },
+      );
+    }
   }
 }
