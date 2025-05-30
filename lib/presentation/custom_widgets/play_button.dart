@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcast/core/globals.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
-import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 
@@ -11,18 +11,18 @@ class PlayButton extends StatelessWidget {
   const PlayButton({
     super.key,
     required this.episode,
-    required this.podcast,
   });
 
   final EpisodeEntity episode;
-  final PodcastEntity podcast;
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<EpisodePlaybackCubit, Map<PodcastEntity, EpisodeEntity>?>(
+    return BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
       builder: (context, state) {
-        if (state?.values.first.eId != episode.eId) {
-          return PlayButtonActive(episode: episode, podcast: podcast);
+        if (state.episode?.eId != episode.eId) {
+          return PlayButtonActive(
+            episode: episode,
+          );
         } else {
           return const PlayButtonInactive();
         }
@@ -50,16 +50,20 @@ class PlayButtonActive extends StatelessWidget {
   const PlayButtonActive({
     super.key,
     required this.episode,
-    required this.podcast,
   });
 
   final EpisodeEntity episode;
-  final PodcastEntity podcast;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () => getIt<MyAudioHandler>().handlePlayButtonPressed(context, episode, podcast),
+      onPressed: () {
+        final episodeToPlay = episodeBox.get(episode.id);
+        BlocProvider.of<EpisodePlaybackCubit>(context).setPlaybackEpisode(
+          episodeToPlay: episodeToPlay,
+        );
+        getIt<MyAudioHandler>().play();
+      },
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints(),
       icon: const Icon(
@@ -68,6 +72,4 @@ class PlayButtonActive extends StatelessWidget {
       ),
     );
   }
-
-
 }
