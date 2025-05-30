@@ -63,8 +63,8 @@ class UtilitiesNotifications{
   }
 
   static void createNotificationPlayback(BuildContext context, bool isPausingState, int position) async {
-    final EpisodeEntity? episode = context.read<EpisodePlaybackCubit>().state?.values.first;
-    final PodcastEntity? podcast = context.read<EpisodePlaybackCubit>().state?.keys.first;
+    final EpisodeEntity? episode = context.read<EpisodePlaybackCubit>().state.episode;
+    final PodcastEntity? podcast = context.read<EpisodePlaybackCubit>().state.podcast;
     final String imageFilePath = podcast?.artworkFilePath ?? "";
 
 
