@@ -8,7 +8,6 @@ import 'package:podcast/presentation/episode_details_page/widgets/player_control
 import 'package:podcast/presentation/episodes_list_page/episodes_list_page.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
-import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/core/utilities/format_utilities.dart';
 import '../custom_widgets/decoration/box_decoration.dart';
 import '../custom_widgets/dialogs/episode_actions_dialog.dart';
@@ -60,6 +59,7 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
     final podcastState =
         BlocProvider.of<PodcastBloc>(context, listen: false).state;
     final List<EpisodeEntity> episodes = widget.episodes; //snapshot.data!;
+
     // We wrap this widget in PopScope so we can apply a method on the OS back-button
     // where we handle the overlay!
     return PopScope(
@@ -70,7 +70,6 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
               overlayEntry == null) {
             showOverlayPlayerMin(context);
           }
-
           return;
         }
         Navigator.of(context).push(
@@ -79,36 +78,52 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
           ),
         );
       },
-      child:
-          BlocBuilder<EpisodePlaybackCubit, Map<PodcastEntity, EpisodeEntity>?>(
+      child: BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
         builder: (context, episodePlaybackState) {
-          episodePlaybackState != null &&
-                  episodePlaybackState.values.first.eId ==
-                      widget.initialEpisode.eId
-              ? removeOverlay()
-              : null;
           return Scaffold(
             body: PageView.builder(
                 controller: pageController,
                 onPageChanged: (index) async {
-                  final ep = episodes[index];
-                  if (getIt<PlayerStatesListener>().player.processingState ==
-                          ProcessingState.ready &&
-                      episodePlaybackState != null) {
+                  // Handle mini player overlay visibility
+                  final episodeOnNewPage = episodes[index];
+
+                  if (episodePlaybackState.episode == null) {
+                    return;
+                  }
+
+                  if (episodePlaybackState.episode!.eId !=
+                      episodeOnNewPage.eId) {
                     if (overlayEntry == null &&
-                        episodePlaybackState.values.first.eId != ep.eId) {
+                        getIt<PlayerStatesListener>().player.processingState ==
+                            ProcessingState.ready) {
                       showOverlayPlayerMin(context);
-                    } else {
-                      if (overlayEntry != null &&
-                          episodePlaybackState.values.first.eId == ep.eId) {
-                        removeOverlay();
-                      }
                     }
+                  } else if (episodePlaybackState.episode!.eId ==
+                      episodeOnNewPage.eId) {
+                    removeOverlay();
                   }
                 },
                 itemCount: episodes.length,
                 itemBuilder: (context, index) {
                   final episodeToDisplay = episodes[index];
+                  // The user may want to play this episode: we already inform the Cubit about podcast and episodes
+                  BlocProvider.of<EpisodePlaybackCubit>(context)
+                      .setPlaybackEpisode(
+                    podcast: podcastState.currentPodcast,
+                    playlist: episodes,
+                    startIndexInPlaylist: index,
+                  );
+
+                  bool shouldShowPlayerControls =
+                      episodePlaybackState.episode != null &&
+                          episodePlaybackState.episode!.eId ==
+                              episodeToDisplay.eId;
+
+                  if (shouldShowPlayerControls) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      removeOverlay();
+                    });
+                  }
                   return Stack(
                     children: [
                       SafeArea(
@@ -256,17 +271,13 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                         ),
                       ),
                       Visibility(
-                        visible: episodePlaybackState != null &&
-                            episodePlaybackState.values.first.eId ==
-                                episodeToDisplay.eId,
+                        visible: shouldShowPlayerControls,
                         child: Positioned(
                           bottom: MediaQuery.of(context).padding.bottom,
                           left: 0,
                           right: 0,
                           child: PlayerControls(
                             pageController: pageController,
-                            episodeListForNav: episodes,
-                            currentIndexInListForNav: index,
                             podcast: podcastState.currentPodcast,
                           ),
                         ),
