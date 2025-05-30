@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
-import 'package:podcast/domain/usecases/episode_usecases.dart';
 
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../../application/podcast_bloc/podcast_bloc.dart';
-import '../../../domain/entities/episode_entity.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/core/utilities/image_provider.dart';
 import '../../../helpers/player/audiohandler.dart';
@@ -23,20 +21,11 @@ class MiniPlayerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Map<PodcastEntity, EpisodeEntity> episodeInfo =
-        BlocProvider.of<EpisodePlaybackCubit>(context).state!;
-    final episode = episodeInfo.entries.first.value;
-    final podcast = episodeInfo.keys.first;
+    final episode = context.read<EpisodePlaybackCubit>().state.episode;
+    final podcast = context.read<EpisodePlaybackCubit>().state.podcast;
+    final episodes = context.read<EpisodePlaybackCubit>().state.episodes;
     String filterStatus =
         context.watch<PodcastBloc>().state.episodesFilterStatus.name;
-    final episodes = getIt<EpisodeUseCases>()
-        .getEpisodes(
-        subscribed: podcast.subscribed,
-        feedId: podcast.pId,
-        podcastTitle: podcast.title,
-        filterStatus: filterStatus,
-        refresh: false)
-        .first;
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -49,7 +38,7 @@ class MiniPlayerWidget extends StatelessWidget {
             GestureDetector(
               onTap: () async {
                 // The EpisodeDetailsPage is a PageView depending on a specific list of episodes.
-                // If user called a different podcast after clicking on Play, the episode being played doesn't exit for this podcast.
+                // If user called a different podcast after clicking on Play, the episode being played doesn't exist for this podcast.
                 // We reset the PodcastBloc state with the podcast the playback episode belongs to.
                 // Once done, we can navigate to the EpisodeDetailsPage.
                 await _resetPodcast(
@@ -62,7 +51,7 @@ class MiniPlayerWidget extends StatelessWidget {
                     ScaleRoute(
                       page: EpisodeDetailsPage(
                         initialEpisode: episode,
-                        episodes: await episodes,
+                        episodes: episodes!,
                       ),
                     ),
                     ModalRoute.withName('/'),
@@ -75,9 +64,9 @@ class MiniPlayerWidget extends StatelessWidget {
                 children: [
                   FutureBuilder<ImageProvider>(
                       future: MyImageProvider(
-                              url: episode.image.isNotEmpty
+                              url: episode!.image.isNotEmpty
                                   ? episode.image
-                                  : podcast.artworkFilePath != null
+                                  : podcast!.artworkFilePath != null
                                       ? podcast.artworkFilePath!
                                       : podcast.artwork)
                           .imageProvider,
@@ -107,7 +96,7 @@ class MiniPlayerWidget extends StatelessWidget {
                         height: 20,
                         width: MediaQuery.of(context).size.width - 170,
                         child: Text(
-                          podcast.title,
+                          podcast!.title,
                         ),
                       ),
                       StreamBuilder<Duration>(
