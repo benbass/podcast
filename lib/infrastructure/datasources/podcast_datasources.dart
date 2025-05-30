@@ -44,12 +44,16 @@ class PodcastDataSourceImpl implements PodcastDataSource {
           .map((feed) => PodcastModel.fromJson(feed).toPodcastEntity())
           .toList();
 
+      /*
       if (entryPoint.contains('search/byterm')) {
         // Merge the found podcasts with subscribed podcasts, giving precedence to subscribed ones.
         return _mergeWithSubscribedPodcasts(podcasts);
       } else {
         return podcasts;
       }
+      */
+      // Merge the remote podcasts with subscribed podcasts, giving precedence to subscribed ones.
+      return _mergeWithSubscribedPodcasts(podcasts);
     } else {
       String errorMessage = '';
       if (entryPoint.contains('search/byterm')) {
@@ -75,6 +79,7 @@ class PodcastDataSourceImpl implements PodcastDataSource {
     return _fetchPodcastsByEntryPoint(entryPoint);
   }
 
+  /// Fetch trending podcasts
   @override
   Future<List<PodcastEntity>> fetchTrendingPodcasts() async {
     String languageCode = "de";
