@@ -48,11 +48,10 @@ class EpisodeCard extends StatelessWidget {
               Color cardColor = isSelected
                   ? themeData.colorScheme.secondary
                   : themeData.colorScheme.primaryContainer;
-              return BlocBuilder<EpisodePlaybackCubit,
-                  Map<PodcastEntity, EpisodeEntity>?>(
+              return BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
                 builder: (context, currentlyPlayingEpisodeState) {
                   final isCurrentlyPlaying =
-                      currentlyPlayingEpisodeState?.values.first.eId ==
+                      currentlyPlayingEpisodeState.episode?.eId ==
                           episode.eId;
                   return Card(
                     key: ValueKey(episode.eId),
@@ -89,7 +88,7 @@ class EpisodeCard extends StatelessWidget {
                             _buildEpisodeImage(
                               imageProvider,
                               isCurrentlyPlaying,
-                              currentlyPlayingEpisodeState,
+                              currentlyPlayingEpisodeState.episode,
                               themeData,
                               dimension,
                             ),
@@ -151,7 +150,7 @@ class EpisodeCard extends StatelessWidget {
                                           isCurrentlyPlaying:
                                               isCurrentlyPlaying,
                                           currentlyPlayingEpisode:
-                                              currentlyPlayingEpisodeState,
+                                              currentlyPlayingEpisodeState.episode,
                                         ),
                                         if (episode.isSubscribed)
                                           _buildEpisodeIconsRow(context),
@@ -188,7 +187,7 @@ class EpisodeCard extends StatelessWidget {
   Widget _buildEpisodeImage(
       ImageProvider imageProvider,
       bool isCurrentlyPlaying,
-      Map<PodcastEntity, EpisodeEntity>? currentlyPlayingEpisode,
+      EpisodeEntity? currentlyPlayingEpisode,
       ThemeData themeData,
       double dimension) {
     return Container(
