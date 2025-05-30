@@ -19,7 +19,8 @@ class MyAppLifecycleObserver extends WidgetsBindingObserver {
       getIt<ConnectivityManager>().dispose();
       // Clean database from objects related to unsubscribed podcasts
       EpisodeCleanup.deleteEpisodes();
-      final bool = UnsubscribedPodcastCleanup.deletePodcastsAndArtworkFiles();
+      //final bool = UnsubscribedPodcastCleanup.deletePodcastsAndArtworkFiles(); // This method keeps the podcasts and their artwork files. Will be used in a future version of the app.
+      final bool = UnsubscribedPodcastCleanup.deletePodcastsAndArtworkFilesCurrentVersion();
       if (!bool) {
         _showErrorDialog("A problem occurred while cleaning the app storage from unneeded data\nWe will try again at the next app closing.");
       }
