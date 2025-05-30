@@ -87,9 +87,6 @@ class EpisodeCard extends StatelessWidget {
                           children: [
                             _buildEpisodeImage(
                               imageProvider,
-                              isCurrentlyPlaying,
-                              currentlyPlayingEpisodeState.episode,
-                              themeData,
                               dimension,
                             ),
                             Padding(
@@ -147,8 +144,6 @@ class EpisodeCard extends StatelessWidget {
                                         EpisodePlaybackProgressIndicator(
                                           themeData: themeData,
                                           episode: episode,
-                                          isCurrentlyPlaying:
-                                              isCurrentlyPlaying,
                                           currentlyPlayingEpisode:
                                               currentlyPlayingEpisodeState.episode,
                                         ),
@@ -186,9 +181,6 @@ class EpisodeCard extends StatelessWidget {
 
   Widget _buildEpisodeImage(
       ImageProvider imageProvider,
-      bool isCurrentlyPlaying,
-      EpisodeEntity? currentlyPlayingEpisode,
-      ThemeData themeData,
       double dimension) {
     return Container(
       width: dimension,
