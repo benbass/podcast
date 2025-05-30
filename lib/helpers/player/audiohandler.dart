@@ -6,8 +6,6 @@ import 'package:just_audio/just_audio.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../core/globals.dart';
-import '../../domain/entities/episode_entity.dart';
-import '../../domain/entities/podcast_entity.dart';
 import '../../injection.dart';
 import '../../main.dart';
 import '../../presentation/audioplayer_overlays/audioplayer_overlays.dart';
@@ -44,12 +42,13 @@ class MyAudioHandler {
   }
 */
 
-  Future<void> handlePlayButtonPressed(BuildContext context,
-      EpisodeEntity episode, PodcastEntity podcast) async {
-    final currentPosition = player.position.inSeconds;
+  // Start audio playback.
+  Future<void> play() async {
+    final context = MyApp.navigatorKey.currentContext;
+    final episode = context!.read<EpisodePlaybackCubit>().state.episode;
     final String connectionType =
         await getIt<ConnectivityManager>().getConnectionTypeAsString();
-    String filePath = episode.filePath ?? episode.enclosureUrl;
+    String filePath = episode!.filePath ?? episode.enclosureUrl;
     if (connectionType == 'none' && filePath == episode.enclosureUrl) {
       if (context.mounted) {
         showDialog(
@@ -60,32 +59,17 @@ class MyAudioHandler {
       }
     } else {
       removeOverlay();
-      // source error?
       try {
-        if (context.mounted) {
-          // Save position of previous episode before changing to new one
-          if (BlocProvider.of<EpisodePlaybackCubit>(context).state != null) {
-            final previousEpisode =
-                BlocProvider.of<EpisodePlaybackCubit>(context)
-                    .state!
-                    .values
-                    .first;
-            previousEpisode.position = currentPosition;
-            episodeBox.put(previousEpisode);
-          }
-        }
-
         await player.setUrl(filePath);
-        play();
-        if (episode.position > 0) {
-          player.seek(Duration(seconds: episode.position));
-        }
 
+        if (episode.position > 0) {
+          Duration position = Duration(seconds: episode.position);
+          await player.seek(position);
+        }
+        await player.play();
         if (context.mounted) {
-          BlocProvider.of<EpisodePlaybackCubit>(context)
-              .setPlaybackEpisode({podcast: episode});
           UtilitiesNotifications.createNotificationPlayback(
-              context, false, episode.position);
+              context, false, player.position.inSeconds);
         }
       } on PlayerException {
         if (context.mounted) {
@@ -96,25 +80,20 @@ class MyAudioHandler {
     }
   }
 
-  // Start audio playback.
-  Future<void> play() async {
-    await player.play();
-    final context = MyApp.navigatorKey.currentContext;
-    if (context != null && context.mounted) {
-      UtilitiesNotifications.createNotificationPlayback(
-          context, false, player.position.inSeconds);
-    }
-  }
-
   // Stop audio playback.
   Future<void> stop() async {
-    await player.stop();
-    UtilitiesNotifications.cancelNotificationPlayback();
-
     final context = MyApp.navigatorKey.currentContext;
-    if (context != null && context.mounted) {
-      removeOverlay();
-    }
+    // Save the current position to the episode
+    final currentEpisode = context!.read<EpisodePlaybackCubit>().state.episode;
+    currentEpisode!.position =
+        getIt<MyAudioHandler>().player.position.inSeconds;
+    episodeBox.put(currentEpisode);
+
+    await player.stop();
+
+    removeOverlay();
+
+    UtilitiesNotifications.cancelNotificationPlayback();
   }
 
   // Pause audio playback.
@@ -129,18 +108,10 @@ class MyAudioHandler {
 
   // Handling Play and Pause
   void handlePlayPause() {
-    final context = MyApp.navigatorKey.currentContext;
-    bool isPaused = false;
     if (player.playing) {
-      player.pause();
-      isPaused = true;
+      pause();
     } else {
-      player.play();
-      isPaused = false;
-    }
-    if (context != null && context.mounted) {
-      UtilitiesNotifications.createNotificationPlayback(
-          context, isPaused, player.position.inSeconds);
+      play();
     }
   }
 
@@ -164,6 +135,27 @@ class MyAudioHandler {
     }
     player.seek(newPosition);
   }
+
+  Future<bool> playNext() async {
+    final context = MyApp.navigatorKey.currentContext;
+    bool result =
+        await BlocProvider.of<EpisodePlaybackCubit>(context!).playNextInCubit();
+    if (result) {
+      await play();
+    }
+    return result;
+  }
+
+  Future<bool> playPrevious() async {
+    final context = MyApp.navigatorKey.currentContext;
+    bool result = await BlocProvider.of<EpisodePlaybackCubit>(context!)
+        .playPreviousInCubit();
+    if (result) {
+      await play();
+    }
+    return result;
+  }
+  // END notification skip buttons
 
   void dispose() {
     player.dispose();
