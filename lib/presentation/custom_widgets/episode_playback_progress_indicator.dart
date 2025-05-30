@@ -7,7 +7,6 @@ import '../../injection.dart';
 class EpisodePlaybackProgressIndicator extends StatelessWidget {
   final ThemeData themeData;
   final EpisodeEntity episode;
-  final bool isCurrentlyPlaying;
   final EpisodeEntity? currentlyPlayingEpisode;
   final double? paddingHoriz;
   final double? paddingVert;
@@ -17,7 +16,6 @@ class EpisodePlaybackProgressIndicator extends StatelessWidget {
     super.key,
     required this.themeData,
     required this.episode,
-    required this.isCurrentlyPlaying,
     required this.currentlyPlayingEpisode,
     this.paddingHoriz,
     this.paddingVert,
@@ -48,7 +46,7 @@ class EpisodePlaybackProgressIndicator extends StatelessWidget {
   }
 
   double _calculateProgress(AsyncSnapshot<Duration> snapshot) {
-    if (snapshot.hasData && isCurrentlyPlaying && currentlyPlayingEpisode != null) {
+    if (snapshot.hasData &&  currentlyPlayingEpisode != null) {
       final currentPosition = snapshot.data!;
       final totalDuration = Duration(seconds: currentlyPlayingEpisode!.duration!);
       return (currentPosition.inMilliseconds / totalDuration.inMilliseconds).clamp(0.0, 1.0);
