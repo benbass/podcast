@@ -45,11 +45,11 @@ class NotificationController {
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
     if (receivedAction.buttonKeyPressed == 'SKIPPREV') {
-      // to be implemented
+      getIt<MyAudioHandler>().playPrevious();
     } else if (receivedAction.buttonKeyPressed == 'RESUMEPAUSE') {
       getIt<MyAudioHandler>().handlePlayPause();
     } else if (receivedAction.buttonKeyPressed == 'SKIPNEXT') {
-      // to be implemented
+      getIt<MyAudioHandler>().playNext();
     } else if (receivedAction.buttonKeyPressed == 'STOP') {
       getIt<MyAudioHandler>().stop();
     } else if (receivedAction.payload?[_notificationPayloadActionKey] ==
