@@ -57,6 +57,7 @@ abstract class EpisodeLocalDatasource extends _BaseEpisodeLocalDatasource {
     required bool refresh,
     String? filterText,
   });
+  Stream<EpisodeEntity?> getEpisodeStream({required int episodeId});
   Stream<int> unreadLocalEpisodesCount(
       {required int feedId}); // this is only needed for subscribed = true
 }
@@ -101,6 +102,9 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
     String? filterText,
   }) async* {
     if (!subscribed) {
+      // If not subscribed, fetch episodes from the remote data source.
+      // And save them to the local database.
+      // These episodes will be deleted from the database at app close if the podcast stays unsubscribed.
       final episodes = await _fetchRemoteEpisodes(
           feedId: feedId, podcastTitle: podcastTitle);
       episodeBox.putMany(episodes);
@@ -111,6 +115,19 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
       }
     }
     yield* _getEpisodesByFeedId(feedId, filterStatus: filterStatus, filterText: filterText);
+  }
+
+  @override
+  Stream<EpisodeEntity?> getEpisodeStream({required int episodeId}) {
+    final queryBuilder = episodeBox.query(EpisodeEntity_.id.equals(episodeId));
+    return queryBuilder.watch(triggerImmediately: true).map((query) {
+      final results = query.find();
+      if (results.isNotEmpty) {
+        return results.first;
+      } else {
+        return null;
+      }
+    });
   }
 
   @override
