@@ -41,7 +41,6 @@ Future<void> init() async {
         episodeDataSources: getIt(),
       )); // remote (fetching)
   getIt.registerLazySingleton<EpisodeRepository>(() => EpisodeRepositoryImpl(
-        episodeRemoteDataSource: getIt(),
         episodeLocalDatasource: getIt(),
       ));
 
@@ -49,9 +48,9 @@ Future<void> init() async {
   getIt.registerLazySingleton<PodcastDataSource>(
       () => PodcastDataSourceImpl(httpClient: getIt())); // remote
   getIt.registerLazySingleton<EpisodeRemoteDataSource>(
-      () => EpisodeRemoteDataSourceImpl(httpClient: getIt()));
+      () => EpisodeRemoteDataSourceImpl(httpClient: getIt())); // remote, used by EpisodeLocalDatasourceImpl only
   getIt.registerLazySingleton<EpisodeLocalDatasource>(
-      () => EpisodeLocalDatasourceImpl());
+      () => EpisodeLocalDatasourceImpl()); // local
 
   // Extern
   getIt.registerLazySingleton(() => http.Client());
