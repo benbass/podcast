@@ -39,8 +39,7 @@ class PlaybackPositionSlider extends StatelessWidget {
                   0.0,
               onChanged: (value)
               {
-                final bool playerState = getIt<MyAudioHandler>().player.playing;
-                UtilitiesNotifications.cancelNotificationPlayback();
+                final bool playerState = getIt<MyAudioHandler>().player.playerState.playing;
                       getIt<MyAudioHandler>()
                           .player
                           .seek(Duration(seconds: value.toInt()));
