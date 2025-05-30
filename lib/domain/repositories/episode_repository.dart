@@ -9,5 +9,6 @@ abstract class EpisodeRepository {
     required bool refresh,
     String? filterText,
   });
+  Stream<EpisodeEntity?> getEpisodeStream({required int episodeId});
   Stream<int> unreadLocalEpisodesCount({required int feedId});
 }
