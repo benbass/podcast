@@ -91,10 +91,10 @@ class HomePage extends StatelessWidget {
     // Inject methods to this listener
     // Episode is set to null when and only when player state is completed
     playerStatesListener.setResetPlaybackEpisodeCallback(
-        () => context.read<EpisodePlaybackCubit>().setPlaybackEpisode(null));
+        () => context.read<EpisodePlaybackCubit>().resetPlayback());
     // listener needs current playback episode from cubit (initially null)
     playerStatesListener
-        .setGetCurrentEpisode(() => context.read<EpisodePlaybackCubit>().state);
+        .setGetCurrentEpisode(() => context.read<EpisodePlaybackCubit>().state.episode);
 
     // Listen for connectivity changes
     ConnectivityDialog.showConnectivityDialogs(context);
