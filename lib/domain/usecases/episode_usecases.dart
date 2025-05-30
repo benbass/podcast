@@ -1,7 +1,5 @@
-import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/repositories/episode_repository.dart';
 
-import '../../objectbox.g.dart';
 import '../entities/episode_entity.dart';
 
 class EpisodeUseCases {
@@ -29,6 +27,7 @@ class EpisodeUseCases {
     );
   }
 
+/*
   Stream<bool> getFavoriteStatus({required int episodeId}) {
     final queryBuilder = episodeBox.query(EpisodeEntity_.id.equals(episodeId));
     return queryBuilder.watch(triggerImmediately: true).map((query) {
@@ -40,6 +39,7 @@ class EpisodeUseCases {
       }
     });
   }
+
 
   Stream<bool> getReadStatus({required int episodeId}) {
     final queryBuilder = episodeBox.query(EpisodeEntity_.id.equals(episodeId));
@@ -63,6 +63,11 @@ class EpisodeUseCases {
         return null;
       }
     });
+  }
+  */
+
+  Stream<EpisodeEntity?> getEpisodeStream({required int episodeId}) {
+    return episodeRepository.getEpisodeStream(episodeId: episodeId);
   }
 
   Stream<int> unreadLocalEpisodesCount({required int feedId}) {
