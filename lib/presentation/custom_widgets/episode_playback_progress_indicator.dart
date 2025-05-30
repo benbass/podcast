@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/episode_entity.dart';
-import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 
@@ -9,7 +8,7 @@ class EpisodePlaybackProgressIndicator extends StatelessWidget {
   final ThemeData themeData;
   final EpisodeEntity episode;
   final bool isCurrentlyPlaying;
-  final Map<PodcastEntity, EpisodeEntity>? currentlyPlayingEpisode;
+  final EpisodeEntity? currentlyPlayingEpisode;
   final double? paddingHoriz;
   final double? paddingVert;
   final double? dimension;
@@ -51,7 +50,7 @@ class EpisodePlaybackProgressIndicator extends StatelessWidget {
   double _calculateProgress(AsyncSnapshot<Duration> snapshot) {
     if (snapshot.hasData && isCurrentlyPlaying && currentlyPlayingEpisode != null) {
       final currentPosition = snapshot.data!;
-      final totalDuration = Duration(seconds: currentlyPlayingEpisode!.values.first.duration!);
+      final totalDuration = Duration(seconds: currentlyPlayingEpisode!.duration!);
       return (currentPosition.inMilliseconds / totalDuration.inMilliseconds).clamp(0.0, 1.0);
     } else if (episode.duration != null && episode.duration! > 0) {
       return (episode.position / episode.duration!).clamp(0.0, 1.0);
