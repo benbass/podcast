@@ -111,7 +111,12 @@ class MyAudioHandler {
     if (player.playing) {
       pause();
     } else {
-      play();
+      player.play();
+      final context = MyApp.navigatorKey.currentContext;
+      if (context != null && context.mounted) {
+        UtilitiesNotifications.createNotificationPlayback(
+            context, false, player.position.inSeconds);
+      }
     }
   }
 
