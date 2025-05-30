@@ -10,6 +10,7 @@ class UnsubscribedPodcastCleanup {
   factory UnsubscribedPodcastCleanup() => _instance;
   UnsubscribedPodcastCleanup._internal();
 
+  /*
   static bool deletePodcastsAndArtworkFiles() {
     // Build a query for episodes that are unsubscribed AND have any flag
     final flaggedEpisodesQuery = episodeBox
@@ -35,6 +36,34 @@ class UnsubscribedPodcastCleanup {
 
     // Now iterate and delete only the identified podcasts and their artwork
     // Keep artwork and podcast if any of its episodes have a flag (read, position, file, favorite)
+    bool success = true;
+    for (PodcastEntity podcast in podcastsToDelete) {
+      if (podcast.artworkFilePath != null) {
+        File artworkFile = File(podcast.artworkFilePath!);
+        if (artworkFile.existsSync()) {
+          try {
+            artworkFile.deleteSync();
+          } catch (e) {
+            success = false;
+            // Consider logging the error here
+          }
+        }
+      }
+      podcastBox.remove(podcast.id);
+    }
+    return success;
+  }
+  */
+
+  static bool deletePodcastsAndArtworkFilesCurrentVersion() {
+    // Build a query for unsubscribed podcasts
+    final podcastsToDeleteQuery = podcastBox
+        .query(PodcastEntity_.subscribed.equals(false))
+        .build();
+
+    final podcastsToDelete = podcastsToDeleteQuery.find();
+
+    // Now iterate and delete only the identified podcasts and their artwork
     bool success = true;
     for (PodcastEntity podcast in podcastsToDelete) {
       if (podcast.artworkFilePath != null) {
