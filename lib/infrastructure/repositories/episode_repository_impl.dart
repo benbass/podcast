@@ -4,11 +4,9 @@ import '../datasources/episode_datasources.dart';
 
 class EpisodeRepositoryImpl implements EpisodeRepository {
   final EpisodeLocalDatasource episodeLocalDatasource;
-  final EpisodeRemoteDataSource episodeRemoteDataSource;
 
   EpisodeRepositoryImpl({
     required this.episodeLocalDatasource,
-    required this.episodeRemoteDataSource,
   });
 
   @override
@@ -28,6 +26,11 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
       refresh: refresh,
       filterText: filterText,
     );
+  }
+
+  @override
+  Stream<EpisodeEntity?> getEpisodeStream({required int episodeId}) {
+    return episodeLocalDatasource.getEpisodeStream(episodeId: episodeId);
   }
 
   @override
