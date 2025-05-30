@@ -80,10 +80,10 @@ class FlexibleSpace extends StatelessWidget {
                 ),
               if (episode != null)
                 BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
+                  buildWhen: (previous, current) {
+                    return previous.episode?.eId != current.episode?.eId;
+                  },
                   builder: (context, currentlyPlayingEpisodeState) {
-                    final isCurrentlyPlaying =
-                        currentlyPlayingEpisodeState.episode?.eId ==
-                            episode!.eId;
                     return Positioned(
                       bottom: 20,
                       left: 12,
@@ -95,7 +95,6 @@ class FlexibleSpace extends StatelessWidget {
                             return EpisodePlaybackProgressIndicator(
                             themeData: themeData,
                             episode: episodeInProgress,
-                            isCurrentlyPlaying: isCurrentlyPlaying,
                             currentlyPlayingEpisode:
                                 currentlyPlayingEpisodeState.episode,
                             dimension: 70,
