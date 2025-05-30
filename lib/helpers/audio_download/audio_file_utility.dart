@@ -7,11 +7,11 @@ import 'package:podcast/injection.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/queued_audio_download/queued_audio_download.dart';
 import 'audio_download_queue_manager.dart';
-import '../core/episode_action_helper.dart';
+import '../database/episode_action_helper.dart';
 
 class AudioFileUtility {
   static void handleDownloadOnPressed(EpisodeEntity episode) async {
-    String? filePath = await getIt<EpisodeUseCases>().getDownloadStatus(episodeId: episode.id).first;
+    String? filePath = await getIt<EpisodeUseCases>().getEpisodeStream(episodeId: episode.id).first.then((value) => value?.filePath);
     if (filePath == null) {
       // This starts the download!
       AudioDownloadQueueManager().addEpisodeToQueue(episode);
