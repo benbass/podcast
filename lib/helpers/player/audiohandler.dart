@@ -66,11 +66,12 @@ class MyAudioHandler {
           Duration position = Duration(seconds: episode.position);
           await player.seek(position);
         }
-        await player.play();
         if (context.mounted) {
           UtilitiesNotifications.createNotificationPlayback(
               context, false, player.position.inSeconds);
         }
+        await player.play();
+
       } on PlayerException {
         if (context.mounted) {
           showOverlayError(
@@ -90,6 +91,10 @@ class MyAudioHandler {
     episodeBox.put(currentEpisode);
 
     await player.stop();
+
+    if (context.mounted) {
+      BlocProvider.of<EpisodePlaybackCubit>(context).resetPlayback();
+    }
 
     removeOverlay();
 
