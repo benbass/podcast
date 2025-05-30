@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
+import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/custom_widgets/page_transition.dart';
 import 'package:podcast/presentation/custom_widgets/play_button.dart';
@@ -73,27 +74,36 @@ class FlexibleSpace extends StatelessWidget {
                 Positioned(
                   bottom: 12,
                   right: 12,
-                  child: PlayButton(episode: episode!, podcast: podcast),
+                  child: PlayButton(
+                    episode: episode!,
+                  ),
                 ),
               if (episode != null)
-                BlocBuilder<EpisodePlaybackCubit,
-                    Map<PodcastEntity, EpisodeEntity>?>(
+                BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
                   builder: (context, currentlyPlayingEpisodeState) {
                     final isCurrentlyPlaying =
-                        currentlyPlayingEpisodeState?.values.first.eId ==
+                        currentlyPlayingEpisodeState.episode?.eId ==
                             episode!.eId;
                     return Positioned(
                       bottom: 20,
                       left: 12,
-                      child: EpisodePlaybackProgressIndicator(
-                        themeData: themeData,
-                        episode: episode!,
-                        isCurrentlyPlaying: isCurrentlyPlaying,
-                        currentlyPlayingEpisode: currentlyPlayingEpisodeState,
-                        dimension: 70,
-                        paddingHoriz: 0,
-                        paddingVert: 0,
-                        strokeWidth: 6,
+                      child: StreamBuilder<EpisodeEntity?>(
+                        stream: getIt<EpisodeUseCases>().getEpisodeStream(episodeId: episode!.id),
+                        initialData: episode,
+                        builder: (context, snapshot) {
+                            final episodeInProgress = snapshot.data ?? episode!;
+                            return EpisodePlaybackProgressIndicator(
+                            themeData: themeData,
+                            episode: episodeInProgress,
+                            isCurrentlyPlaying: isCurrentlyPlaying,
+                            currentlyPlayingEpisode:
+                                currentlyPlayingEpisodeState.episode,
+                            dimension: 70,
+                            paddingHoriz: 0,
+                            paddingVert: 0,
+                            strokeWidth: 6,
+                          );
+                        }
                       ),
                     );
                   },
