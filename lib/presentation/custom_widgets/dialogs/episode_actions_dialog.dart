@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:podcast/helpers/core/episode_action_helper.dart';
+import 'package:podcast/helpers/database/episode_action_helper.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../application/episode_selection_cubit/episode_selection_cubit.dart';
 import '../../../core/globals.dart';
@@ -109,8 +109,8 @@ class EpisodeActionsDialog {
     Map<String, bool> downloadStatus =
         AudioFileUtility.getDownloadStatus(episode);
     final String? filePath = await getIt<EpisodeUseCases>()
-        .getDownloadStatus(episodeId: episode.id)
-        .first;
+        .getEpisodeStream(episodeId: episode.id)
+        .first.then((value) => value?.filePath);
 
     final List<Map<String, dynamic>> menuItems = [
       if (episode.isSubscribed)
