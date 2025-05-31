@@ -100,7 +100,7 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                     ToggleEpisodesFilterStatusEvent(
                       filterStatus:
                           state.episodesFilterStatus.name == "unfinished"
-                              ? "all"
+                              ? "hideRead"
                               : "unfinished",
                     ),
                   );
@@ -119,7 +119,7 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                     ToggleEpisodesFilterStatusEvent(
                       filterStatus:
                           state.episodesFilterStatus.name == "favorites"
-                              ? "all"
+                              ? "hideRead"
                               : "favorites",
                     ),
                   );
@@ -138,7 +138,7 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                     ToggleEpisodesFilterStatusEvent(
                       filterStatus:
                           state.episodesFilterStatus.name == "downloaded"
-                              ? "all"
+                              ? "hideRead"
                               : "downloaded",
                     ),
                   );
