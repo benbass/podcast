@@ -24,7 +24,7 @@ class EpisodeActionsDialog {
             episodeBox.put(episode);
             ActionFeedback.show(
               context,
-              icon: Icons.check,
+              icon: Icons.check_rounded,
             );
           }
           BlocProvider.of<EpisodeSelectionCubit>(context).toggleSelectionMode();
@@ -39,7 +39,7 @@ class EpisodeActionsDialog {
             episodeBox.put(episode);
             ActionFeedback.show(
               context,
-              icon: Icons.radio_button_unchecked,
+              icon: Icons.check_rounded,
             );
           }
           BlocProvider.of<EpisodeSelectionCubit>(context).toggleSelectionMode();
@@ -54,7 +54,7 @@ class EpisodeActionsDialog {
             episodeBox.put(episode);
             ActionFeedback.show(
               context,
-              icon: Icons.star,
+              icon: Icons.star_rounded,
             );
           }
           BlocProvider.of<EpisodeSelectionCubit>(context).toggleSelectionMode();
@@ -69,7 +69,7 @@ class EpisodeActionsDialog {
             episodeBox.put(episode);
             ActionFeedback.show(
               context,
-              icon: Icons.star_border,
+              icon: Icons.star_rounded,
             );
           }
           BlocProvider.of<EpisodeSelectionCubit>(context).toggleSelectionMode();
@@ -120,7 +120,7 @@ class EpisodeActionsDialog {
             final bool isRead = episode.read;
             EpisodeActionHelper.performActionOnEpisode(episode, "read", isRead);
             Navigator.pop(context);
-            ActionFeedback.show(context, icon: Icons.check);
+            ActionFeedback.show(context, icon: Icons.check_rounded);
           }
         },
       {
@@ -143,7 +143,7 @@ class EpisodeActionsDialog {
           EpisodeActionHelper.performActionOnEpisode(
               episode, "favorite", isFavorite);
           Navigator.pop(context);
-          ActionFeedback.show(context, icon: Icons.star);
+          ActionFeedback.show(context, icon: Icons.star_rounded);
         }
       },
       {
