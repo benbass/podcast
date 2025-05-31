@@ -93,7 +93,7 @@ class _EpisodeActionsRowState extends State<EpisodeActionsRow> {
                 },
                 onTapDown: (TapDownDetails details) => ActionFeedback.show(
                     context,
-                    icon: Icons.star,
+                    icon: Icons.star_rounded,
                     tapDownPosition: details.globalPosition),
                 child: Icon(
                   isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
