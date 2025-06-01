@@ -43,7 +43,7 @@ class PlayerStatesListener {
       case ProcessingState.completed:
         _updateEpisodePosition(currentEpisode, 0, true);
         getIt<MyAudioHandler>().stop();
-        removeOverlay();
+        removeOverlayPlayerMin();
         _resetPlaybackEpisode?.call();
         break;
       case ProcessingState.ready:
