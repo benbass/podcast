@@ -51,7 +51,7 @@ void showOverlayError(BuildContext context, String message) async {
   });
 }
 
-void removeOverlay() async {
+void removeOverlayPlayerMin() async {
   overlayEntry?.remove();
   overlayEntry = null;
 }
