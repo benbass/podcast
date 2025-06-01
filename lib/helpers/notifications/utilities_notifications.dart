@@ -7,7 +7,7 @@ import 'package:podcast/domain/entities/episode_entity.dart';
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 
-class UtilitiesNotifications{
+class UtilitiesNotifications {
   static void initAwesomeNotifications() {
     AwesomeNotifications().initialize(
       // set the icon to null if you want to use the default app icon
@@ -31,7 +31,8 @@ class UtilitiesNotifications{
           groupKey: NotificationController.notificationGroupKey,
           channelKey: NotificationController.notificationChannelKey,
           channelName: 'Podcast downloading',
-          channelDescription: 'Notification channel for the Podcast Player Downloads',
+          channelDescription:
+              'Notification channel for the Podcast Player Downloads',
           defaultColor: const Color(0xFFFF8100),
           playSound: false,
           enableVibration: false,
@@ -49,24 +50,26 @@ class UtilitiesNotifications{
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: NotificationController.onActionReceivedMethod,
       //onNotificationCreatedMethod: NotificationController.onNotificationCreatedMethod,
-      onDismissActionReceivedMethod: NotificationController.onDismissActionReceivedMethod,
+      onDismissActionReceivedMethod:
+          NotificationController.onDismissActionReceivedMethod,
       //onNotificationDisplayedMethod: NotificationController.onNotificationDisplayedMethod,
     );
 
     ///TODO: Check if user granted permmission for notifications
     AwesomeNotifications().requestPermissionToSendNotifications();
-
   }
 
   static void cancelNotificationPlayback() {
     AwesomeNotifications().cancel(1);
   }
 
-  static void createNotificationPlayback(BuildContext context, bool isPausingState, int position) async {
-    final EpisodeEntity? episode = context.read<EpisodePlaybackCubit>().state.episode;
-    final PodcastEntity? podcast = context.read<EpisodePlaybackCubit>().state.podcast;
-    final String imageFilePath = podcast?.artworkFilePath ?? "";
-
+  static void createNotificationPlayback(
+      BuildContext context, bool isPausingState, int position) async {
+    final EpisodeEntity episode =
+        context.read<EpisodePlaybackCubit>().state.episode!;
+    final PodcastEntity podcast =
+        context.read<EpisodePlaybackCubit>().state.podcast!;
+    final String imageFilePath = podcast.artworkFilePath ?? "";
 
     // part of string for correct icon depending on boolean provided by the audioHandler methods (playTrack, pauseTrack, resumeTrack...)
     String iconKey = !isPausingState ? 'pause' : 'play';
@@ -81,10 +84,10 @@ class UtilitiesNotifications{
         id: 1,
         channelKey: 'basic_channel',
         category: NotificationCategory.Transport,
-        title: episode?.podcastTitle,
-        body: episode?.title,
-        duration: Duration(seconds: episode?.duration ?? 0),
-        progress: position / (episode?.duration ?? 0) * 100,
+        title: episode.podcastTitle,
+        body: episode.title,
+        duration: Duration(seconds: episode.duration ?? 0),
+        progress: position / (episode.duration ?? 0) * 100,
         playbackSpeed: 1,
         largeIcon: 'file://$imageFilePath',
         bigPicture: 'file://$imageFilePath',
@@ -95,6 +98,9 @@ class UtilitiesNotifications{
         notificationLayout: NotificationLayout.MediaPlayer,
         locked: true,
         playState: notificationPlayState,
+        payload: {
+          'anything': 'as long as this payload is not null',
+        },
       ),
       actionButtons: [
         NotificationActionButton(
@@ -124,8 +130,7 @@ class UtilitiesNotifications{
         NotificationActionButton(
             key: 'RESUMEPAUSE',
             icon: 'resource://drawable/res_ic_$iconKey',
-            label:
-            isPausingState ? 'Pause' : 'Play',
+            label: isPausingState ? 'Pause' : 'Play',
             autoDismissible: false,
             showInCompactView: true,
             enabled: true,
