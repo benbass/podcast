@@ -57,19 +57,21 @@ void main() async {
 
   // Set the callback for the "Show Queue" action in the notification
   audioDownloadQueueManager.onShowQueuePage = () {
-    MyApp.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const AudioDownloadQueuePage()));
+    MyApp.navigatorKey.currentState?.push(
+        MaterialPageRoute(builder: (_) => const AudioDownloadQueuePage()));
   };
 
-
   // Design status and bottom bar
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Color(0xFF000814), // Color of Status Bar
-    statusBarIconBrightness:
-        Brightness.light, // Brightness of Icons in Status Bar
-    systemNavigationBarColor: Color(0xFF000814), // Color of Bottom Bar
-    systemNavigationBarIconBrightness:
-        Brightness.dark, // Brightness of Icons in Bottom Bar
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Color(0xFF050921), // Color of Status Bar
+      statusBarIconBrightness:
+          Brightness.light, // Brightness of Icons in Status Bar
+      systemNavigationBarColor: Color(0xFF050921), // Color of Bottom Bar
+      systemNavigationBarIconBrightness:
+          Brightness.dark, // Brightness of Icons in Bottom Bar
+    ),
+  );
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then(
     (value) => runApp(
@@ -78,9 +80,11 @@ void main() async {
         child: MultiBlocProvider(
           providers: [
             BlocProvider(
-                create: (BuildContext context) => getIt<EpisodeSelectionCubit>()),
+                create: (BuildContext context) =>
+                    getIt<EpisodeSelectionCubit>()),
             BlocProvider(
-                create: (BuildContext context) => getIt<EpisodePlaybackCubit>()),
+                create: (BuildContext context) =>
+                    getIt<EpisodePlaybackCubit>()),
             BlocProvider(
                 create: (BuildContext context) => getIt<TextFieldCubit>()),
             BlocProvider(
@@ -98,7 +102,8 @@ class MyApp extends StatelessWidget {
   const MyApp({
     super.key,
   });
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
