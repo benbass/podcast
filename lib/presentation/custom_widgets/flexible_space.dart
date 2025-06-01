@@ -25,6 +25,8 @@ import 'episode_playback_progress_indicator.dart';
 class FlexibleSpace extends StatelessWidget {
   final PodcastEntity podcast;
   final EpisodeEntity? episode; // If null, widget displays podcast details.
+  final int? episodeIndex;
+  final List<EpisodeEntity>? playlist;
   final String title;
   final String? flag;
 
@@ -32,6 +34,8 @@ class FlexibleSpace extends StatelessWidget {
     super.key,
     required this.podcast,
     this.episode,
+    this.episodeIndex,
+    this.playlist,
     required this.title,
     this.flag,
   });
@@ -76,6 +80,9 @@ class FlexibleSpace extends StatelessWidget {
                   right: 12,
                   child: PlayButton(
                     episode: episode!,
+                    episodeIndex: episodeIndex!,
+                    playlist: playlist!,
+                    podcast: podcast,
                   ),
                 ),
               if (episode != null)
