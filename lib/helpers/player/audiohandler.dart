@@ -58,7 +58,7 @@ class MyAudioHandler {
         );
       }
     } else {
-      removeOverlay();
+      removeOverlayPlayerMin();
       try {
         await player.setUrl(filePath);
 
@@ -71,7 +71,6 @@ class MyAudioHandler {
               context, false, player.position.inSeconds);
         }
         await player.play();
-
       } on PlayerException {
         if (context.mounted) {
           showOverlayError(
@@ -96,7 +95,7 @@ class MyAudioHandler {
       BlocProvider.of<EpisodePlaybackCubit>(context).resetPlayback();
     }
 
-    removeOverlay();
+    removeOverlayPlayerMin();
 
     UtilitiesNotifications.cancelNotificationPlayback();
   }
@@ -147,25 +146,31 @@ class MyAudioHandler {
   }
 
   Future<bool> playNext() async {
+    bool playbackCubitIsReady = false;
     final context = MyApp.navigatorKey.currentContext;
-    bool result =
-        await BlocProvider.of<EpisodePlaybackCubit>(context!).playNextInCubit();
-    if (result) {
+    if (context!.mounted) {
+      playbackCubitIsReady = await BlocProvider.of<EpisodePlaybackCubit>(context)
+          .playNextInCubit();
+    }
+    if (playbackCubitIsReady) {
       await play();
     }
-    return result;
+    return playbackCubitIsReady;
   }
 
   Future<bool> playPrevious() async {
+    bool playbackCubitIsReady = false;
     final context = MyApp.navigatorKey.currentContext;
-    bool result = await BlocProvider.of<EpisodePlaybackCubit>(context!)
-        .playPreviousInCubit();
-    if (result) {
+
+    if (context!.mounted) {
+      playbackCubitIsReady = await BlocProvider.of<EpisodePlaybackCubit>(context)
+          .playPreviousInCubit();
+    }
+    if (playbackCubitIsReady) {
       await play();
     }
-    return result;
+    return playbackCubitIsReady;
   }
-  // END notification skip buttons
 
   void dispose() {
     player.dispose();
