@@ -4,6 +4,7 @@ import 'package:podcast/core/globals.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
+import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 
@@ -11,9 +12,15 @@ class PlayButton extends StatelessWidget {
   const PlayButton({
     super.key,
     required this.episode,
+    required this.episodeIndex,
+    required this.playlist,
+    required this.podcast,
   });
 
   final EpisodeEntity episode;
+  final int episodeIndex;
+  final List<EpisodeEntity> playlist;
+  final PodcastEntity podcast;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +29,9 @@ class PlayButton extends StatelessWidget {
         if (state.episode?.eId != episode.eId) {
           return PlayButtonActive(
             episode: episode,
+            episodeIndex: episodeIndex,
+            playlist: playlist,
+            podcast: podcast,
           );
         } else {
           return const PlayButtonInactive();
@@ -50,9 +60,15 @@ class PlayButtonActive extends StatelessWidget {
   const PlayButtonActive({
     super.key,
     required this.episode,
+    required this.episodeIndex,
+    required this.playlist,
+    required this.podcast,
   });
 
   final EpisodeEntity episode;
+  final int episodeIndex;
+  final List<EpisodeEntity> playlist;
+  final PodcastEntity podcast;
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +85,9 @@ class PlayButtonActive extends StatelessWidget {
         final episodeToPlay = episodeBox.get(episode.id);
         BlocProvider.of<EpisodePlaybackCubit>(context).setPlaybackEpisode(
           episodeToPlay: episodeToPlay,
+          startIndexInPlaylist: episodeIndex,
+          playlist: playlist,
+          podcast: podcast,
         );
         getIt<MyAudioHandler>().play();
       },
