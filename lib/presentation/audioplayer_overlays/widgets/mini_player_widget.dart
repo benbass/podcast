@@ -11,6 +11,7 @@ import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../../episode_details_page/episode_details_page.dart';
+import '../audioplayer_overlays.dart';
 
 class MiniPlayerWidget extends StatelessWidget {
   const MiniPlayerWidget({
@@ -22,7 +23,7 @@ class MiniPlayerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final episode = context.read<EpisodePlaybackCubit>().state.episode;
-    final podcast = context.read<EpisodePlaybackCubit>().state.podcast;
+    final podcast = context.read<EpisodePlaybackCubit>().state.podcast!;
     final episodes = context.read<EpisodePlaybackCubit>().state.episodes;
     String filterStatus =
         context.watch<PodcastBloc>().state.episodesFilterStatus.name;
@@ -38,7 +39,7 @@ class MiniPlayerWidget extends StatelessWidget {
             GestureDetector(
               onTap: () async {
                 // The EpisodeDetailsPage is a PageView depending on a specific list of episodes.
-                // If user called a different podcast after clicking on Play, the episode being played doesn't exist for this podcast.
+                // If user called a different podcast after tapping on Play, the episode being played doesn't exist for this podcast.
                 // We reset the PodcastBloc state with the podcast the playback episode belongs to.
                 // Once done, we can navigate to the EpisodeDetailsPage.
                 await _resetPodcast(
@@ -46,6 +47,7 @@ class MiniPlayerWidget extends StatelessWidget {
                   podcast: podcast,
                   filterStatus: filterStatus,
                 );
+                removeOverlayPlayerMin();
                 if (context.mounted) {
                   Navigator.of(context).pushAndRemoveUntil(
                     ScaleRoute(
@@ -66,7 +68,7 @@ class MiniPlayerWidget extends StatelessWidget {
                       future: MyImageProvider(
                               url: episode!.image.isNotEmpty
                                   ? episode.image
-                                  : podcast!.artworkFilePath != null
+                                  : podcast.artworkFilePath != null
                                       ? podcast.artworkFilePath!
                                       : podcast.artwork)
                           .imageProvider,
@@ -96,7 +98,7 @@ class MiniPlayerWidget extends StatelessWidget {
                         height: 20,
                         width: MediaQuery.of(context).size.width - 170,
                         child: Text(
-                          podcast!.title,
+                          podcast.title,
                         ),
                       ),
                       StreamBuilder<Duration>(
