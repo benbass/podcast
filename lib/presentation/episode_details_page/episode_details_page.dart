@@ -100,30 +100,22 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                     }
                   } else if (episodePlaybackState.episode!.eId ==
                       episodeOnNewPage.eId) {
-                    removeOverlay();
+                    removeOverlayPlayerMin();
                   }
                 },
                 itemCount: episodes.length,
                 itemBuilder: (context, index) {
                   final episodeToDisplay = episodes[index];
-                  // The user may want to play this episode: we already inform the Cubit about podcast and episodes
-                  BlocProvider.of<EpisodePlaybackCubit>(context)
-                      .setPlaybackEpisode(
-                    podcast: podcastState.currentPodcast,
-                    playlist: episodes,
-                    startIndexInPlaylist: index,
-                  );
 
                   bool shouldShowPlayerControls =
                       episodePlaybackState.episode != null &&
                           episodePlaybackState.episode!.eId ==
                               episodeToDisplay.eId;
 
-                  if (shouldShowPlayerControls) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      removeOverlay();
-                    });
+                  if(shouldShowPlayerControls){
+                    removeOverlayPlayerMin();
                   }
+
                   return Stack(
                     children: [
                       SafeArea(
@@ -133,6 +125,8 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                             FlexibleSpace(
                               podcast: podcastState.currentPodcast,
                               episode: episodeToDisplay,
+                              episodeIndex: index,
+                              playlist: episodes,
                               title: episodeToDisplay.title,
                             ),
                             SliverPadding(
