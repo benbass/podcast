@@ -11,17 +11,6 @@ sealed class PodcastEvent extends Equatable {
 // Podcast Local
 final class LoadSubscribedPodcastsEvent extends PodcastEvent {}
 
-final class ToggleEpisodesFilterStatusEvent extends PodcastEvent {
-  final String filterStatus;
-  final String? filterText;
-  const ToggleEpisodesFilterStatusEvent({
-    required this.filterStatus,
-    this.filterText,
-  });
-  @override
-  List<Object> get props => [filterStatus];
-}
-
 final class SubscribeToPodcastEvent extends PodcastEvent {
   final PodcastEntity podcast;
   const SubscribeToPodcastEvent({
@@ -56,14 +45,6 @@ final class GetRemotePodcastsByKeywordEvent extends PodcastEvent {
 
 final class UpdateQueryEvent extends PodcastEvent {}
 
-final class RefreshEpisodesByFeedIdEvent extends PodcastEvent {
-  final int feedId;
-  const RefreshEpisodesByFeedIdEvent({
-    required this.feedId,
-  });
-  @override
-  List<Object> get props => [feedId];
-}
 
 /// None
 final class PodcastTappedEvent extends PodcastEvent {
