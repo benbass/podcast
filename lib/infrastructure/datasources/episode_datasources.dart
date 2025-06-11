@@ -1,80 +1,55 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:dartz/dartz.dart' as dartz;
+
+import 'package:podcast/core/error/failure.dart';
 import '../../core/globals.dart';
 import '../../domain/entities/episode_entity.dart';
+import '../../domain/entities/persistent_podcast_settings_entity.dart';
+import '../../domain/entities/podcast_entity.dart';
+import '../../domain/entities/podcast_filter_settings_entity.dart';
 import '../../helpers/authorization/authorization.dart';
 import '../../injection.dart';
 import '../../objectbox.g.dart';
 import '../models/episode_model.dart';
 
 /// Local data source = objectBox database
-abstract class _BaseEpisodeLocalDatasource {
-  Stream<List<EpisodeEntity>> _getEpisodesByFeedId(int feedId,
-      {required String filterStatus, String? filterText,}) {
-    late QueryBuilder<EpisodeEntity> queryBuilder;
-    if (filterStatus == "favorites") {
-      queryBuilder = episodeBox.query(EpisodeEntity_.feedId
-          .equals(feedId)
-          .and(EpisodeEntity_.favorite.equals(true)))
-        ..order(EpisodeEntity_.datePublished, flags: Order.descending);
-    } else if (filterStatus == "downloaded") {
-      queryBuilder = episodeBox.query(EpisodeEntity_.feedId
-          .equals(feedId)
-          .and(EpisodeEntity_.filePath.notNull()))
-        ..order(EpisodeEntity_.datePublished, flags: Order.descending);
-    } else if (filterStatus == "unfinished") {
-      queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId).and(
-          (EpisodeEntity_.position > 0)
-              .and(EpisodeEntity_.read.equals(false))));
-    } else if (filterStatus == "filterByText") {
-      queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId).and(
-          (EpisodeEntity_.title.contains(filterText!, caseSensitive: false))
-              .or(EpisodeEntity_.description.contains(filterText, caseSensitive: false))));
-    } else {
-      queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId).and(
-          filterStatus == "hideRead"
-              ? EpisodeEntity_.read.equals(false)
-              : EpisodeEntity_.read.notNull()));
-    }
+abstract class EpisodeLocalDatasource {
 
-    queryBuilder.order(EpisodeEntity_.datePublished, flags: Order.descending);
-    final results = queryBuilder
-        .watch(triggerImmediately: true)
-        .map((query) => query.find());
-    return results;
-  }
-}
-
-abstract class EpisodeLocalDatasource extends _BaseEpisodeLocalDatasource {
-  Stream<List<EpisodeEntity>> getEpisodes({
-    required bool subscribed,
+  Stream<List<EpisodeEntity>> getEpisodesStream({
     required int feedId,
     required String podcastTitle,
-    required String filterStatus,
-    required bool refresh,
-    String? filterText,
+    required bool isSubscribed,
+    required PodcastFilterSettingsEntity filterSettings,
+  });
+
+  // Methode, um Episoden explizit vom Server zu laden und in die DB zu speichern
+  Future<void> refreshEpisodesFromServer({
+    required int feedId,
+    required String podcastTitle,
   });
   Stream<EpisodeEntity?> getEpisodeStream({required int episodeId});
   Stream<int> unreadLocalEpisodesCount(
       {required int feedId}); // this is only needed for subscribed = true
 }
 
-class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
+/// Remote data source = http requests
+class EpisodeLocalDatasourceImpl
     implements EpisodeLocalDatasource {
   Future<List<EpisodeEntity>> _fetchRemoteEpisodes(
       {required int feedId, required String podcastTitle}) async {
-    List<EpisodeEntity> remoteEpisodes = [];
-    try {
-      // Fetch episodes from the remote data source.
-      remoteEpisodes = await getIt<EpisodeRemoteDataSource>()
-          .fetchRemoteEpisodesByFeedId(
-              feedId: feedId, podcastTitle: podcastTitle);
-    } catch (e) {
-      remoteEpisodes = [];
-    }
+    dartz.Either<Failure, List<EpisodeEntity>> response =
+        await getIt<EpisodeRemoteDataSource>().fetchRemoteEpisodesByFeedId(
+      feedId: feedId,
+      podcastTitle: podcastTitle,
+    );
+    List<EpisodeEntity> remoteEpisodes = response.fold((failure) {
+      return [];
+    }, (episodes) {
+      return episodes;
+    });
 
     // Retrieve locally stored episodes for the given feed ID.
     final localEpisodes = _getLocalEpisodesByFeedId(feedId: feedId);
@@ -93,31 +68,6 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
   }
 
   @override
-  Stream<List<EpisodeEntity>> getEpisodes({
-    required bool subscribed,
-    required int feedId,
-    required String podcastTitle,
-    required String filterStatus,
-    required bool refresh,
-    String? filterText,
-  }) async* {
-    if (!subscribed) {
-      // If not subscribed, fetch episodes from the remote data source.
-      // And save them to the local database.
-      // These episodes will be deleted from the database at app close if the podcast stays unsubscribed.
-      final episodes = await _fetchRemoteEpisodes(
-          feedId: feedId, podcastTitle: podcastTitle);
-      episodeBox.putMany(episodes);
-    } else {
-      if (refresh) {
-        await _getAndSaveNewEpisodesByFeedId(
-            feedId: feedId, podcastTitle: podcastTitle);
-      }
-    }
-    yield* _getEpisodesByFeedId(feedId, filterStatus: filterStatus, filterText: filterText);
-  }
-
-  @override
   Stream<EpisodeEntity?> getEpisodeStream({required int episodeId}) {
     final queryBuilder = episodeBox.query(EpisodeEntity_.id.equals(episodeId));
     return queryBuilder.watch(triggerImmediately: true).map((query) {
@@ -132,9 +82,51 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
 
   @override
   Stream<int> unreadLocalEpisodesCount({required int feedId}) {
-    final queryBuilder = episodeBox.query(EpisodeEntity_.feedId
-        .equals(feedId)
-        .and(EpisodeEntity_.read.equals(false)));
+    /// 1. Load persistent filter settings for this podcast
+    final podcastQuery =
+        podcastBox.query(PodcastEntity_.pId.equals(feedId)).build();
+    final PodcastEntity? podcast = podcastQuery.findFirst();
+    podcastQuery.close();
+
+    PersistentPodcastSettingsEntity? persistentSettings;
+    if (podcast != null) {
+      persistentSettings = podcast.persistentSettings.target;
+      persistentSettings ??=
+          PersistentPodcastSettingsEntity.defaultPersistentSettings(feedId);
+    }
+
+    late QueryBuilder<EpisodeEntity> queryBuilder;
+    // Base condition for the query
+    Condition<EpisodeEntity> baseCondition =
+        EpisodeEntity_.feedId.equals(feedId);
+
+    // Integrate persistent filter settings to the baseCondition
+    if (persistentSettings != null) {
+      if (persistentSettings.filterExplicitEpisodes) {
+        // Only episodes that are not explicit (or explicit = 0)
+        baseCondition = baseCondition.and(EpisodeEntity_.explicit.notEquals(1));
+      }
+      if (persistentSettings.filterTrailerEpisodes) {
+        // Only episodes that are not trailer (or episodeType = "trailer")
+        baseCondition =
+            baseCondition.and(EpisodeEntity_.episodeType.notEquals("trailer"));
+      }
+      if (persistentSettings.filterBonusEpisodes) {
+        // Only episodes that are not bonus (or episodeType = "bonus")
+        baseCondition =
+            baseCondition.and(EpisodeEntity_.episodeType.notEquals("bonus"));
+      }
+      if (persistentSettings.minEpisodeDurationMinutes != null &&
+          persistentSettings.minEpisodeDurationMinutes! > 0) {
+        final minDurationSeconds =
+            persistentSettings.minEpisodeDurationMinutes! * 60;
+        baseCondition = baseCondition
+            .and(EpisodeEntity_.duration.greaterThan(minDurationSeconds));
+      }
+    }
+
+    queryBuilder =
+        episodeBox.query(baseCondition.and(EpisodeEntity_.read.equals(false)));
     return queryBuilder
         .watch(triggerImmediately: true)
         .map((query) => query.count());
@@ -157,15 +149,16 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
 
   Future<void> _getAndSaveNewEpisodesByFeedId(
       {required int feedId, required String podcastTitle}) async {
-    List<EpisodeEntity> remoteEpisodes = [];
-    try {
-      // Fetch episodes from remote for the given podcast feed ID.
-      remoteEpisodes = await getIt<EpisodeRemoteDataSource>()
-          .fetchRemoteEpisodesByFeedId(
-              feedId: feedId, podcastTitle: podcastTitle);
-    } catch (e) {
-      remoteEpisodes = [];
-    }
+    dartz.Either<Failure, List<EpisodeEntity>> response =
+        await getIt<EpisodeRemoteDataSource>().fetchRemoteEpisodesByFeedId(
+      feedId: feedId,
+      podcastTitle: podcastTitle,
+    );
+    List<EpisodeEntity> remoteEpisodes = response.fold((failure) {
+      return [];
+    }, (episodes) {
+      return episodes;
+    });
 
     // Get the IDs of episodes currently stored locally for this feed ID.
     final Set<int> localEpisodeIds =
@@ -186,68 +179,206 @@ class EpisodeLocalDatasourceImpl extends _BaseEpisodeLocalDatasource
       episodeBox.putMany(newEpisodesSubscribed);
     }
   }
+
+  @override
+  Stream<List<EpisodeEntity>> getEpisodesStream({
+    required int feedId,
+    required String podcastTitle,
+    required bool isSubscribed,
+    required PodcastFilterSettingsEntity filterSettings,
+  }) async* {
+    if (!isSubscribed) {
+      // If not subscribed, fetch episodes from the remote data source.
+      // And save them to the local database.
+      // These episodes will be deleted from the database at app close if the podcast stays unsubscribed.
+      final episodes = await _fetchRemoteEpisodes(
+          feedId: feedId, podcastTitle: podcastTitle);
+      episodeBox.putMany(episodes);
+    }
+
+    // Base condition
+    Condition<EpisodeEntity> queryCondition =
+        EpisodeEntity_.feedId.equals(feedId);
+
+    // --- PERSISTENT FILTER SETTINGS ---
+    if (filterSettings.filterExplicitEpisodes) {
+      queryCondition = queryCondition.and(EpisodeEntity_.explicit.notEquals(1));
+    }
+    if (filterSettings.filterTrailerEpisodes) {
+      queryCondition =
+          queryCondition.and(EpisodeEntity_.episodeType.notEquals("trailer"));
+    }
+    if (filterSettings.filterBonusEpisodes) {
+      queryCondition =
+          queryCondition.and(EpisodeEntity_.episodeType.notEquals("bonus"));
+    }
+    if (filterSettings.minEpisodeDurationMinutes != null &&
+        filterSettings.minEpisodeDurationMinutes! > 0) {
+      final int minDurationMinutes = filterSettings.minEpisodeDurationMinutes!;
+      final int minDurationSeconds = minDurationMinutes * 60;
+      queryCondition = queryCondition
+          .and(EpisodeEntity_.duration.greaterThan(minDurationSeconds));
+    }
+
+    // --- DYNAMIC UI-FILTER ---
+    // Default: read episodes are hidden
+    if (filterSettings.filterRead) {
+      queryCondition = queryCondition.and(EpisodeEntity_.read.equals(false));
+    }
+    if (filterSettings.showOnlyFavorites) {
+      queryCondition = queryCondition.and(EpisodeEntity_.favorite.equals(true));
+    } else if (filterSettings.showOnlyDownloaded) {
+      queryCondition = queryCondition.and(EpisodeEntity_.filePath
+          .notNull()
+          .and(EpisodeEntity_.filePath.notEquals("")));
+    } else if (filterSettings.showOnlyUnfinished) {
+      queryCondition = queryCondition.and(
+          (EpisodeEntity_.position > 0).and(EpisodeEntity_.read.equals(false)));
+    } else if (filterSettings.filterByText &&
+        filterSettings.transientSearchText != null &&
+        filterSettings.transientSearchText!.isNotEmpty) {
+      final searchText = filterSettings.transientSearchText!;
+      queryCondition = queryCondition.and(
+          (EpisodeEntity_.title.contains(searchText, caseSensitive: false)).or(
+              EpisodeEntity_.description
+                  .contains(searchText, caseSensitive: false)));
+    }
+
+    // Create the QueryBuilder with the final condition
+    QueryBuilder<EpisodeEntity> queryBuilder = episodeBox.query(queryCondition);
+
+    // --- SORT ---
+    // We do not offer such a setting in the UI
+    // We use default values: EpisodeEntity_.datePublished and Order.descending.
+    // May be useful for future feature.
+    int orderFlags = filterSettings.sortDirection == SortDirection.descending
+        ? Order.descending
+        : 0;
+    switch (filterSettings.sortProperty) {
+      case EpisodeSortProperty.datePublished:
+        queryBuilder.order(EpisodeEntity_.datePublished, flags: orderFlags);
+        break;
+      case EpisodeSortProperty.duration:
+        queryBuilder.order(EpisodeEntity_.duration, flags: orderFlags);
+        break;
+      case EpisodeSortProperty.title:
+        queryBuilder.order(EpisodeEntity_.title,
+            flags: orderFlags | Order.caseSensitive);
+        break;
+    }
+
+    yield* queryBuilder.watch(triggerImmediately: true).map((query) {
+      final foundEpisodes = query.find();
+      return foundEpisodes;
+    });
+  }
+
+  @override
+  Future<void> refreshEpisodesFromServer({
+    required int feedId,
+    required String podcastTitle,
+  }) async {
+    await _getAndSaveNewEpisodesByFeedId(
+        feedId: feedId, podcastTitle: podcastTitle);
+  }
 }
 
 /// Remote data source = http requests
 abstract class EpisodeRemoteDataSource {
-  Future<List<EpisodeEntity>> fetchRemoteEpisodesByFeedId(
-      {required int feedId, required String podcastTitle});
+  Future<dartz.Either<Failure, List<EpisodeEntity>>>
+      fetchRemoteEpisodesByFeedId(
+          {required int feedId, required String podcastTitle});
+
+  Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb(
+      {required int feedId, required String podcastTitle, bool? markAsSubscribed});
 }
 
 class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
   final http.Client httpClient;
 
   EpisodeRemoteDataSourceImpl({required this.httpClient});
-  @override
-  Future<List<EpisodeEntity>> fetchRemoteEpisodesByFeedId(
-      {required int feedId, required String podcastTitle}) async {
-    // Authorization:
-    Map<String, String> headers = headersForAuth(); // this is the real auth
 
-    // The following code allows to check some podcasts that actually have live episodes:
-    // uri is specific!
-    /*
-    final Uri uriLive = Uri.parse('$baseUrl/episodes/live?pretty&max=20');
-    final responseLive = await httpClient.get(uriLive, headers: headers);
-    if(responseLive.statusCode == 200) {
-      var jsonItems = json.decode(responseLive.body);
-      Map<String, dynamic> myData = {'items': jsonItems['items']};
-      final encoder = JsonEncoder.withIndent('  ');
-      String prettyJson = encoder.convert(myData);
-      debugPrint(prettyJson);
+  @override
+  Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb(
+      {required int feedId, required String podcastTitle, bool? markAsSubscribed}) async {
+    // Check if episodes already exist in db
+    QueryBuilder<EpisodeEntity> queryBuilder =
+        episodeBox.query(EpisodeEntity_.feedId.equals(feedId));
+    final query = queryBuilder.build();
+    final firstMatchingEpisode = query.findFirst();
+    query.close();
+    if (firstMatchingEpisode != null) {
+      return;
     }
-    */
+
+    // Fetch
+    dartz.Either<Failure, List<EpisodeEntity>> responseFromServer =
+        await fetchRemoteEpisodesByFeedId(
+            feedId: feedId, podcastTitle: podcastTitle);
+    List<EpisodeEntity> episodes = responseFromServer.fold((failure) {
+      return [];
+    }, (episodes) {
+      return episodes;
+    });
+
+    // Save to DB
+    if (episodes.isNotEmpty) {
+      if (markAsSubscribed != null && markAsSubscribed) {
+        for (var episode in episodes) {
+          episode.isSubscribed = true;
+        }
+      }
+      episodeBox.putMany(episodes);
+    }
+  }
+
+  @override
+  Future<dartz.Either<Failure, List<EpisodeEntity>>>
+      fetchRemoteEpisodesByFeedId(
+          {required int feedId, required String podcastTitle}) async {
+    // Authorization:
+    Map<String, String> headers = headersForAuth();
 
     final Uri uri =
         Uri.parse('$baseUrl/episodes/byfeedid?id=$feedId&pretty&max=1000');
 
-    final response = await httpClient.get(uri, headers: headers);
-    if (response.statusCode == 200) {
-      var jsonItems = json.decode(response.body);
-      List<EpisodeEntity> episodes = List<EpisodeEntity>.from(
-              jsonItems['items'].map((x) => EpisodeModel.fromJson(x)))
-          .map((e) => e.copyWith(podcastTitle: podcastTitle))
-          .toList();
+    try {
+      final response = await httpClient
+          .get(uri, headers: headers)
+          .timeout(const Duration(seconds: 15));
+      if (response.statusCode == 200) {
+        var jsonItems = json.decode(response.body);
+        List<EpisodeEntity> episodes = List<EpisodeEntity>.from(
+                jsonItems['items'].map((x) => EpisodeModel.fromJson(x)))
+            .map((e) => e.copyWith(podcastTitle: podcastTitle))
+            .toList();
 
-      //episodeBox.putMany(episodes);
-
-      /*
-      // Test for retrieving live items from current podcast (for future feature).
-      // the feature doesn't seem to be supported yet by many podcast providers:
-      // jsonItems['liveItems'] is too often an empty list!
-      Map<String, dynamic> myData = {'liveItems': jsonItems['liveItems']};
-      final encoder = JsonEncoder.withIndent('  ');
-      String prettyJson = encoder.convert(myData);
-      debugPrint(prettyJson);
-      */
-
-      return episodes;
-    } else {
-      debugPrint(
-          "Error Episode datasource fetchEpisodesAsStreamByFeedId: ${response.statusCode}");
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load episodes');
+        return dartz.Right(episodes);
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        return dartz.Left(AuthenticationFailure(
+            message: "Authentication failed: ${response.body}"));
+      } else if (response.statusCode == 404) {
+        return const dartz.Left(NotFoundFailure(
+            message: "Podcast-Feed was not found at this URL."));
+      } else {
+        return dartz.Left(ServerFailure(
+            message: "Server error: ${response.body}",
+            statusCode: response.statusCode));
+      }
+    } on TimeoutException catch (e, s) {
+      return dartz.Left(NetworkFailure(
+          message: "Timeout during the request to the server:", stackTrace: s));
+    } on http.ClientException catch (e, s) {
+      return dartz.Left(NetworkFailure(
+          message: "Network error: ${e.message}", stackTrace: s));
+    } on FormatException catch (e, s) {
+      // When json.decode fails
+      return dartz.Left(ServerFailure(
+          message: "Error processing the server response (invalid format).",
+          stackTrace: s));
+    } catch (e, s) {
+      return dartz.Left(
+          UnexpectedFailure(message: e.toString(), stackTrace: s));
     }
   }
 }
