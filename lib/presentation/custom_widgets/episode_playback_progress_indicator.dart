@@ -20,12 +20,14 @@ class EpisodePlaybackProgressIndicator extends StatelessWidget {
     this.paddingHoriz,
     this.paddingVert,
     this.dimension,
-    this.strokeWidth,});
+    this.strokeWidth,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(bottom: paddingVert ?? 4.0, left: paddingHoriz ?? 4.0),
+      padding: EdgeInsets.only(
+          bottom: paddingVert ?? 4.0, left: paddingHoriz ?? 4.0),
       height: dimension ?? 36,
       width: dimension ?? 36,
       child: StreamBuilder<Duration>(
@@ -46,10 +48,14 @@ class EpisodePlaybackProgressIndicator extends StatelessWidget {
   }
 
   double _calculateProgress(AsyncSnapshot<Duration> snapshot) {
-    if (snapshot.hasData &&  currentlyPlayingEpisode != null) {
+    if (snapshot.hasData &&
+        currentlyPlayingEpisode != null &&
+        currentlyPlayingEpisode!.eId == episode.eId) {
       final currentPosition = snapshot.data!;
-      final totalDuration = Duration(seconds: currentlyPlayingEpisode!.duration!);
-      return (currentPosition.inMilliseconds / totalDuration.inMilliseconds).clamp(0.0, 1.0);
+      final totalDuration =
+          Duration(seconds: currentlyPlayingEpisode!.duration!);
+      return (currentPosition.inMilliseconds / totalDuration.inMilliseconds)
+          .clamp(0.0, 1.0);
     } else if (episode.duration != null && episode.duration! > 0) {
       return (episode.position / episode.duration!).clamp(0.0, 1.0);
     }
@@ -57,7 +63,10 @@ class EpisodePlaybackProgressIndicator extends StatelessWidget {
   }
 
   Color _getBackgroundColor(double progress) {
-    if (progress > 0 || (episode.position > 0 && episode.duration != null && episode.duration! > 0)) {
+    if (progress > 0 ||
+        (episode.position > 0 &&
+            episode.duration != null &&
+            episode.duration! > 0)) {
       return themeData.colorScheme.secondary.withValues(alpha: 0.6);
     }
     return Colors.transparent;
