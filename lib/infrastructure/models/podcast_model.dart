@@ -18,8 +18,6 @@ class PodcastModel extends PodcastEntity {
     required super.medium,
     required super.episodeCount,
     required super.categories,
-    required super.subscribed,
-    required super.artworkFilePath,
   });
 
   /// Converts a map of categories to a list of strings representing the category names.
@@ -82,8 +80,6 @@ class PodcastModel extends PodcastEntity {
       medium: json['medium'] as String?, // stays nullable
       episodeCount: tryParseInt(json['episodeCount']), // stays nullable
       categories: (json['categories'] != null) ? _categoryValuesToList(json['categories'] as Map<String, dynamic>) : [],
-      subscribed: false,
-      artworkFilePath: null,
     );
   }
 
@@ -106,8 +102,6 @@ class PodcastModel extends PodcastEntity {
       medium: medium,
       episodeCount: episodeCount,
       categories: categories,
-      subscribed: subscribed,
-      artworkFilePath: artworkFilePath,
     );
   }
 }
