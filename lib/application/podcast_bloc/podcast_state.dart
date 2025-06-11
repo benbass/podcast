@@ -1,7 +1,6 @@
 part of 'podcast_bloc.dart';
 
 enum PodcastStatus { initial, loading, success, failure }
-enum EpisodesFilterStatus { all, hideRead, unfinished, favorites, downloaded, filterByText }
 
 @immutable
 class PodcastState extends Equatable {
@@ -10,16 +9,13 @@ class PodcastState extends Equatable {
   final List<PodcastEntity> queryResultPodcasts;
   final List<PodcastEntity> trendingPodcasts;
   final PodcastEntity currentPodcast;
-  final EpisodesFilterStatus episodesFilterStatus;
-  final String filterText;
+
   const PodcastState({
     required this.status,
     required this.subscribedPodcasts,
     required this.queryResultPodcasts,
     required this.trendingPodcasts,
     required this.currentPodcast,
-    required this.episodesFilterStatus,
-    required this.filterText,
   });
 
   PodcastState.initial()
@@ -27,9 +23,7 @@ class PodcastState extends Equatable {
         subscribedPodcasts = const <PodcastEntity>[],
         queryResultPodcasts = const <PodcastEntity>[],
         trendingPodcasts = const <PodcastEntity>[],
-        currentPodcast = PodcastEntity.emptyPodcast(),
-        episodesFilterStatus = EpisodesFilterStatus.hideRead,
-        filterText = "";
+        currentPodcast = PodcastEntity.emptyPodcast();
 
   PodcastState copyWith({
     PodcastStatus? status,
@@ -37,8 +31,6 @@ class PodcastState extends Equatable {
     List<PodcastEntity>? queryResultPodcasts,
     List<PodcastEntity>? trendingPodcasts,
     PodcastEntity? currentPodcast,
-    EpisodesFilterStatus? episodesFilterStatus,
-    String? filterText,
   }) {
     return PodcastState(
       status: status ?? this.status,
@@ -46,8 +38,6 @@ class PodcastState extends Equatable {
       queryResultPodcasts: queryResultPodcasts ?? this.queryResultPodcasts,
       trendingPodcasts: trendingPodcasts ?? this.trendingPodcasts,
       currentPodcast: currentPodcast ?? this.currentPodcast,
-      episodesFilterStatus: episodesFilterStatus ?? this.episodesFilterStatus,
-      filterText: filterText ?? this.filterText,
     );
   }
 
@@ -58,7 +48,5 @@ class PodcastState extends Equatable {
         queryResultPodcasts,
         trendingPodcasts,
         currentPodcast,
-        episodesFilterStatus,
-        filterText,
       ];
 }
