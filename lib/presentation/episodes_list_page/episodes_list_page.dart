@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/application/episode_selection_cubit/episode_selection_cubit.dart';
-import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:podcast/injection.dart';
 
@@ -9,17 +8,91 @@ import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.da
 import 'package:podcast/presentation/episodes_list_page/widgets/animated_download_icon.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/conditional_floating_action_buttons.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card_for_list.dart';
+import '../../application/episodes_bloc/episodes_bloc.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
+import '../../domain/entities/podcast_filter_settings_entity.dart';
 import '../custom_widgets/failure_widget.dart';
 import '../custom_widgets/page_transition.dart';
 import '../podcast_details_page/podcast_details_page.dart';
 import 'widgets/row_icon_buttons_episodes.dart';
+
+class EpisodesListPageWrapper extends StatefulWidget {
+  const EpisodesListPageWrapper({super.key});
+
+  @override
+  State<EpisodesListPageWrapper> createState() =>
+      _EpisodesListPageWrapperState();
+}
+
+class _EpisodesListPageWrapperState extends State<EpisodesListPageWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    final podcastState = context.read<PodcastBloc>().state;
+    final currentPodcast = podcastState.currentPodcast;
+    context.read<PodcastSettingsCubit>().loadSettings(currentPodcast.id);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final podcastState = context.watch<PodcastBloc>().state;
+    final currentPodcast = podcastState.currentPodcast;
+
+    return BlocBuilder<PodcastSettingsCubit, PodcastSettingsState>(
+      buildWhen: (previous, current) {
+        if (current is PodcastSettingsLoaded &&
+            current.podcast.id == currentPodcast.id) {
+          return true;
+        }
+        if (previous is PodcastSettingsLoaded &&
+            current is! PodcastSettingsLoaded) {
+          return true;
+        }
+        return false;
+      },
+      builder: (context, settingsState) {
+        if (settingsState is PodcastSettingsLoaded &&
+            settingsState.podcast.id == currentPodcast.id) {
+          final PodcastFilterSettingsEntity initialFilters =
+              settingsState.settings;
+          return BlocProvider<EpisodesBloc>(
+            key: ValueKey(currentPodcast.id),
+            create: (blocContext) {
+              final settingsCubit =
+                  BlocProvider.of<PodcastSettingsCubit>(blocContext);
+              return EpisodesBloc(
+                episodeUseCases: getIt<EpisodeUseCases>(),
+                podcastSettingsCubit: settingsCubit,
+              )..add(LoadEpisodes(
+                  feedId: currentPodcast.pId,
+                  podcastTitle: currentPodcast.title,
+                  isSubscribed: currentPodcast.subscribed,
+                  initialFilterSettings: initialFilters,
+                ));
+            },
+            child: const EpisodesListPage(),
+          );
+        } else {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+      },
+    );
+  }
+}
 
 class EpisodesListPage extends StatelessWidget {
   const EpisodesListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final podcastState = context.watch<PodcastBloc>().state;
+    final currentPodcast = podcastState.currentPodcast;
+
     return PopScope(
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) {
@@ -32,11 +105,147 @@ class EpisodesListPage extends StatelessWidget {
           return;
         }
       },
-      child: const Scaffold(
+      child: Scaffold(
         body: Stack(
           children: [
-            EpisodeListWidget(),
-            ConditionalFloatingActionButtons(),
+            BlocBuilder<EpisodesBloc, EpisodesState>(
+                builder: (context, episodesState) {
+              return SafeArea(
+                child: CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  slivers: [
+                    SliverAppBar(
+                      collapsedHeight: 60,
+                      expandedHeight: 170,
+                      pinned: true,
+                      flexibleSpace: FlexibleSpaceBar(
+                        background: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          spacing: 12,
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 80.0),
+                              child: Text(
+                                currentPodcast.title,
+                                style: Theme.of(context).textTheme.displayLarge,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButtonSubscribe(
+                                  podcast: currentPodcast,
+                                ),
+                                const SizedBox(
+                                  width: 30,
+                                ),
+                                IconButton(
+                                  onPressed: () => Navigator.push(
+                                      context,
+                                      ScaleRoute(
+                                        page: const PodcastDetailsPage(),
+                                      )),
+                                  icon: const Icon(
+                                    Icons.info_outline_rounded,
+                                    size: 30,
+                                  ),
+                                ),
+                                const AnimatedDownloadIcon(),
+                              ],
+                            ),
+                            if (currentPodcast.subscribed)
+                              const RowIconButtonsEpisodes(),
+                            const SizedBox(height: 12),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (episodesState.status == EpisodesStatus.loading &&
+                        episodesState.episodes.isEmpty)
+                      const SliverFillRemaining(
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (episodesState.status == EpisodesStatus.failure)
+                      SliverFillRemaining(
+                        child: Center(
+                          child: buildFailureWidget(
+                              message: episodesState.errorMessage ??
+                                  'Error loading episodes'),
+                        ),
+                      )
+                    else if (episodesState.episodes.isEmpty &&
+                        (episodesState.status == EpisodesStatus.success ||
+                            episodesState.status == EpisodesStatus.refreshing))
+                      const SliverFillRemaining(
+                        child: Center(child: Text("No episodes found")),
+                      )
+                    else
+                      SliverMainAxisGroup(
+                        slivers: [
+                          SliverPersistentHeader(
+                            pinned: true,
+                            delegate: MyHeaderDelegate(
+                              height: 40.0,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Text(
+                                      episodesState.episodes
+                                          .where((ep) => !ep.read)
+                                          .length
+                                          .toString(),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  const Text("  unread episodes"),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SliverPadding(
+                            padding: const EdgeInsets.only(bottom: 80.0),
+                            sliver: SliverList.builder(
+                              itemCount: episodesState.episodes.length,
+                              itemBuilder: (context, index) {
+                                final item = episodesState.episodes[index];
+                                return EpisodeCardForList(
+                                  // episodes Liste wird nicht mehr direkt übergeben,
+                                  // da jede Karte ihren eigenen Zustand (Favorit etc.) verwaltet
+                                  episodes: episodesState.episodes,
+                                  episode: item,
+                                  podcast:
+                                      currentPodcast, // weiterhin vom PodcastBloc
+                                );
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                  ],
+                ),
+              );
+            }),
+            const ConditionalFloatingActionButtons(),
           ],
         ),
       ),
@@ -44,115 +253,31 @@ class EpisodesListPage extends StatelessWidget {
   }
 }
 
-class EpisodeListWidget extends StatelessWidget {
-  const EpisodeListWidget({
-    super.key,
-  });
+class MyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final double height;
+  final Widget child;
+
+  MyHeaderDelegate({required this.height, required this.child});
 
   @override
-  Widget build(BuildContext context) {
-    PodcastState state = context.watch<PodcastBloc>().state;
-    return SafeArea(
-      child: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverAppBar(
-            collapsedHeight: 60,
-            expandedHeight: 170,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                spacing: 12,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 80.0),
-                    child: Text(
-                      state.currentPodcast.title,
-                      style: Theme.of(context).textTheme.displayLarge,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButtonSubscribe(
-                        navigate: true,
-                        podcast: state.currentPodcast,
-                      ),
-                      const SizedBox(
-                        width: 30,
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.push(
-                            context,
-                            ScaleRoute(
-                              page: const PodcastDetailsPage(),
-                            )),
-                        icon: const Icon(
-                          Icons.info_outline_rounded,
-                          size: 30,
-                        ),
-                      ),
-                      const AnimatedDownloadIcon(),
-                    ],
-                  ),
-                  if (state.currentPodcast.subscribed)
-                    const RowIconButtonsEpisodes(),
-                  const SizedBox(
-                    height: 12,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          StreamBuilder<List<EpisodeEntity>>(
-              initialData: const [],
-              // The method getEpisodes checks the subscribed flag of
-              // the podcast and returns the correct stream
-              // (from objectBox database or from the remote server)
-              stream: getIt<EpisodeUseCases>().getEpisodes(
-                subscribed: state.currentPodcast.subscribed,
-                feedId: state.currentPodcast.pId,
-                podcastTitle: state.currentPodcast.title,
-                filterStatus: state.episodesFilterStatus.name,
-                refresh: false,
-                filterText: state.filterText,
-              ),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SliverFillRemaining(
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  return SliverFillRemaining(
-                      child: Center(
-                    child: buildFailureWidget(
-                        message: 'Error loading the episodes'),
-                  ));
-                } else {
-                  return SliverPadding(
-                    padding: const EdgeInsets.only(bottom: 80.0),
-                    sliver: SliverList.builder(
-                      itemCount: snapshot.hasData ? snapshot.data!.length : 0,
-                      itemBuilder: (context, index) {
-                        List<EpisodeEntity> episodes = snapshot.data ?? [];
-                        final item = episodes[index];
-                        return EpisodeCardForList(
-                          episodes: episodes,
-                          episode: item,
-                          podcast: state.currentPodcast,
-                        );
-                      },
-                    ),
-                  );
-                }
-              }),
-        ],
-      ),
-    );
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final color = Theme.of(context).scaffoldBackgroundColor;
+    return Container(
+        color: overlapsContent
+            ? color.withValues(alpha: 0.98)
+            : color.withValues(alpha: 0.95),
+        child: child);
+  }
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  double get minExtent => height;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+    return oldDelegate.maxExtent != maxExtent || oldDelegate != this;
   }
 }
