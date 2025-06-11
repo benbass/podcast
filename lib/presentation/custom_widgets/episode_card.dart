@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
+import 'package:podcast/presentation/custom_widgets/playback_linear_progress_indicator.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../application/episode_selection_cubit/episode_selection_cubit.dart';
@@ -9,7 +10,6 @@ import '../../helpers/core/utilities/format_utilities.dart';
 import '../../helpers/core/utilities/image_provider.dart';
 import 'dialogs/episode_actions_dialog.dart';
 import 'episode_actions_row.dart';
-import 'episode_playback_progress_indicator.dart';
 import 'page_transition.dart';
 import '../episode_details_page/episode_details_page.dart';
 
@@ -51,8 +51,7 @@ class EpisodeCard extends StatelessWidget {
               return BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
                 builder: (context, currentlyPlayingEpisodeState) {
                   final isCurrentlyPlaying =
-                      currentlyPlayingEpisodeState.episode?.eId ==
-                          episode.eId;
+                      currentlyPlayingEpisodeState.episode?.eId == episode.eId;
                   return Card(
                     key: ValueKey(episode.eId),
                     color: cardColor,
@@ -89,66 +88,60 @@ class EpisodeCard extends StatelessWidget {
                               imageProvider,
                               dimension,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(
-                                6.0,
-                                5.0,
-                                0.0,
-                                0.0,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                            Expanded(
+                              child: Stack(
                                 children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                            maxWidth: MediaQuery.of(context)
-                                                    .size
-                                                    .width /
-                                                2,
-                                            minWidth: MediaQuery.of(context)
-                                                    .size
-                                                    .width /
-                                                2),
-                                        child: _buildEpisodeDetails(themeData),
-                                      ),
-                                      const SizedBox(
-                                        width: 40,
-                                      ),
-                                      if (episode.isSubscribed)
-                                        IconButton(
-                                          onPressed: () => EpisodeActionsDialog
-                                              .showEpisodeActionsDialog(
-                                                  context, episode),
-                                          icon: const Icon(
-                                            Icons.more_horiz_rounded,
-                                          ),
-                                        ),
-                                    ],
+                                  PlaybackLinearProgressIndicator(
+                                    themeData: themeData,
+                                    episode: episode,
+                                    currentlyPlayingEpisode:
+                                    currentlyPlayingEpisodeState.episode,
+                                    paddingVert: 0.0,
                                   ),
-                                  SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width - 140,
-                                    child: Row(
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                      6.0,
+                                      8.0,
+                                      0.0,
+                                      0.0,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        EpisodePlaybackProgressIndicator(
-                                          themeData: themeData,
-                                          episode: episode,
-                                          currentlyPlayingEpisode:
-                                              currentlyPlayingEpisodeState.episode,
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                  maxWidth: MediaQuery.of(context)
+                                                          .size
+                                                          .width /
+                                                      2,
+                                                  minWidth: MediaQuery.of(context)
+                                                          .size
+                                                          .width /
+                                                      2),
+                                              child: _buildEpisodeDetails(themeData),
+                                            ),
+                                            const SizedBox(
+                                              width: 40,
+                                            ),
+                                            if (episode.isSubscribed)
+                                              IconButton(
+                                                onPressed: () => EpisodeActionsDialog
+                                                    .showEpisodeActionsDialog(
+                                                        context, episode),
+                                                icon: const Icon(
+                                                  Icons.more_horiz_rounded,
+                                                ),
+                                              ),
+                                          ],
                                         ),
-                                        if (episode.isSubscribed)
-                                          _buildEpisodeIconsRow(context),
+                                        if (episode.isSubscribed) _buildEpisodeIconsRow(context),
                                       ],
                                     ),
                                   ),
@@ -179,9 +172,7 @@ class EpisodeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEpisodeImage(
-      ImageProvider imageProvider,
-      double dimension) {
+  Widget _buildEpisodeImage(ImageProvider imageProvider, double dimension) {
     return Container(
       width: dimension,
       decoration: BoxDecoration(
