@@ -73,11 +73,10 @@ class PodcastRepositoryImpl implements PodcastRepository {
       // Update the subscribed status of the podcast.
       final unsubscribedPodcast = podcastBox.get(podcast.id)!;
 
-      unsubscribedPodcast.artworkFilePath = unsubscribedPodcast.artworkFilePath;
-      unsubscribedPodcast.subscribed = true;
+      final subscribedPodcast = unsubscribedPodcast.copyWith(subscribed: true);
 
       // Persist the updated podcast data.
-      podcastBox.put(unsubscribedPodcast);
+      podcastBox.put(subscribedPodcast);
 
       return true;
     } catch (e) {
