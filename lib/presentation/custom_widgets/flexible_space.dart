@@ -10,6 +10,7 @@ import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/custom_widgets/page_transition.dart';
 import 'package:podcast/presentation/custom_widgets/play_button.dart';
+import 'package:podcast/presentation/custom_widgets/playback_linear_progress_indicator.dart';
 import 'package:podcast/presentation/episodes_list_page/episodes_list_page.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
@@ -18,7 +19,6 @@ import '../../helpers/player/audiohandler.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
 import '../episodes_list_page/widgets/animated_download_icon.dart';
-import 'episode_playback_progress_indicator.dart';
 
 /// This widget displays details about a selected podcast or episode,
 /// depending on which entity (podcast or episode) is provided.
@@ -70,7 +70,6 @@ class FlexibleSpace extends StatelessWidget {
                   top: 12,
                   right: 12,
                   child: ElevatedButtonSubscribe(
-                    navigate: false,
                     podcast: podcast,
                   ),
                 ),
@@ -92,22 +91,20 @@ class FlexibleSpace extends StatelessWidget {
                   },
                   builder: (context, currentlyPlayingEpisodeState) {
                     return Positioned(
-                      bottom: 20,
-                      left: 12,
+                      bottom: 0,
+                      left: 0,
                       child: StreamBuilder<EpisodeEntity?>(
                         stream: getIt<EpisodeUseCases>().getEpisodeStream(episodeId: episode!.id),
                         initialData: episode,
                         builder: (context, snapshot) {
                             final episodeInProgress = snapshot.data ?? episode!;
-                            return EpisodePlaybackProgressIndicator(
+                            return PlaybackLinearProgressIndicator(
                             themeData: themeData,
                             episode: episodeInProgress,
                             currentlyPlayingEpisode:
                                 currentlyPlayingEpisodeState.episode,
-                            dimension: 70,
-                            paddingHoriz: 0,
-                            paddingVert: 0,
-                            strokeWidth: 6,
+                              paddingHoriz: 0.0,
+                              paddingVert: 0.0,
                           );
                         }
                       ),
@@ -207,7 +204,7 @@ class FlexibleSpace extends StatelessWidget {
               }
               Navigator.of(context).pushAndRemoveUntil(
                 ScaleRoute(
-                  page: const EpisodesListPage(),
+                  page: const EpisodesListPageWrapper(),
                 ),
                 ModalRoute.withName('/'),
               );
