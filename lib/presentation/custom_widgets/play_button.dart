@@ -75,7 +75,8 @@ class PlayButtonActive extends StatelessWidget {
     return IconButton(
       onPressed: () {
         // Save the position to the episode being played, if any, before playing the new episode
-        final currentEpisode = context.read<EpisodePlaybackCubit>().state.episode;
+        final currentEpisode =
+            context.read<EpisodePlaybackCubit>().state.episode;
         if (currentEpisode != null) {
           currentEpisode.position =
               getIt<MyAudioHandler>().player.position.inSeconds;
@@ -83,12 +84,13 @@ class PlayButtonActive extends StatelessWidget {
         }
 
         final episodeToPlay = episodeBox.get(episode.id);
-        BlocProvider.of<EpisodePlaybackCubit>(context).setPlaybackEpisode(
-          episodeToPlay: episodeToPlay,
-          startIndexInPlaylist: episodeIndex,
-          playlist: playlist,
-          podcast: podcast,
-        );
+          BlocProvider.of<EpisodePlaybackCubit>(context).setPlaybackEpisode(
+            episodeToPlay: episodeToPlay,
+            startIndexInPlaylist: episodeIndex,
+            playlist: playlist,
+            podcast: podcast,
+          );
+
         getIt<MyAudioHandler>().play();
       },
       padding: EdgeInsets.zero,
