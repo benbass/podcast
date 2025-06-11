@@ -82,12 +82,13 @@ class EpisodeLocalDatasourceImpl
 
   @override
   Stream<int> unreadLocalEpisodesCount({required int feedId}) {
-    /// 1. Load persistent filter settings for this podcast
+
     final podcastQuery =
         podcastBox.query(PodcastEntity_.pId.equals(feedId)).build();
     final PodcastEntity? podcast = podcastQuery.findFirst();
     podcastQuery.close();
 
+    /// 1. Load persistent filter settings for this podcast
     PersistentPodcastSettingsEntity? persistentSettings;
     if (podcast != null) {
       persistentSettings = podcast.persistentSettings.target;
@@ -98,7 +99,7 @@ class EpisodeLocalDatasourceImpl
     late QueryBuilder<EpisodeEntity> queryBuilder;
     // Base condition for the query
     Condition<EpisodeEntity> baseCondition =
-        EpisodeEntity_.feedId.equals(feedId);
+        EpisodeEntity_.feedId.equals(feedId).and(EpisodeEntity_.read.equals(false));
 
     // Integrate persistent filter settings to the baseCondition
     if (persistentSettings != null) {
@@ -126,7 +127,7 @@ class EpisodeLocalDatasourceImpl
     }
 
     queryBuilder =
-        episodeBox.query(baseCondition.and(EpisodeEntity_.read.equals(false)));
+        episodeBox.query(baseCondition);
     return queryBuilder
         .watch(triggerImmediately: true)
         .map((query) => query.count());
