@@ -58,7 +58,7 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
   Widget build(BuildContext context) {
     final podcastState =
         BlocProvider.of<PodcastBloc>(context, listen: false).state;
-    final List<EpisodeEntity> episodes = widget.episodes; //snapshot.data!;
+    final List<EpisodeEntity> episodes = widget.episodes;
 
     // We wrap this widget in PopScope so we can apply a method on the OS back-button
     // where we handle the overlay!
@@ -74,7 +74,7 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
         }
         Navigator.of(context).push(
           ScaleRoute(
-            page: const EpisodesListPage(),
+            page: const EpisodesListPageWrapper(),
           ),
         );
       },
@@ -159,7 +159,6 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                                                       episode:
                                                           episodeToDisplay),
                                                 ),
-                                              const SizedBox(width: 20),
                                               if (episodeToDisplay.isSubscribed)
                                                 IconButton(
                                                   onPressed: () =>
