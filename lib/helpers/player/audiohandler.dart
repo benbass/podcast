@@ -89,11 +89,10 @@ class MyAudioHandler {
         getIt<MyAudioHandler>().player.position.inSeconds;
     episodeBox.put(currentEpisode);
 
-    await player.stop();
-
     if (context.mounted) {
       BlocProvider.of<EpisodePlaybackCubit>(context).resetPlayback();
     }
+    await player.stop();
 
     removeOverlayPlayerMin();
 
@@ -149,8 +148,9 @@ class MyAudioHandler {
     bool playbackCubitIsReady = false;
     final context = MyApp.navigatorKey.currentContext;
     if (context!.mounted) {
-      playbackCubitIsReady = await BlocProvider.of<EpisodePlaybackCubit>(context)
-          .playNextInCubit();
+      playbackCubitIsReady =
+          await BlocProvider.of<EpisodePlaybackCubit>(context)
+              .playNextInCubit();
     }
     if (playbackCubitIsReady) {
       await play();
@@ -163,8 +163,9 @@ class MyAudioHandler {
     final context = MyApp.navigatorKey.currentContext;
 
     if (context!.mounted) {
-      playbackCubitIsReady = await BlocProvider.of<EpisodePlaybackCubit>(context)
-          .playPreviousInCubit();
+      playbackCubitIsReady =
+          await BlocProvider.of<EpisodePlaybackCubit>(context)
+              .playPreviousInCubit();
     }
     if (playbackCubitIsReady) {
       await play();
