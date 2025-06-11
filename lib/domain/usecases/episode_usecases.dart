@@ -1,71 +1,31 @@
 import 'package:podcast/domain/repositories/episode_repository.dart';
 
 import '../entities/episode_entity.dart';
+import '../entities/podcast_filter_settings_entity.dart';
 
 class EpisodeUseCases {
   final EpisodeRepository episodeRepository;
 
   EpisodeUseCases({required this.episodeRepository});
 
-  // Depending on parameters, we either return local or remote data,
-  // and for local data we may filter episodes based on read status
-  Stream<List<EpisodeEntity>> getEpisodes({
-    required bool subscribed,
+  // LOCAL DATA SOURCE
+  // Provides a stream of episodes that reacts to DB changes and filters
+  Stream<List<EpisodeEntity>> getEpisodesStream({
     required int feedId,
     required String podcastTitle,
-    required String filterStatus,
-    required bool refresh,
+    required bool isSubscribed,
+    required PodcastFilterSettingsEntity filterSettings,
     String? filterText,
   }) {
-    return episodeRepository.getEpisodes(
-      subscribed: subscribed,
+    return episodeRepository.getEpisodesStream(
       feedId: feedId,
       podcastTitle: podcastTitle,
-      filterStatus: filterStatus,
-      refresh: refresh,
-      filterText: filterText,
+      isSubscribed: isSubscribed,
+      filterSettings: filterSettings,
     );
   }
 
-/*
-  Stream<bool> getFavoriteStatus({required int episodeId}) {
-    final queryBuilder = episodeBox.query(EpisodeEntity_.id.equals(episodeId));
-    return queryBuilder.watch(triggerImmediately: true).map((query) {
-      final results = query.find();
-      if (results.isNotEmpty) {
-        return results.first.favorite;
-      } else {
-        return false;
-      }
-    });
-  }
-
-
-  Stream<bool> getReadStatus({required int episodeId}) {
-    final queryBuilder = episodeBox.query(EpisodeEntity_.id.equals(episodeId));
-    return queryBuilder.watch(triggerImmediately: true).map((query) {
-      final results = query.find();
-      if (results.isNotEmpty) {
-        return results.first.read;
-      } else {
-        return false;
-      }
-    });
-  }
-
-  Stream<String?> getDownloadStatus({required int episodeId}) {
-    final queryBuilder = episodeBox.query(EpisodeEntity_.id.equals(episodeId));
-    return queryBuilder.watch(triggerImmediately: true).map((query) {
-      final results = query.find();
-      if (results.isNotEmpty) {
-        return results.first.filePath;
-      } else {
-        return null;
-      }
-    });
-  }
-  */
-
+  // Provides a stream of a specific episode that reacts to DB changes and filters
   Stream<EpisodeEntity?> getEpisodeStream({required int episodeId}) {
     return episodeRepository.getEpisodeStream(episodeId: episodeId);
   }
@@ -73,4 +33,33 @@ class EpisodeUseCases {
   Stream<int> unreadLocalEpisodesCount({required int feedId}) {
     return episodeRepository.unreadLocalEpisodesCount(feedId: feedId);
   }
+  // END LOCAL DATA SOURCE
+
+  // REMOTE DATA SOURCE
+  // Is called when podcast is not subscribed (when podcast is result of a search or is a trending podcast).
+  // Gets remote episodes and saves them to local DB: they are deleted at app close if podcast is not subscribed.
+  Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb({
+    required int feedId,
+    required String podcastTitle,
+    bool? markAsSubscribed,
+  }){
+    return episodeRepository.fetchRemoteEpisodesByFeedIdAndSaveToDb(
+      feedId: feedId,
+      podcastTitle: podcastTitle,
+      markAsSubscribed: markAsSubscribed,
+    );
+  }
+
+  // Fetches new episodes from the server and saves them to the local database.
+  Future<void> refreshEpisodesFromServer({
+    required int feedId,
+    required String podcastTitle,
+  }) {
+    return episodeRepository.refreshEpisodesFromServer(
+      feedId: feedId,
+      podcastTitle: podcastTitle,
+    );
+  }
+  // END REMOTE DATA SOURCE
+
 }
