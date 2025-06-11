@@ -5,6 +5,7 @@ import 'package:marquee/marquee.dart';
 
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
 import '../../../application/podcast_bloc/podcast_bloc.dart';
+import '../../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/core/utilities/image_provider.dart';
 import '../../../helpers/player/audiohandler.dart';
@@ -25,8 +26,6 @@ class MiniPlayerWidget extends StatelessWidget {
     final episode = context.read<EpisodePlaybackCubit>().state.episode;
     final podcast = context.read<EpisodePlaybackCubit>().state.podcast!;
     final episodes = context.read<EpisodePlaybackCubit>().state.episodes;
-    String filterStatus =
-        context.watch<PodcastBloc>().state.episodesFilterStatus.name;
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -45,7 +44,6 @@ class MiniPlayerWidget extends StatelessWidget {
                 await _resetPodcast(
                   context: context,
                   podcast: podcast,
-                  filterStatus: filterStatus,
                 );
                 removeOverlayPlayerMin();
                 if (context.mounted) {
@@ -175,16 +173,10 @@ class MiniPlayerWidget extends StatelessWidget {
   _resetPodcast({
     required BuildContext context,
     required PodcastEntity podcast,
-    required String filterStatus,
   }) async {
     final podcastBloc = BlocProvider.of<PodcastBloc>(context);
     // Remove filterText, if any:
-    podcastBloc.add(
-      ToggleEpisodesFilterStatusEvent(
-        filterStatus: filterStatus,
-        filterText: "",
-      ),
-    );
+    context.read<PodcastSettingsCubit>().updateUiFilterSettings(filterByText: false, transientSearchText: "");
     // Reset podcast
     if (context.mounted) {
       podcastBloc.add(PodcastTappedEvent(podcast: podcast));
