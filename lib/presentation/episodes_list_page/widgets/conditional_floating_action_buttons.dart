@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcast/application/episodes_bloc/episodes_bloc.dart';
 
 import '../../../application/episode_selection_cubit/episode_selection_cubit.dart';
-import '../../../application/podcast_bloc/podcast_bloc.dart';
-import '../../../domain/entities/episode_entity.dart';
-import '../../../domain/usecases/episode_usecases.dart';
-import '../../../injection.dart';
 import '../../audioplayer_overlays/audioplayer_overlays.dart';
 import '../../custom_widgets/dialogs/episode_actions_dialog.dart';
 
@@ -33,15 +30,7 @@ class ConditionalFloatingActionButtons extends StatelessWidget {
               FloatingActionButton(
                 heroTag: 'fab_action_select_all',
                 onPressed: () async {
-                  PodcastState podcastState = BlocProvider.of<PodcastBloc>(context).state;
-                  List<EpisodeEntity> allEpisodes = await getIt<EpisodeUseCases>().getEpisodes(
-                    subscribed: podcastState.currentPodcast.subscribed,
-                    feedId: podcastState.currentPodcast.pId,
-                    podcastTitle: podcastState.currentPodcast.title,
-                    filterStatus: podcastState.episodesFilterStatus.name,
-                    refresh: false,
-                    filterText: podcastState.filterText,
-                  ).first;
+                  final allEpisodes = context.read<EpisodesBloc>().state.episodes;
                   if(context.mounted) {
                     BlocProvider.of<EpisodeSelectionCubit>(context).selectAllEpisodes(allEpisodes);
                   }
