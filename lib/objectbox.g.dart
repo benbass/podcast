@@ -15,6 +15,7 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'domain/entities/episode_entity.dart';
+import 'domain/entities/persistent_podcast_settings_entity.dart';
 import 'domain/entities/podcast_entity.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -174,7 +175,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(2, 6590084371707452549),
       name: 'PodcastEntity',
-      lastPropertyId: const obx_int.IdUid(19, 2968814174583946096),
+      lastPropertyId: const obx_int.IdUid(21, 5838812849290071290),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -266,6 +267,53 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(19, 2968814174583946096),
             name: 'artworkFilePath',
             type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(21, 5838812849290071290),
+            name: 'persistentSettingsId',
+            type: 11,
+            flags: 520,
+            indexId: const obx_int.IdUid(4, 4003899417538329055),
+            relationTarget: 'PersistentPodcastSettingsEntity')
+      ],
+      relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(4, 608649504811762363),
+      name: 'PersistentPodcastSettingsEntity',
+      lastPropertyId: const obx_int.IdUid(6, 1305076679239595773),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 576580792927692526),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 934379403263100959),
+            name: 'podcastId',
+            type: 6,
+            flags: 8,
+            indexId: const obx_int.IdUid(3, 3916772115278796845)),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 1059977666763440371),
+            name: 'filterExplicitEpisodes',
+            type: 1,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 8993802752251949173),
+            name: 'filterTrailerEpisodes',
+            type: 1,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 3815097311428515481),
+            name: 'filterBonusEpisodes',
+            type: 1,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 1305076679239595773),
+            name: 'minEpisodeDurationMinutes',
+            type: 6,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -307,13 +355,27 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(2, 6590084371707452549),
-      lastIndexId: const obx_int.IdUid(1, 1126246801486907936),
+      lastEntityId: const obx_int.IdUid(4, 608649504811762363),
+      lastIndexId: const obx_int.IdUid(4, 4003899417538329055),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
-      retiredEntityUids: const [],
-      retiredIndexUids: const [],
-      retiredPropertyUids: const [945864541081495901, 5180667781003373211],
+      retiredEntityUids: const [3290180938186603765],
+      retiredIndexUids: const [4721092752090803034],
+      retiredPropertyUids: const [
+        945864541081495901,
+        5180667781003373211,
+        1529548882864976903,
+        7849284108113886998,
+        2632567559645695073,
+        4447008600377385420,
+        4840784607436359512,
+        2616209215026393219,
+        8637726682018123765,
+        3286808603116795029,
+        4615198929745657932,
+        1922259496943495004,
+        6030078856056489527
+      ],
       retiredRelationUids: const [],
       modelVersion: 5,
       modelVersionParserMinimum: 5,
@@ -475,7 +537,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         }),
     PodcastEntity: obx_int.EntityDefinition<PodcastEntity>(
         model: _entities[1],
-        toOneRelations: (PodcastEntity object) => [],
+        toOneRelations: (PodcastEntity object) => [object.persistentSettings],
         toManyRelations: (PodcastEntity object) => {},
         getId: (PodcastEntity object) => object.id,
         setId: (PodcastEntity object, int id) {
@@ -503,7 +565,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final artworkFilePathOffset = object.artworkFilePath == null
               ? null
               : fbb.writeString(object.artworkFilePath!);
-          fbb.startTable(20);
+          fbb.startTable(22);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.pId);
           fbb.addOffset(2, podcastGuidOffset);
@@ -522,12 +584,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addOffset(15, categoriesOffset);
           fbb.addBool(16, object.subscribed);
           fbb.addOffset(18, artworkFilePathOffset);
+          fbb.addInt64(20, object.persistentSettings.targetId);
           fbb.finish(fbb.endTable());
           return object.id;
         },
         objectFromFB: (obx.Store store, ByteData fbData) {
           final buffer = fb.BufferContext(fbData);
           final rootOffset = buffer.derefObject(0);
+          final idParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
           final pIdParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
           final podcastGuidParam =
@@ -568,6 +633,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.StringReader(asciiOptimization: true)
                   .vTableGetNullable(buffer, rootOffset, 40);
           final object = PodcastEntity(
+              id: idParam,
               pId: pIdParam,
               podcastGuid: podcastGuidParam,
               title: titleParam,
@@ -584,7 +650,51 @@ obx_int.ModelDefinition getObjectBoxModel() {
               episodeCount: episodeCountParam,
               categories: categoriesParam,
               subscribed: subscribedParam,
-              artworkFilePath: artworkFilePathParam)
+              artworkFilePath: artworkFilePathParam);
+          object.persistentSettings.targetId =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 44, 0);
+          object.persistentSettings.attach(store);
+          return object;
+        }),
+    PersistentPodcastSettingsEntity: obx_int.EntityDefinition<
+            PersistentPodcastSettingsEntity>(
+        model: _entities[2],
+        toOneRelations: (PersistentPodcastSettingsEntity object) => [],
+        toManyRelations: (PersistentPodcastSettingsEntity object) => {},
+        getId: (PersistentPodcastSettingsEntity object) => object.id,
+        setId: (PersistentPodcastSettingsEntity object, int id) {
+          object.id = id;
+        },
+        objectToFB: (PersistentPodcastSettingsEntity object, fb.Builder fbb) {
+          fbb.startTable(7);
+          fbb.addInt64(0, object.id);
+          fbb.addInt64(1, object.podcastId);
+          fbb.addBool(2, object.filterExplicitEpisodes);
+          fbb.addBool(3, object.filterTrailerEpisodes);
+          fbb.addBool(4, object.filterBonusEpisodes);
+          fbb.addInt64(5, object.minEpisodeDurationMinutes);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final podcastIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          final filterExplicitEpisodesParam =
+              const fb.BoolReader().vTableGet(buffer, rootOffset, 8, false);
+          final filterTrailerEpisodesParam =
+              const fb.BoolReader().vTableGet(buffer, rootOffset, 10, false);
+          final filterBonusEpisodesParam =
+              const fb.BoolReader().vTableGet(buffer, rootOffset, 12, false);
+          final minEpisodeDurationMinutesParam =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 14);
+          final object = PersistentPodcastSettingsEntity(
+              podcastId: podcastIdParam,
+              filterExplicitEpisodes: filterExplicitEpisodesParam,
+              filterTrailerEpisodes: filterTrailerEpisodesParam,
+              filterBonusEpisodes: filterBonusEpisodesParam,
+              minEpisodeDurationMinutes: minEpisodeDurationMinutesParam)
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
           return object;
@@ -782,4 +892,41 @@ class PodcastEntity_ {
   /// See [PodcastEntity.artworkFilePath].
   static final artworkFilePath =
       obx.QueryStringProperty<PodcastEntity>(_entities[1].properties[17]);
+
+  /// See [PodcastEntity.persistentSettings].
+  static final persistentSettings =
+      obx.QueryRelationToOne<PodcastEntity, PersistentPodcastSettingsEntity>(
+          _entities[1].properties[18]);
+}
+
+/// [PersistentPodcastSettingsEntity] entity fields to define ObjectBox queries.
+class PersistentPodcastSettingsEntity_ {
+  /// See [PersistentPodcastSettingsEntity.id].
+  static final id = obx.QueryIntegerProperty<PersistentPodcastSettingsEntity>(
+      _entities[2].properties[0]);
+
+  /// See [PersistentPodcastSettingsEntity.podcastId].
+  static final podcastId =
+      obx.QueryIntegerProperty<PersistentPodcastSettingsEntity>(
+          _entities[2].properties[1]);
+
+  /// See [PersistentPodcastSettingsEntity.filterExplicitEpisodes].
+  static final filterExplicitEpisodes =
+      obx.QueryBooleanProperty<PersistentPodcastSettingsEntity>(
+          _entities[2].properties[2]);
+
+  /// See [PersistentPodcastSettingsEntity.filterTrailerEpisodes].
+  static final filterTrailerEpisodes =
+      obx.QueryBooleanProperty<PersistentPodcastSettingsEntity>(
+          _entities[2].properties[3]);
+
+  /// See [PersistentPodcastSettingsEntity.filterBonusEpisodes].
+  static final filterBonusEpisodes =
+      obx.QueryBooleanProperty<PersistentPodcastSettingsEntity>(
+          _entities[2].properties[4]);
+
+  /// See [PersistentPodcastSettingsEntity.minEpisodeDurationMinutes].
+  static final minEpisodeDurationMinutes =
+      obx.QueryIntegerProperty<PersistentPodcastSettingsEntity>(
+          _entities[2].properties[5]);
 }
