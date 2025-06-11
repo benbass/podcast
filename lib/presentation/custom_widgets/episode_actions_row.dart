@@ -58,11 +58,11 @@ class _EpisodeActionsRowState extends State<EpisodeActionsRow> {
   Widget build(BuildContext context) {
     bool isDownloadingOrPending = false;
     DownloadStatus currentStatus = DownloadStatus.none;
-    double currentProgress = 0.0;
+    double currentDownloadProgress = 0.0;
 
     if (_currentDownloadItemForThisEpisode != null) {
       currentStatus = _currentDownloadItemForThisEpisode!.status;
-      currentProgress = _currentDownloadItemForThisEpisode!.progress;
+      currentDownloadProgress = _currentDownloadItemForThisEpisode!.progress;
       if (currentStatus == DownloadStatus.downloading ||
           currentStatus == DownloadStatus.pending) {
         isDownloadingOrPending = true;
@@ -77,86 +77,90 @@ class _EpisodeActionsRowState extends State<EpisodeActionsRow> {
           bool isRead = snapshot.data?.read ?? widget.episode.read;
           bool isFavorite = snapshot.data?.favorite ?? widget.episode.favorite;
           String? filePath = snapshot.data?.filePath;
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Icon(
-                isRead ? Icons.check_rounded : null,
-                size: 30.0,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 20),
-              GestureDetector(
-                onTap: () {
-                  EpisodeActionHelper.performActionOnEpisode(
-                      widget.episode, "favorite", isFavorite);
-                },
-                onTapDown: (TapDownDetails details) => ActionFeedback.show(
-                    context,
-                    icon: Icons.star_rounded,
-                    tapDownPosition: details.globalPosition),
-                child: Icon(
-                  isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+          return SizedBox(
+            width: MediaQuery.of(context).size.width - 140,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isRead ? Icons.check_rounded : null,
                   size: 30.0,
-                  color: isFavorite
-                      ? Theme.of(context).colorScheme.primary
-                      : Colors.white12,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
-              ),
-              const SizedBox(width: 20),
-              if (isDownloadingOrPending)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: _buildProgressIndicator(
-                      context, currentStatus, currentProgress),
-                )
-              else
-                IconButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text(filePath != null
-                              ? "Delete the downloaded file?"
-                              : "Download the episode?"),
-                          content: Text(filePath != null
-                              ? "The file will be deleted from your device."
-                              : "This will download the file to your device."),
-                          actions: [
-                            TextButton(
-                              onPressed: () => {
-                                Navigator.pop(context),
-                              },
-                              child: const Text("Cancel"),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                AudioFileUtility.handleDownloadOnPressed(
-                                    widget.episode);
-                              },
-                              child: Text(
-                                  filePath != null ? "Delete" : "Download"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                const SizedBox(width: 20),
+                GestureDetector(
+                  onTap: () {
+                    EpisodeActionHelper.performActionOnEpisode(
+                        widget.episode, "favorite", isFavorite);
                   },
-                  constraints: const BoxConstraints(),
-                  padding: EdgeInsets.zero,
-                  icon: Icon(
-                    filePath != null
-                        ? Icons.delete_rounded
-                        : Icons.save_alt_rounded,
+                  onTapDown: (TapDownDetails details) => ActionFeedback.show(
+                      context,
+                      icon: Icons.star_rounded,
+                      tapDownPosition: details.globalPosition),
+                  child: Icon(
+                    isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
                     size: 30.0,
-                    color: filePath != null
+                    color: isFavorite
                         ? Theme.of(context).colorScheme.primary
                         : Colors.white12,
                   ),
                 ),
-            ],
+                const SizedBox(width: 20),
+                if (isDownloadingOrPending)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: _buildProgressIndicator(
+                        context, currentStatus, currentDownloadProgress),
+                  )
+                else
+                  IconButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text(filePath != null
+                                ? "Delete the downloaded file?"
+                                : "Download the episode?"),
+                            content: Text(filePath != null
+                                ? "The file will be deleted from your device."
+                                : "This will download the file to your device."),
+                            actions: [
+                              TextButton(
+                                onPressed: () => {
+                                  Navigator.pop(context),
+                                },
+                                child: const Text("Cancel"),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  AudioFileUtility.handleDownloadOnPressed(
+                                      widget.episode);
+                                },
+                                child: Text(
+                                    filePath != null ? "Delete" : "Download"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    constraints: const BoxConstraints(),
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      filePath != null
+                          ? Icons.delete_rounded
+                          : Icons.save_alt_rounded,
+                      size: 30.0,
+                      color: filePath != null
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.white12,
+                    ),
+                  ),
+              ],
+            ),
           );
         });
   }
