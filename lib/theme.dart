@@ -86,6 +86,9 @@ class AppTheme {
       primaryContainer: _primaryVariantColor,
     ),
     textTheme: _textTheme,
+    drawerTheme: const DrawerThemeData(
+      backgroundColor: _primaryVariantColor,
+    ),
     elevatedButtonTheme: const ElevatedButtonThemeData(
         style: ButtonStyle(
       elevation: WidgetStatePropertyAll(30),
