@@ -2,9 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:podcast/domain/usecases/episode_usecases.dart';
-import 'package:podcast/injection.dart';
-import 'package:podcast/presentation/homepage/widgets/rounded_text_widget.dart';
 import '../../../application/podcast_bloc/podcast_bloc.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../custom_widgets/page_transition.dart';
@@ -22,11 +19,13 @@ class SubscribedPodcastCard extends StatelessWidget {
     final podcastBloc = BlocProvider.of<PodcastBloc>(context);
     return InkResponse(
       onTap: () {
+        //context.read<PodcastSettingsCubit>().loadSettings(podcast.id);
+
         podcastBloc.add(PodcastTappedEvent(podcast: podcast));
         Navigator.push(
           context,
           ScaleRoute(
-            page: const EpisodesListPage(),
+            page: const EpisodesListPageWrapper(),
           ),
         );
       },
@@ -43,24 +42,6 @@ class SubscribedPodcastCard extends StatelessWidget {
               fit: BoxFit.fitHeight,
             ),
             borderRadius: BorderRadius.circular(15),
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: StreamBuilder<int>(
-                        stream: getIt<EpisodeUseCases>()
-                            .unreadLocalEpisodesCount(feedId: podcast.pId),
-                        builder: (context, snapshotCount) {
-                          return RoundedTextWidget(
-                              text: snapshotCount.data.toString());
-                        })),
-              )
-            ],
           ),
         ),
       ),
