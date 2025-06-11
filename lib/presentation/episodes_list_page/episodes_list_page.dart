@@ -136,6 +136,7 @@ class EpisodesListPage extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+                                const Spacer(),
                                 ElevatedButtonSubscribe(
                                   podcast: currentPodcast,
                                 ),
@@ -153,7 +154,49 @@ class EpisodesListPage extends StatelessWidget {
                                     size: 30,
                                   ),
                                 ),
+                                const SizedBox(
+                                  width: 30,
+                                ),
                                 const AnimatedDownloadIcon(),
+                                const Spacer(),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: StreamBuilder<int>(
+                                    stream: getIt<EpisodeUseCases>()
+                                        .unreadLocalEpisodesCount(
+                                            feedId: currentPodcast.pId),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        final unreadEpisodesCount =
+                                            snapshot.data;
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary),
+                                          alignment: Alignment.center,
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Text(
+                                            unreadEpisodesCount.toString(),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium!
+                                                .copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primaryContainer,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        );
+                                      } else {
+                                        return const SizedBox();
+                                      }
+                                    },
+                                  ),
+                                ),
                               ],
                             ),
                             if (currentPodcast.subscribed)
@@ -183,63 +226,22 @@ class EpisodesListPage extends StatelessWidget {
                         child: Center(child: Text("No episodes found")),
                       )
                     else
-                      SliverMainAxisGroup(
-                        slivers: [
-                          SliverPersistentHeader(
-                            pinned: true,
-                            delegate: MyHeaderDelegate(
-                              height: 40.0,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary),
-                                    alignment: Alignment.center,
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Text(
-                                      episodesState.episodes
-                                          .where((ep) => !ep.read)
-                                          .length
-                                          .toString(),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium!
-                                          .copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onPrimary,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  const Text("  unread episodes"),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: const EdgeInsets.only(bottom: 80.0),
-                            sliver: SliverList.builder(
-                              itemCount: episodesState.episodes.length,
-                              itemBuilder: (context, index) {
-                                final item = episodesState.episodes[index];
-                                return EpisodeCardForList(
-                                  // episodes Liste wird nicht mehr direkt übergeben,
-                                  // da jede Karte ihren eigenen Zustand (Favorit etc.) verwaltet
-                                  episodes: episodesState.episodes,
-                                  episode: item,
-                                  podcast:
-                                      currentPodcast, // weiterhin vom PodcastBloc
-                                );
-                              },
-                            ),
-                          )
-                        ],
+                      SliverPadding(
+                        padding: const EdgeInsets.only(bottom: 80.0),
+                        sliver: SliverList.builder(
+                          itemCount: episodesState.episodes.length,
+                          itemBuilder: (context, index) {
+                            final item = episodesState.episodes[index];
+                            return EpisodeCardForList(
+                              // episodes Liste wird nicht mehr direkt übergeben,
+                              // da jede Karte ihren eigenen Zustand (Favorit etc.) verwaltet
+                              episodes: episodesState.episodes,
+                              episode: item,
+                              podcast:
+                                  currentPodcast, // weiterhin vom PodcastBloc
+                            );
+                          },
+                        ),
                       ),
                   ],
                 ),
@@ -250,34 +252,5 @@ class EpisodesListPage extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class MyHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final double height;
-  final Widget child;
-
-  MyHeaderDelegate({required this.height, required this.child});
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    final color = Theme.of(context).scaffoldBackgroundColor;
-    return Container(
-        color: overlapsContent
-            ? color.withValues(alpha: 0.98)
-            : color.withValues(alpha: 0.95),
-        child: child);
-  }
-
-  @override
-  double get maxExtent => height;
-
-  @override
-  double get minExtent => height;
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    return oldDelegate.maxExtent != maxExtent || oldDelegate != this;
   }
 }
