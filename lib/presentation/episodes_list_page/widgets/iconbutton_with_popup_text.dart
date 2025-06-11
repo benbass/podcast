@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/podcast_bloc/podcast_bloc.dart';
+import '../../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
 
 class IconButtonWithPopupText extends StatefulWidget {
   const IconButtonWithPopupText({super.key});
@@ -43,12 +44,10 @@ class _IconButtonWithPopupTextState extends State<IconButtonWithPopupText> {
                       suffixIcon: IconButton(
                         onPressed: () {
                           _textController.clear();
-                          BlocProvider.of<PodcastBloc>(context).add(
-                              const ToggleEpisodesFilterStatusEvent(
-                                filterStatus: "all",
-                                filterText: "",
-                              ),
-                          );
+                          context
+                              .read<PodcastSettingsCubit>()
+                              .updateUiFilterSettings(
+                                  filterByText: false, transientSearchText: "");
                         },
                         icon: Icon(
                           Icons.cancel,
@@ -78,20 +77,16 @@ class _IconButtonWithPopupTextState extends State<IconButtonWithPopupText> {
                       ),
                     ),
                     onSubmitted: (text) {
-                      BlocProvider.of<PodcastBloc>(context).add(
-                        ToggleEpisodesFilterStatusEvent(
-                          filterStatus: "filterByText",
-                          filterText: text,
-                        ),
-                      );
+                      context
+                          .read<PodcastSettingsCubit>()
+                          .updateUiFilterSettings(
+                              filterByText: true, transientSearchText: text);
                     },
                     onChanged: (text) {
-                      BlocProvider.of<PodcastBloc>(context).add(
-                        ToggleEpisodesFilterStatusEvent(
-                          filterStatus: "filterByText",
-                          filterText: text,
-                        ),
-                      );
+                      context
+                          .read<PodcastSettingsCubit>()
+                          .updateUiFilterSettings(
+                              filterByText: true, transientSearchText: text);
                     },
                   ),
                   const SizedBox(height: 8),
@@ -128,31 +123,37 @@ class _IconButtonWithPopupTextState extends State<IconButtonWithPopupText> {
         link: _layerLink,
         child: BlocBuilder<PodcastBloc, PodcastState>(
           builder: (context, state) {
-            return IconButton(
-              icon: Icon(
-                state.filterText.isNotEmpty
-                    ? Icons.filter_list_off_rounded
-                    : Icons.search_rounded,
-                size: 30,
-              ),
-              onPressed: state.filterText.isNotEmpty
-                  ? () {
-                      _textController.clear();
-                      BlocProvider.of<PodcastBloc>(context).add(
-                        const ToggleEpisodesFilterStatusEvent(
-                          filterStatus: "all",
-                          filterText: "",
-                        ),
-                      );
-                    }
-                  : () {
-                      if (_overlayEntry == null) {
-                        _showTextOverlay();
-                      } else {
-                        _removeOverlay();
+            final settingState = context.watch<PodcastSettingsCubit>().state;
+            if (settingState is PodcastSettingsLoaded) {
+              final settings = settingState.settings;
+              return IconButton(
+                icon: Icon(
+                  settings.transientSearchText != null &&
+                          settings.transientSearchText!.isNotEmpty
+                      ? Icons.filter_list_off_rounded
+                      : Icons.search_rounded,
+                  size: 30,
+                ),
+                onPressed: settings.transientSearchText != null &&
+                        settings.transientSearchText!.isNotEmpty
+                    ? () {
+                        _textController.clear();
+                        context
+                            .read<PodcastSettingsCubit>()
+                            .updateUiFilterSettings(
+                                filterByText: false, transientSearchText: "");
                       }
-                    },
-            );
+                    : () {
+                        if (_overlayEntry == null) {
+                          _showTextOverlay();
+                        } else {
+                          _removeOverlay();
+                        }
+                      },
+              );
+            } else {
+              return const SizedBox();
+            }
           },
         ),
       ),
