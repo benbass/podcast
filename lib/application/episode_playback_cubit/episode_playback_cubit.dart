@@ -14,7 +14,6 @@ part 'episode_playback_state.dart';
 class EpisodePlaybackCubit extends Cubit<EpisodePlaybackState> {
   EpisodePlaybackCubit() : super(const EpisodePlaybackState());
 
-
   void setPlaybackEpisode({
     PodcastEntity? podcast,
     EpisodeEntity? episodeToPlay,
