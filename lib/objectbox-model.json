@@ -157,7 +157,7 @@
     },
     {
       "id": "2:6590084371707452549",
-      "lastPropertyId": "19:2968814174583946096",
+      "lastPropertyId": "21:5838812849290071290",
       "name": "PodcastEntity",
       "properties": [
         {
@@ -250,22 +250,86 @@
           "id": "19:2968814174583946096",
           "name": "artworkFilePath",
           "type": 9
+        },
+        {
+          "id": "21:5838812849290071290",
+          "name": "persistentSettingsId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "4:4003899417538329055",
+          "relationTarget": "PersistentPodcastSettingsEntity"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:608649504811762363",
+      "lastPropertyId": "6:1305076679239595773",
+      "name": "PersistentPodcastSettingsEntity",
+      "properties": [
+        {
+          "id": "1:576580792927692526",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:934379403263100959",
+          "name": "podcastId",
+          "type": 6,
+          "flags": 8,
+          "indexId": "3:3916772115278796845"
+        },
+        {
+          "id": "3:1059977666763440371",
+          "name": "filterExplicitEpisodes",
+          "type": 1
+        },
+        {
+          "id": "4:8993802752251949173",
+          "name": "filterTrailerEpisodes",
+          "type": 1
+        },
+        {
+          "id": "5:3815097311428515481",
+          "name": "filterBonusEpisodes",
+          "type": 1
+        },
+        {
+          "id": "6:1305076679239595773",
+          "name": "minEpisodeDurationMinutes",
+          "type": 6
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "2:6590084371707452549",
-  "lastIndexId": "1:1126246801486907936",
+  "lastEntityId": "4:608649504811762363",
+  "lastIndexId": "4:4003899417538329055",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
-  "retiredEntityUids": [],
-  "retiredIndexUids": [],
+  "retiredEntityUids": [
+    3290180938186603765
+  ],
+  "retiredIndexUids": [
+    4721092752090803034
+  ],
   "retiredPropertyUids": [
     945864541081495901,
-    5180667781003373211
+    5180667781003373211,
+    1529548882864976903,
+    7849284108113886998,
+    2632567559645695073,
+    4447008600377385420,
+    4840784607436359512,
+    2616209215026393219,
+    8637726682018123765,
+    3286808603116795029,
+    4615198929745657932,
+    1922259496943495004,
+    6030078856056489527
   ],
   "retiredRelationUids": [],
   "version": 1
