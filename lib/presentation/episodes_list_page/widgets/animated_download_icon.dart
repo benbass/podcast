@@ -132,23 +132,30 @@ class _AnimatedDownloadIconState extends State<AnimatedDownloadIcon>
   @override
   Widget build(BuildContext context) {
     if (_downloadManager.downloadItems.isEmpty) {
-      return const SizedBox.shrink();
+      return const SizedBox(
+        width: 40,
+      );
     }
 
-    return IconButton(
-      onPressed: () {
-        Navigator.of(context)
-            .push(SlideBottomRoute(page: const AudioDownloadQueuePage()));
-      },
-      icon: AnimatedBuilder(
-        animation: _colorAnimation,
-        builder: (context, child) {
-          return Icon(
-            Icons.download_rounded,
-            size: widget.size ?? 30,
-            color: _colorAnimation.value,
-          );
+    return SizedBox(
+      width: 40.0,
+      child: IconButton(
+        onPressed: () {
+          Navigator.of(context)
+              .push(SlideBottomRoute(page: const AudioDownloadQueuePage()));
         },
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        icon: AnimatedBuilder(
+          animation: _colorAnimation,
+          builder: (context, child) {
+            return Icon(
+              Icons.download_rounded,
+              size: widget.size ?? 30,
+              color: _colorAnimation.value,
+            );
+          },
+        ),
       ),
     );
   }
