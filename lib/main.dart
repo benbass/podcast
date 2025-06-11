@@ -22,8 +22,10 @@ import 'package:provider/provider.dart';
 import 'application/episode_playback_cubit/episode_playback_cubit.dart';
 import 'application/episode_selection_cubit/episode_selection_cubit.dart';
 import 'application/podcast_bloc/podcast_bloc.dart';
+import 'application/podcast_settings_cubit/podcast_settings_cubit.dart';
 import 'core/globals.dart';
 import 'core/objectbox.dart';
+import 'domain/entities/persistent_podcast_settings_entity.dart';
 import 'helpers/audio_download/audio_download_queue_manager.dart';
 import 'helpers/core/lifecycle_oberserver.dart';
 import 'injection.dart' as di;
@@ -39,6 +41,7 @@ void main() async {
   objectBox = await ObjectBox.create();
   podcastBox = objectBox.store.box<PodcastEntity>();
   episodeBox = objectBox.store.box<EpisodeEntity>();
+  settingsBox = objectBox.store.box<PersistentPodcastSettingsEntity>();
 
   // Initialize the lifecycle observer
   final observer = MyAppLifecycleObserver();
@@ -90,6 +93,8 @@ void main() async {
             BlocProvider(
                 create: (BuildContext context) =>
                     getIt<PodcastBloc>()..add(LoadSubscribedPodcastsEvent())),
+            BlocProvider(
+              create: (BuildContext context) => getIt<PodcastSettingsCubit>()),
           ],
           child: const MyApp(),
         ),
@@ -126,7 +131,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const HomePage(),
         '/podcastDetails': (context) => const PodcastDetailsPage(),
         '/podcastSearch': (context) => const PodcastsSearchPage(),
-        '/episodesList': (context) => const EpisodesListPage(),
+        '/episodesList': (context) => const EpisodesListPageWrapper(),
       },
     );
   }
