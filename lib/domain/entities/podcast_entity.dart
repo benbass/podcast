@@ -1,4 +1,5 @@
 import 'package:objectbox/objectbox.dart';
+import 'package:podcast/domain/entities/persistent_podcast_settings_entity.dart';
 
 @Entity()
 class PodcastEntity {
@@ -26,12 +27,16 @@ class PodcastEntity {
   final List<String> categories;
 
   /// User parameter
-  bool subscribed;
+  final bool subscribed;
 
   // will be used for subscribed podcasts: artworkFilePath is artwork url file saved to device
-  String? artworkFilePath;
+  final String? artworkFilePath;
+
+  // relation to persistent settings
+  final ToOne<PersistentPodcastSettingsEntity> persistentSettings = ToOne<PersistentPodcastSettingsEntity>();
 
   PodcastEntity({
+    this.id = 0,
     required this.pId,
     required this.podcastGuid,
     required this.title,
@@ -47,16 +52,16 @@ class PodcastEntity {
     required this.medium,
     required this.episodeCount,
     required this.categories,
-    required this.subscribed,
-    required this.artworkFilePath,
+    this.subscribed = false,
+    this.artworkFilePath,
   });
 
   PodcastEntity copyWith({
     bool? subscribed,
-    int? unreadEpisodes,
     String? artworkFilePath,
   }) {
     return PodcastEntity(
+      id: id,
       pId: pId,
       podcastGuid: podcastGuid,
       title: title,
