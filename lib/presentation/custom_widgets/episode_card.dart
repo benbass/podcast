@@ -46,8 +46,8 @@ class EpisodeCard extends StatelessWidget {
               bool isSelected = BlocProvider.of<EpisodeSelectionCubit>(context)
                   .isEpisodeSelected(episode);
               Color cardColor = isSelected
-                  ? themeData.colorScheme.secondary
-                  : themeData.colorScheme.primaryContainer;
+                  ? themeData.colorScheme.secondary.withValues(alpha: 0.4)
+                  : Colors.black12;
               return BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
                 builder: (context, currentlyPlayingEpisodeState) {
                   final isCurrentlyPlaying =
@@ -63,8 +63,8 @@ class EpisodeCard extends StatelessWidget {
                                 width: 2.0,
                               )
                             : BorderSide.none),
-                    elevation: 5.0,
-                    shadowColor: Colors.black,
+                    elevation: 4.0,
+                    shadowColor: Colors.black12,
                     //margin: const EdgeInsets.all(8.0),
                     clipBehavior: Clip.antiAlias,
                     child: SizedBox(
