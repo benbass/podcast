@@ -65,16 +65,16 @@ void main() async {
   };
 
   // Design status and bottom bar
-  SystemChrome.setSystemUIOverlayStyle(
+ /* SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Color(0xFF050921), // Color of Status Bar
+      statusBarColor: Color(0xFF202531), // Color of Status Bar
       statusBarIconBrightness:
           Brightness.light, // Brightness of Icons in Status Bar
-      systemNavigationBarColor: Color(0xFF050921), // Color of Bottom Bar
+      systemNavigationBarColor: Color(0xFF202531), // Color of Bottom Bar
       systemNavigationBarIconBrightness:
           Brightness.dark, // Brightness of Icons in Bottom Bar
     ),
-  );
+  );*/
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then(
     (value) => runApp(
