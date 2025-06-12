@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/podcast_details_page/widgets/drawer.dart';
 
@@ -6,9 +9,13 @@ import 'package:podcast/presentation/podcast_details_page/widgets/podcast_catego
 import 'package:podcast/presentation/podcast_details_page/widgets/row_icon_buttons_podcasts.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
+import '../../domain/entities/podcast_entity.dart';
 import '../custom_widgets/decoration/box_decoration.dart';
 import '../custom_widgets/dialogs/failure_dialog.dart';
-import '../custom_widgets/flexible_space.dart';
+import '../custom_widgets/elevated_button_subscribe.dart';
+import '../custom_widgets/page_transition.dart';
+import '../episodes_list_page/episodes_list_page.dart';
+import '../episodes_list_page/widgets/animated_download_icon.dart';
 
 class PodcastDetailsPage extends StatelessWidget {
   const PodcastDetailsPage({super.key});
@@ -48,94 +55,229 @@ class PodcastDetailsPage extends StatelessWidget {
             return const Drawer(child: PodcastSettingsDrawer());
           }),
         ),
-        body: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              FlexibleSpace(
-                podcast: state.currentPodcast,
-                episode: null,
-                title: state.currentPodcast.title,
-              ),
-              SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(10.0, 0.0, 20.0, 10.0),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ...state.currentPodcast.categories
-                            .map((value) => PodcastCategory(
-                                  value: value,
-                                )),
-                      ],
+        body: Stack(
+          children: [
+            Stack(
+              fit: StackFit.expand,
+              children: [
+                if (state.currentPodcast.artworkFilePath != null)
+                  Opacity(
+                    opacity: 0.4,
+                    child: Image.file(
+                      File(state.currentPodcast.artworkFilePath!),
+                      fit: BoxFit.cover,
+                      errorBuilder: (BuildContext context, Object error,
+                          StackTrace? stackTrace) {
+                        return const SizedBox();
+                      },
                     ),
-                  )),
-              SliverPadding(
-                padding: const EdgeInsets.all(20.0),
-                sliver: SliverToBoxAdapter(
+                  ),
+                BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
                   child: Container(
-                      decoration: buildBoxDecoration(context),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: RowIconButtonsPodcasts(
-                            podcast: state.currentPodcast),
-                      )),
+                    color: Colors.black26,
+                  ),
                 ),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 100.0),
-                sliver: SliverToBoxAdapter(
-                  child: Container(
-                    decoration: buildBoxDecoration(context),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            state.currentPodcast.description,
-                            style: const TextStyle(
-                              fontSize: 16,
+                SafeArea(
+                  child: ListView(
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.25,
+                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Center(
+                              child: Text(
+                                state.currentPodcast.title,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displayLarge
+                                    ?.copyWith(
+                                      fontSize: 20,
+                                    ),
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: true,
+                                maxLines: 3,
+                              ),
                             ),
-                          ),
-                          Text(
-                            state.currentPodcast.author,
-                            style: const TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: Row(
+                            const SizedBox(height: 20.0,),
+                            ...state.currentPodcast.categories
+                                .map((value) => PodcastCategory(
+                                      value: value,
+                                    )),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Container(
+                            decoration: buildBoxDecoration(context),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: RowIconButtonsPodcasts(
+                                  podcast: state.currentPodcast),
+                            )),
+                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 140.0),
+                        child: Container(
+                          decoration: buildBoxDecoration(context),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
-                                  Icons.language,
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
                                 Text(
-                                  state.currentPodcast.language.toUpperCase(),
+                                  state.currentPodcast.description,
                                   style: const TextStyle(
                                     fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  state.currentPodcast.author,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 20.0),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.language,
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        state.currentPodcast.language
+                                            .toUpperCase(),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: MediaQuery.of(context).size.height * 0.33,
+              child: SafeArea(
+                child: Container(
+                  color: Colors.black12,
+                  child: Stack(
+                    children: [
+                      _buildBackgroundImage(
+                        _getImageUrl(state.currentPodcast),
+                        state.currentPodcast,
+                      ),
+                      const Positioned(
+                        top: 70,
+                        left: 12,
+                        child: AnimatedDownloadIcon(size: 42),
+                      ),
+                      Positioned(
+                        top: 12,
+                        right: 12,
+                        child: ElevatedButtonSubscribe(
+                          podcast: state.currentPodcast,
+                        ),
+                      ),
+                      Positioned(
+                        top: 12,
+                        left: 12,
+                        child: _buildBackButton(context),
+                      )
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     } else {
       return const Scaffold(
           body: Center(child: Text("Error loading podcast details.")));
     }
+  }
+
+  /// Determines the image URL based on whether an episode or podcast is provided.
+  String _getImageUrl(PodcastEntity podcast) {
+    return podcast.artworkFilePath ?? podcast.artwork;
+  }
+
+  /// Builds the background image with blur effect.
+  Widget _buildBackgroundImage(
+    String imageUrl,
+    PodcastEntity podcast,
+  ) {
+    return Stack(
+      children: [
+        Opacity(
+          opacity: 0.4,
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: podcast.artworkFilePath != null
+                    ? FileImage(File(podcast.artworkFilePath!))
+                    : const AssetImage('assets/placeholder.png'),
+                fit: BoxFit.fitWidth,
+              ),
+            ),
+          ),
+        ),
+        ClipRect(
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+            child: Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: podcast.artworkFilePath != null
+                        ? FileImage(File(podcast.artworkFilePath!))
+                        : const AssetImage('assets/placeholder.png'),
+                    fit: BoxFit.fitHeight,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBackButton(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        Navigator.of(context).pushAndRemoveUntil(
+          ScaleRoute(
+            page: const EpisodesListPageWrapper(),
+          ),
+          ModalRoute.withName('/'),
+        );
+      },
+      icon: const BackButtonIcon(),
+    );
   }
 }
