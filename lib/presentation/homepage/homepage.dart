@@ -247,18 +247,7 @@ class HomePage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(_spacing),
           child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(10.0),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black54,
-                  spreadRadius: 0,
-                  blurRadius: 5,
-                  offset: Offset(0, 6),
-                ),
-              ],
-            ),
+            decoration: buildBoxDecoration(context),
             child: Padding(
               padding: const EdgeInsets.all(_spacing * 0.5),
               child: GridView.builder(
