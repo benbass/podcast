@@ -4,10 +4,10 @@ class AppTheme {
   AppTheme._();
 
   static const Color _primaryColor = Color(0xFFCBD4C2);
-  static const Color _primaryVariantColor = Color(0xFF050921);
+  static const Color _primaryVariantColor = Color(0xFF202531);
   static const Color _onPrimaryColor = Color(0xFFF28F3B);
 
-  static const Color _appbarColor = Color(0xFF050921);
+  static const Color _appbarColor = Color(0xFF202531);
   static const Color _textColor = Color(0xFFCBD4C2);
   static const Color _iconColor = Color(0xFFF28F3B);
   static const Color _accentColor = Color(0xFF2D728F); //Color(0xFFB2E92E);
