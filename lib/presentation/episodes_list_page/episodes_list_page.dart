@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/application/episode_selection_cubit/episode_selection_cubit.dart';
@@ -107,7 +110,26 @@ class EpisodesListPage extends StatelessWidget {
       },
       child: Scaffold(
         body: Stack(
+          fit: StackFit.expand,
           children: [
+            if (podcastState.currentPodcast.artworkFilePath != null)
+              Opacity(
+                opacity: 0.4,
+                child: Image.file(
+                  File(podcastState.currentPodcast.artworkFilePath!),
+                  fit: BoxFit.cover,
+                  errorBuilder: (BuildContext context, Object error,
+                      StackTrace? stackTrace) {
+                    return const SizedBox();
+                  },
+                ),
+              ),
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
+              child: Container(
+                color: Colors.black26,
+              ),
+            ),
             BlocBuilder<EpisodesBloc, EpisodesState>(
                 builder: (context, episodesState) {
               return SafeArea(
@@ -115,6 +137,7 @@ class EpisodesListPage extends StatelessWidget {
                   physics: const BouncingScrollPhysics(),
                   slivers: [
                     SliverAppBar(
+                      backgroundColor: Colors.transparent,
                       collapsedHeight: 60,
                       expandedHeight: 170,
                       pinned: true,
@@ -233,12 +256,10 @@ class EpisodesListPage extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final item = episodesState.episodes[index];
                             return EpisodeCardForList(
-                              // episodes Liste wird nicht mehr direkt übergeben,
-                              // da jede Karte ihren eigenen Zustand (Favorit etc.) verwaltet
                               episodes: episodesState.episodes,
                               episode: item,
                               podcast:
-                                  currentPodcast, // weiterhin vom PodcastBloc
+                                  currentPodcast,
                             );
                           },
                         ),
