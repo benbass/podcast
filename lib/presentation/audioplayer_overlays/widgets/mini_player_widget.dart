@@ -2,17 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
+import 'package:podcast/core/navigation/app_navigator.dart';
 
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
-import '../../../application/podcast_bloc/podcast_bloc.dart';
-import '../../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
-import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/core/utilities/image_provider.dart';
 import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
-import '../../custom_widgets/page_transition.dart';
-import '../../episode_details_page/episode_details_page.dart';
-import '../audioplayer_overlays.dart';
 
 class MiniPlayerWidget extends StatelessWidget {
   const MiniPlayerWidget({
@@ -25,7 +20,6 @@ class MiniPlayerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final episode = context.read<EpisodePlaybackCubit>().state.episode;
     final podcast = context.read<EpisodePlaybackCubit>().state.podcast!;
-    final episodes = context.read<EpisodePlaybackCubit>().state.episodes;
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -36,27 +30,8 @@ class MiniPlayerWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             GestureDetector(
-              onTap: () async {
-                // The EpisodeDetailsPage is a PageView depending on a specific list of episodes.
-                // If user called a different podcast after tapping on Play, the episode being played doesn't exist for this podcast.
-                // We reset the PodcastBloc state with the podcast the playback episode belongs to.
-                // Once done, we can navigate to the EpisodeDetailsPage.
-                await _resetPodcast(
-                  context: context,
-                  podcast: podcast,
-                );
-                removeOverlayPlayerMin();
-                if (context.mounted) {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    ScaleRoute(
-                      page: EpisodeDetailsPage(
-                        initialEpisode: episode,
-                        episodes: episodes!,
-                      ),
-                    ),
-                    ModalRoute.withName('/'),
-                  );
-                }
+              onTap: () {
+                AppNavigator.navigateToEpisodeDetailsFromGlobalAction();
               },
               // set HitTestBehavior.opaque to enable the GestureDetector to receive events on the entire row and not only on the row's children
               behavior: HitTestBehavior.opaque,
@@ -168,18 +143,5 @@ class MiniPlayerWidget extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  _resetPodcast({
-    required BuildContext context,
-    required PodcastEntity podcast,
-  }) async {
-    final podcastBloc = BlocProvider.of<PodcastBloc>(context);
-    // Remove filterText, if any:
-    context.read<PodcastSettingsCubit>().updateUiFilterSettings(filterByText: false, transientSearchText: "");
-    // Reset podcast
-    if (context.mounted) {
-      podcastBloc.add(PodcastTappedEvent(podcast: podcast));
-    }
   }
 }
