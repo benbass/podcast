@@ -18,7 +18,8 @@ class RowIconButtonsPodcasts extends StatelessWidget {
 
   // This method will be used when the podcast is not subscribed:
   // we need to fetch the episodes from the server before navigating to the EpisodesListPage.
-  Future<void> _handleRemoteEpisodesFetchingAndNavigate(BuildContext context) async {
+  Future<void> _handleRemoteEpisodesFetchingAndNavigate(
+      BuildContext context) async {
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -34,8 +35,7 @@ class RowIconButtonsPodcasts extends StatelessWidget {
           );
         });
     try {
-      await getIt<EpisodeUseCases>()
-          .fetchRemoteEpisodesByFeedIdAndSaveToDb(
+      await getIt<EpisodeUseCases>().fetchRemoteEpisodesByFeedIdAndSaveToDb(
           feedId: podcast.pId, podcastTitle: podcast.title);
       if (context.mounted) {
         Navigator.of(context).pop();
@@ -50,8 +50,7 @@ class RowIconButtonsPodcasts extends StatelessWidget {
       if (context.mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text("Error fetching the episodes")),
+          const SnackBar(content: Text("Error fetching the episodes")),
         );
       }
     }
@@ -69,7 +68,6 @@ class RowIconButtonsPodcasts extends StatelessWidget {
             },
             icon: const Icon(
               Icons.settings_rounded,
-              size: 30,
             ),
           ),
         Row(
@@ -78,9 +76,7 @@ class RowIconButtonsPodcasts extends StatelessWidget {
               podcast.episodeCount != null
                   ? podcast.episodeCount.toString()
                   : "",
-              style: const TextStyle(
-                fontSize: 16,
-              ),
+              style: Theme.of(context).textTheme.bodySmall,
             ),
             IconButton(
               onPressed: () async {
@@ -111,7 +107,6 @@ class RowIconButtonsPodcasts extends StatelessWidget {
               },
               icon: const Icon(
                 Icons.view_list_rounded,
-                size: 40,
               ),
             ),
           ],
@@ -125,7 +120,6 @@ class RowIconButtonsPodcasts extends StatelessWidget {
           },
           icon: const Icon(
             Icons.share_rounded,
-            size: 30,
           ),
         ),
       ],
