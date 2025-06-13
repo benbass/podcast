@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
 
 class MyImageProvider {
   final String url;
@@ -10,6 +11,17 @@ class MyImageProvider {
   static final Set<String> _verifiedUrls = {};
 
   MyImageProvider({required this.url});
+
+  static const List<String> _imageExtensions = [
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.gif',
+    '.webp',
+    '.bmp',
+    '.heic',
+    '.heif'
+  ];
 
   Future<ImageProvider> get imageProvider async {
     if (url.isEmpty) {
@@ -32,7 +44,20 @@ class MyImageProvider {
         Uri.parse(url),
         headers: {'Range': 'bytes=0-0'}, // Only check the first byte
       ).timeout(const Duration(seconds: 5)); // Timeout
-      final contentType = response.headers['content-type'];
+
+      final contentType = response.headers['content-type']?.toLowerCase();
+
+      bool isLikelyImageByExtension = false;
+
+      try {
+        final uri = Uri.parse(url);
+        String extension = p.extension(uri.path).toLowerCase();
+        if (_imageExtensions.contains(extension)) {
+          isLikelyImageByExtension = true;
+        }
+      } catch (e) {
+        debugPrint('Could not parse extension from URL: $url - $e');
+      }
 
       if (response.statusCode == 200 || response.statusCode == 206) {
         // 206: Partial Content
@@ -42,6 +67,10 @@ class MyImageProvider {
           _verifiedUrls.add(url);
           return NetworkImage(url);
         } else if (contentType != null && contentType.startsWith('binary/')) {
+          return NetworkImage(url);
+        } else if (contentType != null &&
+            contentType == 'application/octet-stream' &&
+            isLikelyImageByExtension) {
           return NetworkImage(url);
         } else {
           debugPrint('Invalid Content-Type: $contentType for URL: $url');
