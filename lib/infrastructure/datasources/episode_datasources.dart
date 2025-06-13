@@ -309,37 +309,60 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
   EpisodeRemoteDataSourceImpl({required this.httpClient});
 
   @override
+  // This Methode is used as soon the user calls an unsubscribed! podcast (we "cache" the episodes in db).
+  // It can can also be called when the episodes are already in the db.
+  // In both cases user may want to subscribe to the podcast.
+  @override
   Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb(
       {required int feedId, required String podcastTitle, bool? markAsSubscribed}) async {
-    // Check if episodes already exist in db
-    QueryBuilder<EpisodeEntity> queryBuilder =
-        episodeBox.query(EpisodeEntity_.feedId.equals(feedId));
+    // first check if episodes already exist in the database
+    final queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId));
     final query = queryBuilder.build();
-    final firstMatchingEpisode = query.findFirst();
+    final List<EpisodeEntity> localEpisodes = query.find();
     query.close();
-    if (firstMatchingEpisode != null) {
+
+    if (localEpisodes.isNotEmpty) {
+      // Episodes already exist in the database.
+      if (markAsSubscribed != null) {
+        // Podcast is being subscribed
+        List<EpisodeEntity> episodesToUpdate = [];
+        for (var episode in localEpisodes) {
+          if (episode.isSubscribed != markAsSubscribed) {
+            episode.isSubscribed = true;
+            episodesToUpdate.add(episode);
+          }
+        }
+        if (episodesToUpdate.isNotEmpty) {
+          episodeBox.putMany(episodesToUpdate);
+        }
+      }
+      // Episodes exist and podcast is not being subscribed
       return;
     }
 
-    // Fetch
-    dartz.Either<Failure, List<EpisodeEntity>> responseFromServer =
-        await fetchRemoteEpisodesByFeedId(
-            feedId: feedId, podcastTitle: podcastTitle);
-    List<EpisodeEntity> episodes = responseFromServer.fold((failure) {
-      return [];
-    }, (episodes) {
-      return episodes;
-    });
+    // Episodes do not exist in the database: fetch them from the server.
+    dartz.Either<Failure, List<EpisodeEntity>> serverResponse =
+    await fetchRemoteEpisodesByFeedId(
+        feedId: feedId, podcastTitle: podcastTitle);
 
-    // Save to DB
-    if (episodes.isNotEmpty) {
-      if (markAsSubscribed != null && markAsSubscribed) {
-        for (var episode in episodes) {
-          episode.isSubscribed = true;
+    await serverResponse.fold(
+          (failure) async {
+        return;
+      },
+          (remoteEpisodes) async {
+        if (remoteEpisodes.isEmpty) {
+          return;
         }
-      }
-      episodeBox.putMany(episodes);
-    }
+        if (markAsSubscribed != null) {
+          // Podcast is being subscribed: update the isSubscribed flag.
+          for (var episode in remoteEpisodes) {
+            episode.isSubscribed = markAsSubscribed;
+          }
+        }
+        // Save the fetched episodes to the database.
+        episodeBox.putMany(remoteEpisodes);
+      },
+    );
   }
 
   @override
