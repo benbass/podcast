@@ -24,8 +24,18 @@ class MiniPlayerWidget extends StatelessWidget {
       color: Colors.transparent,
       child: Container(
         height: kPlayerHeight,
-        width: MediaQuery.of(context).size.width,
-        color: Colors.black,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(10.0), topRight: Radius.circular(10.0)),
+          color: Colors.white12,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black87,
+              blurRadius: 2.0,
+              offset: Offset(0, 2),
+              spreadRadius: 1.0,
+            ),
+          ],
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -54,6 +64,7 @@ class MiniPlayerWidget extends StatelessWidget {
                           height: kPlayerHeight,
                           width: kPlayerHeight,
                           decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.only(topLeft: Radius.circular(10.0)),
                             image: DecorationImage(
                               image: imageProvider,
                               fit: BoxFit.fitWidth,
@@ -66,10 +77,10 @@ class MiniPlayerWidget extends StatelessWidget {
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
                         height: 20,
-                        width: MediaQuery.of(context).size.width - 170,
                         child: Text(
                           podcast.title,
                         ),
@@ -85,11 +96,11 @@ class MiniPlayerWidget extends StatelessWidget {
                                 totalDuration.inMilliseconds;
                             return SizedBox(
                               height: 6,
-                              width: MediaQuery.of(context).size.width - 170,
+                              width: MediaQuery.of(context).size.width - 150,
                               child: LinearProgressIndicator(
                                 value: progress.clamp(0.0, 1.0),
                                 backgroundColor: const Color(0xFFCBD4C2),
-                                color: const Color(0xFF202531),
+                                color: Theme.of(context).colorScheme.secondary,
                               ),
                             );
                           } else if (snapshot.hasError) {
@@ -101,7 +112,7 @@ class MiniPlayerWidget extends StatelessWidget {
                       ),
                       SizedBox(
                         height: 20,
-                        width: MediaQuery.of(context).size.width - 170,
+                        width: MediaQuery.of(context).size.width - 150,
                         child: Marquee(
                           text: episode.title,
                           //style: const TextStyle(color: Colors.white),
