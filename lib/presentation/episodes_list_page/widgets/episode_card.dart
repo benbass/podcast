@@ -3,15 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/playback_linear_progress_indicator.dart';
 
-import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
-import '../../application/episode_selection_cubit/episode_selection_cubit.dart';
-import '../../domain/entities/episode_entity.dart';
-import '../../helpers/core/utilities/format_utilities.dart';
-import '../../helpers/core/utilities/image_provider.dart';
-import 'dialogs/episode_actions_dialog.dart';
-import 'episode_actions_row.dart';
-import 'page_transition.dart';
-import '../episode_details_page/episode_details_page.dart';
+import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../../application/episode_selection_cubit/episode_selection_cubit.dart';
+import '../../../domain/entities/episode_entity.dart';
+import '../../../helpers/core/utilities/format_utilities.dart';
+import '../../../helpers/core/utilities/image_provider.dart';
+import '../../custom_widgets/dialogs/episode_actions_dialog.dart';
+import '../../custom_widgets/episode_actions_row.dart';
+import '../../custom_widgets/page_transition.dart';
+import '../../episode_details_page/episode_details_page.dart';
 
 class EpisodeCard extends StatelessWidget {
   const EpisodeCard({
@@ -113,7 +113,7 @@ class EpisodeCard extends StatelessWidget {
                                         Row(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
                                             ConstrainedBox(
                                               constraints: BoxConstraints(
