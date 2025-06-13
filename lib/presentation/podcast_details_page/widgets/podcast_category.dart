@@ -13,9 +13,7 @@ class PodcastCategory extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: Text(
         value,
-        style: const TextStyle(
-          fontSize: 16,
-        ),
+        style: Theme.of(context).textTheme.bodySmall,
       ),
     );
   }
