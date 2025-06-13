@@ -10,7 +10,7 @@ import 'package:podcast/injection.dart';
 import 'package:podcast/presentation/custom_widgets/elevated_button_subscribe.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/animated_download_icon.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/conditional_floating_action_buttons.dart';
-import 'package:podcast/presentation/episodes_list_page/widgets/episode_card_for_list.dart';
+import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
 import '../../application/episodes_bloc/episodes_bloc.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
@@ -255,7 +255,7 @@ class EpisodesListPage extends StatelessWidget {
                           itemCount: episodesState.episodes.length,
                           itemBuilder: (context, index) {
                             final item = episodesState.episodes[index];
-                            return EpisodeCardForList(
+                            return EpisodeCard(
                               episodes: episodesState.episodes,
                               episode: item,
                               podcast:
