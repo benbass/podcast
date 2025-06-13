@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:podcast/presentation/custom_widgets/decoration/box_decoration.dart';
 import 'package:podcast/presentation/episode_details_page/widgets/playback_position_slider.dart';
 
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
@@ -25,11 +24,23 @@ class PlayerControls extends StatelessWidget {
     return BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
       builder: (context, state) {
         return Container(
-          decoration: buildBoxDecoration(context),
-          height: MediaQuery.of(context).size.height / 7,
-          constraints: const BoxConstraints(minHeight: 150),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(10.0), topRight: Radius.circular(10.0)),
+            color: Colors.white12,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black87,
+                blurRadius: 2.0,
+                offset: Offset(0, 2),
+                spreadRadius: 1.0,
+              ),
+            ],
+          ),
+          height: MediaQuery.of(context).size.height * 0.17,
+          constraints: const BoxConstraints(minHeight: 170),
           child: Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 PlaybackPositionSlider(episode: state.episode!),
                 Padding(
