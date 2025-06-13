@@ -1,13 +1,8 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcast/core/navigation/app_navigator.dart';
 
 import 'package:podcast/helpers/player/audiohandler.dart';
-import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
-import '../../domain/entities/episode_entity.dart';
-import '../../main.dart';
-import '../../presentation/audioplayer_overlays/audioplayer_overlays.dart';
-import '../../presentation/episode_details_page/episode_details_page.dart';
 import '../audio_download/audio_download_queue_manager.dart';
 import '../../injection.dart';
 
@@ -69,30 +64,7 @@ class NotificationController {
     // Tap on the notification: navigate to the episode details page
     // Make sure that payload of NotificationContent ist not null
     if (receivedAction.payload != null) {
-      if (MyApp.navigatorKey.currentState != null) {
-        if (MyApp.navigatorKey.currentContext != null) {
-          EpisodeEntity episode = BlocProvider.of<EpisodePlaybackCubit>(
-                  MyApp.navigatorKey.currentContext!,
-                  listen: false)
-              .state
-              .episode!;
-          List<EpisodeEntity> episodes = BlocProvider.of<EpisodePlaybackCubit>(
-                  MyApp.navigatorKey.currentContext!,
-                  listen: false)
-              .state
-              .episodes!;
-          removeOverlayPlayerMin();
-          Navigator.of(MyApp.navigatorKey.currentContext!).push(
-            MaterialPageRoute<void>(
-              builder: (BuildContext context) => EpisodeDetailsPage(
-                initialEpisode: episode,
-                episodes: episodes,
-              ),
-            ),
-          );
-        }
-
-      }
+      AppNavigator.navigateToEpisodeDetailsFromGlobalAction();
     }
   }
 }
