@@ -192,9 +192,18 @@ class EpisodeLocalDatasourceImpl
       // If not subscribed, fetch episodes from the remote data source.
       // And save them to the local database.
       // These episodes will be deleted from the database at app close if the podcast stays unsubscribed.
-      final episodes = await _fetchRemoteEpisodes(
-          feedId: feedId, podcastTitle: podcastTitle);
-      episodeBox.putMany(episodes);
+
+      // User may have called the episode list already: check this first.
+      final queryForCachedEpisodes = episodeBox.query(EpisodeEntity_.feedId.equals(feedId));
+      final queryBuilderForCachedEpisodes = queryForCachedEpisodes.build();
+      final cachedEpisodes = queryBuilderForCachedEpisodes.find();
+      queryBuilderForCachedEpisodes.close();
+
+      if (cachedEpisodes.isEmpty) {
+        final episodes = await _fetchRemoteEpisodes(
+            feedId: feedId, podcastTitle: podcastTitle);
+        episodeBox.putMany(episodes);
+      }
     }
 
     // Base condition
