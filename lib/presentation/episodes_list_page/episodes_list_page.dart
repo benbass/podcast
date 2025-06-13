@@ -59,23 +59,14 @@ class _EpisodesListPageWrapperState extends State<EpisodesListPageWrapper> {
             settingsState.podcast.id == currentPodcast.id) {
           final PodcastFilterSettingsEntity initialFilters =
               settingsState.settings;
-          return BlocProvider<EpisodesBloc>(
-            key: ValueKey(currentPodcast.id),
-            create: (blocContext) {
-              final settingsCubit =
-                  BlocProvider.of<PodcastSettingsCubit>(blocContext);
-              return EpisodesBloc(
-                episodeUseCases: getIt<EpisodeUseCases>(),
-                podcastSettingsCubit: settingsCubit,
-              )..add(LoadEpisodes(
-                  feedId: currentPodcast.pId,
-                  podcastTitle: currentPodcast.title,
-                  isSubscribed: currentPodcast.subscribed,
-                  initialFilterSettings: initialFilters,
-                ));
-            },
-            child: const EpisodesListPage(),
-          );
+
+          BlocProvider.of<EpisodesBloc>(context).add(LoadEpisodes(
+            feedId: currentPodcast.pId,
+            podcastTitle: currentPodcast.title,
+            isSubscribed: currentPodcast.subscribed,
+            initialFilterSettings: initialFilters,
+          ));
+          return const EpisodesListPage();
         } else {
           return const Scaffold(
             body: Center(
@@ -258,8 +249,7 @@ class EpisodesListPage extends StatelessWidget {
                             return EpisodeCard(
                               episodes: episodesState.episodes,
                               episode: item,
-                              podcast:
-                                  currentPodcast,
+                              podcast: currentPodcast,
                             );
                           },
                         ),
