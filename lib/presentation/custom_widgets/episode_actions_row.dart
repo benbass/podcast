@@ -80,15 +80,16 @@ class _EpisodeActionsRowState extends State<EpisodeActionsRow> {
           return SizedBox(
             width: MediaQuery.of(context).size.width - 140,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               mainAxisSize: MainAxisSize.min,
               children: [
+                const Spacer(flex: 5),
                 Icon(
                   isRead ? Icons.check_rounded : null,
                   size: 30.0,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                const SizedBox(width: 20),
+                const Spacer(),
                 GestureDetector(
                   onTap: () {
                     EpisodeActionHelper.performActionOnEpisode(
@@ -106,7 +107,7 @@ class _EpisodeActionsRowState extends State<EpisodeActionsRow> {
                         : Colors.white12,
                   ),
                 ),
-                const SizedBox(width: 20),
+                const Spacer(),
                 if (isDownloadingOrPending)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
