@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 BoxDecoration buildBoxDecoration(BuildContext context) {
   return BoxDecoration(
     borderRadius: BorderRadius.circular(10.0),
-    color: Colors.white10,//Theme.of(context).colorScheme.primaryContainer,
+    color: Colors.white10,
     boxShadow: const [
       BoxShadow(
         color: Colors.black12,
