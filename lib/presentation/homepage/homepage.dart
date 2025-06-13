@@ -270,7 +270,7 @@ class HomePage extends StatelessWidget {
       );
     }
 
-    Widget buildCircularProgressIndicator() {
+    Widget buildLoadingWidget() {
       return Builder(
           builder: (context) => SizedBox(
                 height: MediaQuery.of(context).size.height,
@@ -286,7 +286,7 @@ class HomePage extends StatelessWidget {
 
     // Build the grid based on the state
     return state.status == PodcastStatus.loading
-        ? buildCircularProgressIndicator()
+        ? buildLoadingWidget()
         : state.subscribedPodcasts.isEmpty
             ? emptyStateWidget
             : buildGrid(state.subscribedPodcasts);
