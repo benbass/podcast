@@ -190,7 +190,7 @@ class EpisodesListPage extends StatelessWidget {
                                                   .colorScheme
                                                   .primary),
                                           alignment: Alignment.center,
-                                          padding: const EdgeInsets.all(5.0),
+                                          padding: const EdgeInsets.all(10.0),
                                           child: Text(
                                             unreadEpisodesCount.toString(),
                                             style: Theme.of(context)
