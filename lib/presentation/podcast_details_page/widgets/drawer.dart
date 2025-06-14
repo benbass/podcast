@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -68,10 +69,10 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
       child: Column(
         children: [
           Text(
-            "Filter for $_podcastTitle",
+            "Filter for\n$_podcastTitle",
             style: themeData.textTheme.displayLarge,
             overflow: TextOverflow.ellipsis,
-            maxLines: 2,
+            maxLines: 3,
           ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 20.0),
