@@ -14,6 +14,8 @@ import '../custom_widgets/decoration/box_decoration.dart';
 import '../custom_widgets/dialogs/failure_dialog.dart';
 import '../custom_widgets/elevated_button_subscribe.dart';
 import '../custom_widgets/page_transition.dart';
+import '../effects/backdropfilter_body.dart';
+import '../effects/opacity_body.dart';
 import '../episodes_list_page/episodes_list_page.dart';
 import '../episodes_list_page/widgets/animated_download_icon.dart';
 
@@ -51,9 +53,27 @@ class PodcastDetailsPage extends StatelessWidget {
       return Scaffold(
         drawer: BlocProvider(
           create: (context) => PodcastSettingsCubit()..loadSettings(podcastId),
-          child: Builder(builder: (context) {
-            return const Drawer(child: PodcastSettingsDrawer());
-          }),
+          child: Builder(
+            builder: (context) {
+              return BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: SafeArea(
+                  child: Drawer(
+                    backgroundColor: Colors.transparent,
+                    surfaceTintColor: Theme.of(context).colorScheme.secondary,
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
+                      ),
+                    ),
+                    child: const PodcastSettingsDrawer(),
+                  ),
+                ),
+              );
+            },
+          ),
         ),
         body: Stack(
           children: [
@@ -61,37 +81,24 @@ class PodcastDetailsPage extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 if (state.currentPodcast.artworkFilePath != null)
-                  Opacity(
-                    opacity: 0.4,
-                    child: Image.file(
-                      File(state.currentPodcast.artworkFilePath!),
-                      fit: BoxFit.cover,
-                      errorBuilder: (BuildContext context, Object error,
-                          StackTrace? stackTrace) {
-                        return const SizedBox();
-                      },
-                    ),
-                  ),
-                BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
-                  child: Container(
-                    color: Colors.black26,
-                  ),
-                ),
+                  OpacityBody(state: state, assetImage: null,),
+                const BackdropFilterBody(),
                 SafeArea(
                   child: Padding(
                     padding: EdgeInsets.only(
                         top: MediaQuery.of(context).size.height * 0.25),
                     child: CustomScrollView(
+                      physics: const BouncingScrollPhysics(),
                       slivers: [
                         SliverAppBar(
                           automaticallyImplyLeading: false,
                           backgroundColor: Colors.transparent,
-                          expandedHeight:
-                              MediaQuery.of(context).size.height * 0.18,
-                          collapsedHeight: 90,
+                          expandedHeight: MediaQuery.of(context).size.height * 0.18,
+                          collapsedHeight: 150,
                           pinned: false,
                           floating: true,
+                          snap: true,
+                          primary: false,
                           title: Text(
                             state.currentPodcast.title,
                           ),
@@ -100,6 +107,7 @@ class PodcastDetailsPage extends StatelessWidget {
                               Theme.of(context).textTheme.displayLarge,
                           toolbarHeight: 20,
                           flexibleSpace: FlexibleSpaceBar(
+                            titlePadding: EdgeInsets.zero,
                             title: Padding(
                               padding: const EdgeInsets.all(14.0),
                               child: Wrap(
@@ -161,7 +169,7 @@ class PodcastDetailsPage extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            titlePadding: EdgeInsets.zero,
+
                           ),
                         ),
                         SliverPadding(
@@ -325,3 +333,4 @@ class PodcastDetailsPage extends StatelessWidget {
     );
   }
 }
+
