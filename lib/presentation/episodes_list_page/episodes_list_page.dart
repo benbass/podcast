@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/application/episode_selection_cubit/episode_selection_cubit.dart';
@@ -15,8 +12,11 @@ import '../../application/episodes_bloc/episodes_bloc.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
 import '../../domain/entities/podcast_filter_settings_entity.dart';
+import '../custom_widgets/decoration/box_decoration.dart';
 import '../custom_widgets/failure_widget.dart';
 import '../custom_widgets/page_transition.dart';
+import '../effects/backdropfilter_body.dart';
+import '../effects/opacity_body.dart';
 import '../podcast_details_page/podcast_details_page.dart';
 import 'widgets/row_icon_buttons_episodes.dart';
 
@@ -29,12 +29,21 @@ class EpisodesListPageWrapper extends StatefulWidget {
 }
 
 class _EpisodesListPageWrapperState extends State<EpisodesListPageWrapper> {
+  late Stream<int> _unreadEpisodesStream;
+
   @override
   void initState() {
     super.initState();
     final podcastState = context.read<PodcastBloc>().state;
     final currentPodcast = podcastState.currentPodcast;
     context.read<PodcastSettingsCubit>().loadSettings(currentPodcast.id);
+    _unreadEpisodesStream = getIt<EpisodeUseCases>()
+        .unreadLocalEpisodesCount(feedId: currentPodcast.pId);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -66,7 +75,9 @@ class _EpisodesListPageWrapperState extends State<EpisodesListPageWrapper> {
             isSubscribed: currentPodcast.subscribed,
             initialFilterSettings: initialFilters,
           ));
-          return const EpisodesListPage();
+          return EpisodesListPage(
+            unreadEpisodesStream: _unreadEpisodesStream,
+          );
         } else {
           return const Scaffold(
             body: Center(
@@ -80,12 +91,19 @@ class _EpisodesListPageWrapperState extends State<EpisodesListPageWrapper> {
 }
 
 class EpisodesListPage extends StatelessWidget {
-  const EpisodesListPage({super.key});
+  final Stream<int> unreadEpisodesStream;
+
+  const EpisodesListPage(
+      {super.key,
+      required this.unreadEpisodesStream,
+      });
 
   @override
   Widget build(BuildContext context) {
     final podcastState = context.watch<PodcastBloc>().state;
     final currentPodcast = podcastState.currentPodcast;
+    ScrollController scrollController = ScrollController();
+    const double paddingChangeThreshold = 10;
 
     return PopScope(
       onPopInvokedWithResult: (didPop, result) async {
@@ -104,121 +122,130 @@ class EpisodesListPage extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             if (podcastState.currentPodcast.artworkFilePath != null)
-              Opacity(
-                opacity: 0.4,
-                child: Image.file(
-                  File(podcastState.currentPodcast.artworkFilePath!),
-                  fit: BoxFit.cover,
-                  errorBuilder: (BuildContext context, Object error,
-                      StackTrace? stackTrace) {
-                    return const SizedBox();
-                  },
-                ),
+              OpacityBody(
+                state: podcastState,
+                assetImage: null,
               ),
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
-              child: Container(
-                color: Colors.black26,
-              ),
-            ),
+            const BackdropFilterBody(),
             BlocBuilder<EpisodesBloc, EpisodesState>(
                 builder: (context, episodesState) {
               return SafeArea(
                 child: CustomScrollView(
                   physics: const BouncingScrollPhysics(),
+                  controller: scrollController,
                   slivers: [
                     SliverAppBar(
+                      automaticallyImplyLeading: false,
                       backgroundColor: Colors.transparent,
-                      collapsedHeight: 60,
-                      expandedHeight: 170,
+                      expandedHeight: MediaQuery.of(context).size.height * 0.20,
+                      collapsedHeight: MediaQuery.of(context).size.height * 0.17,
                       pinned: true,
-                      flexibleSpace: FlexibleSpaceBar(
-                        background: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          spacing: 12,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 80.0),
-                              child: Text(
-                                currentPodcast.title,
-                                style: Theme.of(context).textTheme.displayLarge,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Spacer(),
-                                ElevatedButtonSubscribe(
-                                  podcast: currentPodcast,
-                                ),
-                                const SizedBox(
-                                  width: 30,
-                                ),
-                                IconButton(
-                                  onPressed: () => Navigator.push(
-                                      context,
-                                      ScaleRoute(
-                                        page: const PodcastDetailsPage(),
-                                      )),
-                                  icon: const Icon(
-                                    Icons.info_outline_rounded,
-                                    size: 30,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 30,
-                                ),
-                                const AnimatedDownloadIcon(),
-                                const Spacer(),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
-                                  child: StreamBuilder<int>(
-                                    stream: getIt<EpisodeUseCases>()
-                                        .unreadLocalEpisodesCount(
-                                            feedId: currentPodcast.pId),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        final unreadEpisodesCount =
-                                            snapshot.data;
-                                        return Container(
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary),
-                                          alignment: Alignment.center,
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: Text(
-                                            unreadEpisodesCount.toString(),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium!
-                                                .copyWith(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primaryContainer,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        );
-                                      } else {
-                                        return const SizedBox();
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (currentPodcast.subscribed)
-                              const RowIconButtonsEpisodes(),
-                            const SizedBox(height: 12),
-                          ],
-                        ),
+                      floating: true,
+                      snap: true,
+                      title: Text(
+                        currentPodcast.title,
                       ),
+                      centerTitle: true,
+                      titleTextStyle: Theme.of(context).textTheme.displayLarge,
+                      flexibleSpace: AnimatedBuilder(
+                          animation: scrollController,
+                          builder: (context, child) {
+                            const double minPadding = 12;
+                            const double maxPadding = 59;
+                            double calculatePadding = 12;
+                            if (scrollController.hasClients &&
+                                scrollController.offset > 0) {
+                              calculatePadding = (scrollController.offset / paddingChangeThreshold);
+                            }
+                            final double padding =
+                                calculatePadding.clamp(minPadding, maxPadding);
+                            return Padding(
+                              padding:  EdgeInsets.all(padding),
+                              child: Container(
+                                decoration: buildBoxDecoration(context),
+                                child: FlexibleSpaceBar(
+                                  expandedTitleScale: 1,
+                                  titlePadding: EdgeInsets.zero,
+                                  title: Wrap(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Spacer(),
+                                          ElevatedButtonSubscribe(
+                                            podcast: currentPodcast,
+                                          ),
+                                          const SizedBox(
+                                            width: 30,
+                                          ),
+                                          IconButton(
+                                            onPressed: () => Navigator.push(
+                                                context,
+                                                ScaleRoute(
+                                                  page: const PodcastDetailsPage(),
+                                                )),
+                                            icon: const Icon(
+                                              Icons.info_outline_rounded,
+                                              size: 30,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 30,
+                                          ),
+                                          const AnimatedDownloadIcon(),
+                                          const Spacer(),
+                                          StreamBuilder<int>(
+                                            stream: unreadEpisodesStream,
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasData) {
+                                                final unreadEpisodesCount =
+                                                    snapshot.data;
+                                                return Container(
+                                                  decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .primary),
+                                                  alignment: Alignment.center,
+                                                  padding:
+                                                      const EdgeInsets.all(10.0),
+                                                  child: Text(
+                                                    unreadEpisodesCount
+                                                        .toString(),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium!
+                                                        .copyWith(
+                                                          color: Theme.of(context)
+                                                              .colorScheme
+                                                              .primaryContainer,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                );
+                                              } else {
+                                                return const SizedBox();
+                                              }
+                                            },
+                                          ),
+                                          Spacer(),
+                                        ],
+                                      ),
+                                      if (currentPodcast.subscribed && padding < 45)
+                                        const Padding(
+                                          padding:
+                                              EdgeInsets.symmetric(vertical: 8.0),
+                                          child: RowIconButtonsEpisodes(),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
                     ),
                     if (episodesState.status == EpisodesStatus.loading &&
                         episodesState.episodes.isEmpty)
