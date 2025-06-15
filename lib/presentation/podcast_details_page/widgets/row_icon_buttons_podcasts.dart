@@ -59,7 +59,7 @@ class RowIconButtonsPodcasts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         if (podcast.subscribed)
           IconButton(
@@ -68,6 +68,7 @@ class RowIconButtonsPodcasts extends StatelessWidget {
             },
             icon: const Icon(
               Icons.settings_rounded,
+              size: 30,
             ),
           ),
         Row(
@@ -76,7 +77,7 @@ class RowIconButtonsPodcasts extends StatelessWidget {
               podcast.episodeCount != null
                   ? podcast.episodeCount.toString()
                   : "",
-              style: Theme.of(context).textTheme.bodySmall,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
             IconButton(
               onPressed: () async {
@@ -107,6 +108,7 @@ class RowIconButtonsPodcasts extends StatelessWidget {
               },
               icon: const Icon(
                 Icons.view_list_rounded,
+                size: 30,
               ),
             ),
           ],
@@ -120,6 +122,7 @@ class RowIconButtonsPodcasts extends StatelessWidget {
           },
           icon: const Icon(
             Icons.share_rounded,
+            size: 30,
           ),
         ),
       ],
