@@ -12,10 +12,10 @@ import '../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../custom_widgets/decoration/box_decoration.dart';
 import '../custom_widgets/dialogs/failure_dialog.dart';
+import '../custom_widgets/effects/backdropfilter_body.dart';
+import '../custom_widgets/effects/opacity_body.dart';
 import '../custom_widgets/elevated_button_subscribe.dart';
 import '../custom_widgets/page_transition.dart';
-import '../effects/backdropfilter_body.dart';
-import '../effects/opacity_body.dart';
 import '../episodes_list_page/episodes_list_page.dart';
 import '../episodes_list_page/widgets/animated_download_icon.dart';
 
