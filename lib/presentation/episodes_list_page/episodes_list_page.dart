@@ -127,11 +127,12 @@ class EpisodesListPage extends StatelessWidget {
                 assetImage: null,
               ),
             const BackdropFilterBody(),
-            SafeArea(
-              child: Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
+            // Title
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Text(
@@ -144,6 +145,7 @@ class EpisodesListPage extends StatelessWidget {
                 ),
               ),
             ),
+            // Row icon buttons
             Positioned(
               top: 94,
               left: 0,
@@ -177,6 +179,7 @@ class EpisodesListPage extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
+                                  const BackButton(),
                                   const Spacer(),
                                   ElevatedButtonSubscribe(
                                     podcast: currentPodcast,
@@ -193,8 +196,7 @@ class EpisodesListPage extends StatelessWidget {
                                       size: 30,
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 30,
+                                  const Spacer(
                                   ),
                                   const AnimatedDownloadIcon(),
                                   const Spacer(),
@@ -265,9 +267,11 @@ class EpisodesListPage extends StatelessWidget {
                 return const Center(child: Text("No episodes found"));
               } else {
                 return Padding(
-                  padding: EdgeInsets.only(bottom: 80.0, top: currentPodcast.subscribed ? 230 : 170),
+                  padding: EdgeInsets.only(
+                      bottom: 80.0, top: currentPodcast.subscribed ? 230 : 170),
                   child: ListView.builder(
                     controller: scrollController,
+                    physics: const BouncingScrollPhysics(),
                     itemCount: episodesState.episodes.length,
                     itemBuilder: (context, index) {
                       final item = episodesState.episodes[index];
