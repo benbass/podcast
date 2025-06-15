@@ -102,6 +102,7 @@ flutter:
 
   assets:
     - assets/placeholder.png
+    - assets/background.jpeg # to be replaced with app logo when available
 
 
   fonts:
