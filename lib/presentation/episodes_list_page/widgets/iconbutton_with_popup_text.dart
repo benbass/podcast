@@ -14,7 +14,6 @@ class IconButtonWithPopupText extends StatefulWidget {
 
 class _IconButtonWithPopupTextState extends State<IconButtonWithPopupText> {
   OverlayEntry? _overlayEntry;
-  final LayerLink _layerLink = LayerLink();
   final TextEditingController _textController = TextEditingController();
 
   void _showTextOverlay() {
@@ -23,10 +22,7 @@ class _IconButtonWithPopupTextState extends State<IconButtonWithPopupText> {
     _overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         width: MediaQuery.of(context).size.width,
-        child: CompositedTransformFollower(
-          link: _layerLink,
-          showWhenUnlinked: false,
-          offset: const Offset(-30, -80),
+        child: SafeArea(
           child: Material(
             color: Theme.of(context).colorScheme.primaryContainer,
             elevation: 4.0,
@@ -119,43 +115,40 @@ class _IconButtonWithPopupTextState extends State<IconButtonWithPopupText> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: CompositedTransformTarget(
-        link: _layerLink,
-        child: BlocBuilder<PodcastBloc, PodcastState>(
-          builder: (context, state) {
-            final settingState = context.watch<PodcastSettingsCubit>().state;
-            if (settingState is PodcastSettingsLoaded) {
-              final settings = settingState.settings;
-              return IconButton(
-                icon: Icon(
-                  settings.transientSearchText != null &&
-                          settings.transientSearchText!.isNotEmpty
-                      ? Icons.filter_list_off_rounded
-                      : Icons.search_rounded,
-                  size: 30,
-                ),
-                onPressed: settings.transientSearchText != null &&
+      child: BlocBuilder<PodcastBloc, PodcastState>(
+        builder: (context, state) {
+          final settingState = context.watch<PodcastSettingsCubit>().state;
+          if (settingState is PodcastSettingsLoaded) {
+            final settings = settingState.settings;
+            return IconButton(
+              icon: Icon(
+                settings.transientSearchText != null &&
                         settings.transientSearchText!.isNotEmpty
-                    ? () {
-                        _textController.clear();
-                        context
-                            .read<PodcastSettingsCubit>()
-                            .updateUiFilterSettings(
-                                filterByText: false, transientSearchText: "");
+                    ? Icons.filter_list_off_rounded
+                    : Icons.search_rounded,
+                size: 30,
+              ),
+              onPressed: settings.transientSearchText != null &&
+                      settings.transientSearchText!.isNotEmpty
+                  ? () {
+                      _textController.clear();
+                      context
+                          .read<PodcastSettingsCubit>()
+                          .updateUiFilterSettings(
+                              filterByText: false, transientSearchText: "");
+                    }
+                  : () {
+                      if (_overlayEntry == null) {
+                        _showTextOverlay();
+                      } else {
+                        _removeOverlay();
                       }
-                    : () {
-                        if (_overlayEntry == null) {
-                          _showTextOverlay();
-                        } else {
-                          _removeOverlay();
-                        }
-                      },
-              );
-            } else {
-              return const SizedBox();
-            }
-          },
-        ),
+                    },
+            );
+          } else {
+            return const SizedBox();
+          }
+        },
       ),
     );
   }
