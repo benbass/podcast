@@ -26,8 +26,10 @@ class RowIconButtonsEpisodes extends StatelessWidget {
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisSize: MainAxisSize.min,
       children: [
         const IconButtonWithPopupText(),
+        const SizedBox(width: 30),
         BlocBuilder<EpisodeSelectionCubit, EpisodeSelectionState>(
           builder: (context, episodeSelectionState) {
             return IconButton(
@@ -44,82 +46,80 @@ class RowIconButtonsEpisodes extends StatelessWidget {
             );
           },
         ),
+        const SizedBox(width: 30),
         if (podcastState.currentPodcast.subscribed)
-          SizedBox(
-            width: 30,
-            child: Stack(children: [
-              if (episodesState.status != EpisodesStatus.refreshing)
-                IconButton(
-                  onPressed: () async {
-                    final int currentCount = episodesState.episodes.length;
-                    episodesBloc.add(RefreshEpisodes(
-                      feedId: podcastState.currentPodcast.pId,
-                      podcastTitle: podcastState.currentPodcast.title,
-                      isSubscribed: podcastState.currentPodcast.subscribed,
-                    ));
-                    Duration duration = const Duration(milliseconds: 1500);
-                    try {
-                      final finalState = await episodesBloc.stream.firstWhere(
-                          (state) =>
-                              state.status != EpisodesStatus.refreshing &&
-                              state.status != EpisodesStatus.loading);
+          Stack(children: [
+            if (episodesState.status != EpisodesStatus.refreshing)
+              IconButton(
+                onPressed: () async {
+                  final int currentCount = episodesState.episodes.length;
+                  episodesBloc.add(RefreshEpisodes(
+                    feedId: podcastState.currentPodcast.pId,
+                    podcastTitle: podcastState.currentPodcast.title,
+                    isSubscribed: podcastState.currentPodcast.subscribed,
+                  ));
+                  Duration duration = const Duration(milliseconds: 1500);
+                  try {
+                    final finalState = await episodesBloc.stream.firstWhere(
+                        (state) =>
+                            state.status != EpisodesStatus.refreshing &&
+                            state.status != EpisodesStatus.loading);
 
-                      if (context.mounted) {
-                        if (finalState.status == EpisodesStatus.success) {
-                          final int newCount = finalState.episodes.length;
-                          final int diff = newCount - currentCount;
+                    if (context.mounted) {
+                      if (finalState.status == EpisodesStatus.success) {
+                        final int newCount = finalState.episodes.length;
+                        final int diff = newCount - currentCount;
 
-                          if (diff > 0) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  duration: duration,
-                                  content: Text("$diff new episodes added.")),
-                            );
-                          } else if (diff == 0) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  duration: duration,
-                                  content: const Text(
-                                      "No new episodes were found.")),
-                            );
-                          } else {
-                            // diff < 0 (episodes removed??),
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  duration: duration,
-                                  content:
-                                      const Text("Episodes were updated.")),
-                            );
-                          }
+                        if (diff > 0) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                duration: duration,
+                                content: Text("$diff new episodes added.")),
+                          );
+                        } else if (diff == 0) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                duration: duration,
+                                content:
+                                    const Text("No new episodes were found.")),
+                          );
+                        } else {
+                          // diff < 0 (episodes removed??),
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                duration: duration,
+                                content: const Text("Episodes were updated.")),
+                          );
                         }
                       }
-                    } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              duration: duration,
-                              content: const Text("An error occurred.")),
-                        );
-                      }
                     }
-                  },
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: const Icon(
-                    Icons.refresh_rounded,
-                    size: 30,
-                  ),
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            duration: duration,
+                            content: const Text("An error occurred.")),
+                      );
+                    }
+                  }
+                },
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(
+                  Icons.refresh_rounded,
+                  size: 30,
                 ),
-              if (episodesState.status == EpisodesStatus.refreshing)
-                const SizedBox(
-                  width: 30,
-                  height: 30,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                  ),
+              ),
+            if (episodesState.status == EpisodesStatus.refreshing)
+              const SizedBox(
+                width: 30,
+                height: 30,
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
                 ),
-            ]),
-          ),
+              ),
+          ]),
+        const SizedBox(width: 30),
         if (podcastState.currentPodcast.subscribed &&
             podcastSettingsState is PodcastSettingsLoaded)
           IconButton(
