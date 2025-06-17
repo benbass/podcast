@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -55,8 +54,11 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
       return const Center(child: CircularProgressIndicator());
     }
     if (cubitState is PodcastSettingsError) {
-      return Center(child: Text(cubitState.message,
-      style: themeData.textTheme.displayLarge,));
+      return Center(
+          child: Text(
+        cubitState.message,
+        style: themeData.textTheme.displayLarge,
+      ));
     }
 
     double sliderUiValue =
@@ -76,13 +78,17 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
           ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 20.0),
-            child: Text("Note: These filters may not work if the podcast author doesn't provide this information or provides it incorrectly."),
+            child: Text(
+                "Note: These filters may not work if the podcast author doesn't provide this information or provides it incorrectly."),
           ),
           const SizedBox(height: 40),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Ignore explicit episodes"),
+              const Text(
+                "Ignore explicit episodes",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               Switch(
                 value: _currentFilterExplicit,
                 onChanged: (value) {
@@ -90,7 +96,8 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
                     _currentFilterExplicit = value;
                     context
                         .read<PodcastSettingsCubit>()
-                        .updatePersistentSettings(filterExplicitEpisodes: value);
+                        .updatePersistentSettings(
+                            filterExplicitEpisodes: value);
                   });
                 },
               ),
@@ -99,7 +106,10 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Ignore trailer episodes"),
+              const Text(
+                "Ignore trailer episodes",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               Switch(
                 value: _currentFilterTrailer,
                 onChanged: (value) {
@@ -116,7 +126,10 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Ignore bonus episodes"),
+              const Text(
+                "Ignore bonus episodes",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               Switch(
                 value: _currentFilterBonus,
                 onChanged: (value) {
@@ -140,6 +153,7 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
                 padding: const EdgeInsets.only(left: 4.0, bottom: 0),
                 child: Text(
                   "Ignore episodes shorter than:\n${sliderUiValue == _minSliderValue ? 'No limit' : '${sliderUiValue.round()} min.'}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               Slider(
@@ -159,14 +173,15 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
                   onChangeEnd: (double value) {
                     context
                         .read<PodcastSettingsCubit>()
-                        .updatePersistentSettings(minEpisodeDurationMinutes: value.round());
+                        .updatePersistentSettings(
+                            minEpisodeDurationMinutes: value.round());
                   }),
             ],
           ),
           const SizedBox(height: 20),
           Divider(color: themeData.colorScheme.primary),
           const SizedBox(height: 120),
-          ElevatedButton(
+          TextButton(
             onPressed: () {
               Navigator.pop(context);
             },
