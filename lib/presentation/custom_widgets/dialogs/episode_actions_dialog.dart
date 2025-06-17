@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -10,6 +12,7 @@ import '../../../domain/usecases/episode_usecases.dart';
 import '../../../helpers/audio_download/audio_file_utility.dart';
 import '../../../injection.dart';
 import '../action_feedback/action_feedback.dart';
+import '../decoration/box_decoration.dart';
 import 'audio_file_dialog.dart';
 
 class EpisodeActionsDialog {
@@ -80,21 +83,44 @@ class EpisodeActionsDialog {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text("Choose an action for the selected episodes"),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (var menuItem in menuItems)
-                TextButton(
-                  onPressed: () => menuItem["onPressed"](),
-                  child: Text(menuItem["title"]),
-                ),
-            ],
-          ),
+        return Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+              child: Container(
+                color: Colors.black26,
+              ),
+            ),
+            Container(
+              decoration: buildBoxDecoration(context),
+              child: AlertDialog(
+                  backgroundColor: Colors.white12,
+                  title:
+                      const Text("Choose an action for the selected episodes", style: TextStyle(fontWeight: FontWeight.bold),),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 40.0, vertical: 20.0),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var menuItem in menuItems)
+                        TextButton(
+                          onPressed: () => menuItem["onPressed"](),
+                          child: Text(menuItem["title"], style: const TextStyle(fontWeight: FontWeight.bold),),
+                        ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.bold),),
+                    )
+                  ],
+              ),
+            ),
+          ],
         );
       },
     );
@@ -102,15 +128,12 @@ class EpisodeActionsDialog {
 
   static void showEpisodeActionsDialog(
       BuildContext context, EpisodeEntity episode) async {
-    // Reset for debugging purposes
-    /* episode.filePath = null;
-  episodeBox.put(episode);*/
-
     Map<String, bool> downloadStatus =
         AudioFileUtility.getDownloadStatus(episode);
     final String? filePath = await getIt<EpisodeUseCases>()
         .getEpisodeStream(episodeId: episode.id)
-        .first.then((value) => value?.filePath);
+        .first
+        .then((value) => value?.filePath);
 
     final List<Map<String, dynamic>> menuItems = [
       if (episode.isSubscribed)
@@ -171,18 +194,40 @@ class EpisodeActionsDialog {
       showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (var menuItem in menuItems)
-                  TextButton(
-                    onPressed: () => menuItem["onPressed"](),
-                    child: Text(menuItem["title"]),
+          return Stack(
+            children: [
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                child: Container(
+                  color: Colors.black26,
+                ),
+              ),
+              Container(
+                decoration: buildBoxDecoration(context),
+                child: AlertDialog(
+                  backgroundColor: Colors.white12,
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var menuItem in menuItems)
+                        TextButton(
+                          onPressed: () => menuItem["onPressed"](),
+                          child: Text(menuItem["title"], style: const TextStyle(fontWeight: FontWeight.bold),),
+                        ),
+                    ],
                   ),
-              ],
-            ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.bold),),
+                    )
+                  ],
+                ),
+              ),
+            ],
           );
         },
       );
