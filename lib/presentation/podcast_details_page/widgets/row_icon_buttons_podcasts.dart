@@ -7,6 +7,7 @@ import '../../../injection.dart';
 import '../../custom_widgets/dialogs/failure_dialog.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../../episodes_list_page/episodes_list_page.dart';
+import '../../episodes_list_page/widgets/animated_download_icon.dart';
 
 class RowIconButtonsPodcasts extends StatelessWidget {
   const RowIconButtonsPodcasts({
@@ -58,74 +59,88 @@ class RowIconButtonsPodcasts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        if (podcast.subscribed)
-          IconButton(
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-            icon: const Icon(
-              Icons.settings_rounded,
-              size: 30,
-            ),
-          ),
-        Row(
-          children: [
-            Text(
-              podcast.episodeCount != null
-                  ? podcast.episodeCount.toString()
-                  : "",
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.8,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (podcast.subscribed)
             IconButton(
-              onPressed: () async {
-                final String connectionType = await getIt<ConnectivityManager>()
-                    .getConnectionTypeAsString();
-                if (((connectionType != 'none' && !podcast.subscribed) ||
-                        podcast.subscribed) &&
-                    context.mounted) {
-                  if (podcast.subscribed) {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      ScaleRoute(
-                        page: const EpisodesListPageWrapper(),
-                      ),
-                      ModalRoute.withName('/'),
-                    );
-                  } else {
-                    _handleRemoteEpisodesFetchingAndNavigate(context);
-                  }
-                } else {
-                  if (context.mounted) {
-                    showDialog(
-                        context: context,
-                        builder: (context) => const FailureDialog(
-                            message:
-                                "No internet connection to load episodes from the server!"));
-                  }
-                }
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
               },
               icon: const Icon(
-                Icons.view_list_rounded,
+                Icons.settings_rounded,
                 size: 30,
               ),
             ),
-          ],
-        ),
-        IconButton(
-          onPressed: () async {
-            await SharePlus.instance.share(ShareParams(
-              subject: podcast.title,
-              text: "${podcast.title}:\n\n ${podcast.link}",
-            ));
-          },
-          icon: const Icon(
-            Icons.share_rounded,
-            size: 30,
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              const AnimatedDownloadIcon(),
+              const SizedBox(
+                width: 30,
+              ),
+              Text(
+                podcast.episodeCount != null
+                    ? podcast.episodeCount.toString()
+                    : "",
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              IconButton(
+                onPressed: () async {
+                  final String connectionType =
+                      await getIt<ConnectivityManager>()
+                          .getConnectionTypeAsString();
+                  if (((connectionType != 'none' && !podcast.subscribed) ||
+                          podcast.subscribed) &&
+                      context.mounted) {
+                    if (podcast.subscribed) {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        ScaleRoute(
+                          page: const EpisodesListPageWrapper(),
+                        ),
+                        ModalRoute.withName('/'),
+                      );
+                    } else {
+                      _handleRemoteEpisodesFetchingAndNavigate(context);
+                    }
+                  } else {
+                    if (context.mounted) {
+                      showDialog(
+                          context: context,
+                          builder: (context) => const FailureDialog(
+                              message:
+                                  "No internet connection to load episodes from the server!"));
+                    }
+                  }
+                },
+                icon: const Icon(
+                  Icons.view_list_rounded,
+                  size: 30,
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+          const SizedBox(
+            width: 30,
+          ),
+          IconButton(
+            onPressed: () async {
+              await SharePlus.instance.share(ShareParams(
+                subject: podcast.title,
+                text: "${podcast.title}:\n\n ${podcast.link}",
+              ));
+            },
+            icon: const Icon(
+              Icons.share_rounded,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
