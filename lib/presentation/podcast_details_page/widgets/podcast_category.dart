@@ -9,12 +9,9 @@ class PodcastCategory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: Text(
-        value,
-        style: Theme.of(context).textTheme.bodyMedium,
-      ),
+    return Text(
+      value,
+      style: Theme.of(context).textTheme.bodyMedium,
     );
   }
 }
