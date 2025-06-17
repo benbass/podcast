@@ -128,7 +128,7 @@ class EpisodeCard extends StatelessWidget {
                                               child: _buildEpisodeDetails(themeData),
                                             ),
                                             const SizedBox(
-                                              width: 40,
+                                              width: 36,
                                             ),
                                             if (episode.isSubscribed)
                                               IconButton(
