@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:share_plus/share_plus.dart';
@@ -25,14 +27,24 @@ class RowIconButtonsPodcasts extends StatelessWidget {
         context: context,
         barrierDismissible: false,
         builder: (context) {
-          return const AlertDialog(
-            content: Row(
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(width: 16),
-                Text('Fetching episodes...'),
-              ],
-            ),
+          return Stack(
+            children: [
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                child: Container(
+                  color: Colors.black26,
+                ),
+              ),
+              const AlertDialog(
+                content: Row(
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(width: 16),
+                    Text('Fetching episodes...'),
+                  ],
+                ),
+              ),
+            ],
           );
         });
     try {
