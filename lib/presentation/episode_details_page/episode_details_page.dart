@@ -244,7 +244,7 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                                   ),
                                   SliverPadding(
                                     padding: const EdgeInsets.fromLTRB(
-                                        20.0, 0.0, 20.0, 170.0),
+                                        20.0, 0.0, 20.0, 220.0),
                                     sliver: SliverToBoxAdapter(
                                       child: Container(
                                         decoration: buildBoxDecoration(context),
