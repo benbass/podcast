@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,20 +36,30 @@ class HomePage extends StatelessWidget {
     if (hasActiveDownloads) {
       final bool? shouldPop = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Downloads aktiv'),
-          content: const Text(
-              'Downloads are still running or downloads are waiting in the queue. Do you really want to close the app? The downloads will be cancelled.'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+        builder: (context) => Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+              child: Container(
+                color: Colors.black26,
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: const Text('Close the app'),
+            AlertDialog(
+              title: const Text('Downloads aktiv'),
+              content: const Text(
+                  'Downloads are still running or downloads are waiting in the queue. Do you really want to close the app? The downloads will be cancelled.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: const Text('Close the app'),
+                ),
+              ],
             ),
           ],
         ),
@@ -62,18 +74,28 @@ class HomePage extends StatelessWidget {
     } else {
       final bool? shouldPop = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Do you really want to close the app?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+        builder: (context) => Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+              child: Container(
+                color: Colors.black26,
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: const Text('Close the app'),
+            AlertDialog(
+              title: const Text('Do you really want to close the app?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: const Text('Close the app'),
+                ),
+              ],
             ),
           ],
         ),
