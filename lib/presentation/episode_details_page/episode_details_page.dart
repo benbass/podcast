@@ -180,8 +180,8 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                                       child: Container(
                                         decoration: buildBoxDecoration(context),
                                         child: Padding(
-                                          padding: const EdgeInsets.all(
-                                            16.0,
+                                          padding: const EdgeInsets.fromLTRB(
+                                            16.0, 8.0, 16.0, 16.0,
                                           ),
                                           child: Column(
                                               mainAxisAlignment:
