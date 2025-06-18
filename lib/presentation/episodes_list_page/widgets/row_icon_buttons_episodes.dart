@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/application/episodes_bloc/episodes_bloc.dart';
@@ -146,93 +148,137 @@ class RowIconButtonsEpisodes extends StatelessWidget {
         context: context,
         builder: (BuildContext context) {
           if (episodesState is PodcastSettingsLoaded) {
-            return AlertDialog(
-              title: const Text("Filter Episodes"),
-              content: const Text("Select the filter option"),
-              actionsAlignment: MainAxisAlignment.center,
-              actionsOverflowAlignment: OverflowBarAlignment.center,
-              alignment: Alignment.center,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    context.read<PodcastSettingsCubit>().updateUiFilterSettings(
-                          filterRead:
-                              episodesState.settings.filterRead ? false : true,
-                        );
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    episodesState.settings.filterRead
-                        ? "Show read episodes"
-                        : "Hide read episodes",
-                    textAlign: TextAlign.center,
-                  ),
+            return Stack(
+              children: [
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                  child: Container(color: Colors.black26),
                 ),
-                TextButton(
-                  onPressed: () {
-                    context.read<PodcastSettingsCubit>().updateUiFilterSettings(
-                          showOnlyUnfinished:
-                              episodesState.settings.showOnlyUnfinished
-                                  ? false
-                                  : true,
-                          showOnlyFavorites: false,
-                          showOnlyDownloaded: false,
-                        );
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    episodesState.settings.showOnlyUnfinished
-                        ? "Show all"
-                        : "Show only unfinished",
-                    textAlign: TextAlign.center,
+                AlertDialog(
+                  title: const Text(
+                    "Filter Episodes",
                   ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    context.read<PodcastSettingsCubit>().updateUiFilterSettings(
-                          showOnlyFavorites:
-                              episodesState.settings.showOnlyFavorites
-                                  ? false
-                                  : true,
-                          showOnlyDownloaded: false,
-                          showOnlyUnfinished: false,
-                        );
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    episodesState.settings.showOnlyFavorites
-                        ? "Show all"
-                        : "Show only favorites",
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    context.read<PodcastSettingsCubit>().updateUiFilterSettings(
-                          showOnlyDownloaded:
-                              episodesState.settings.showOnlyDownloaded
-                                  ? false
-                                  : true,
-                          showOnlyUnfinished: false,
-                          showOnlyFavorites: false,
-                        );
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    episodesState.settings.showOnlyDownloaded
-                        ? "Show all"
-                        : "Show only downloaded",
-                    textAlign: TextAlign.center,
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text(
+                        "Close",
+                      ),
+                    ),
+                  ],
+                  actionsAlignment: MainAxisAlignment.center,
+                  actionsOverflowAlignment: OverflowBarAlignment.center,
+                  alignment: Alignment.center,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          context
+                              .read<PodcastSettingsCubit>()
+                              .updateUiFilterSettings(
+                                filterRead: episodesState.settings.filterRead
+                                    ? false
+                                    : true,
+                              );
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          episodesState.settings.filterRead
+                              ? "Show read episodes"
+                              : "Hide read episodes",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          context
+                              .read<PodcastSettingsCubit>()
+                              .updateUiFilterSettings(
+                                showOnlyUnfinished:
+                                    episodesState.settings.showOnlyUnfinished
+                                        ? false
+                                        : true,
+                                showOnlyFavorites: false,
+                                showOnlyDownloaded: false,
+                              );
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          episodesState.settings.showOnlyUnfinished
+                              ? "Show all"
+                              : "Show only unfinished",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          context
+                              .read<PodcastSettingsCubit>()
+                              .updateUiFilterSettings(
+                                showOnlyFavorites:
+                                    episodesState.settings.showOnlyFavorites
+                                        ? false
+                                        : true,
+                                showOnlyDownloaded: false,
+                                showOnlyUnfinished: false,
+                              );
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          episodesState.settings.showOnlyFavorites
+                              ? "Show all"
+                              : "Show only favorites",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          context
+                              .read<PodcastSettingsCubit>()
+                              .updateUiFilterSettings(
+                                showOnlyDownloaded:
+                                    episodesState.settings.showOnlyDownloaded
+                                        ? false
+                                        : true,
+                                showOnlyUnfinished: false,
+                                showOnlyFavorites: false,
+                              );
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          episodesState.settings.showOnlyDownloaded
+                              ? "Show all"
+                              : "Show only downloaded",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             );
           } else {
-            return const AlertDialog(
-              title: Text("Filter Episodes"),
-              content: CircularProgressIndicator(),
+            return Stack(
+              children: [
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                  child: Container(
+                    color: Colors.black26,
+                  ),
+                ),
+                const AlertDialog(
+                  title: Text(
+                    "Filter Episodes",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  content: CircularProgressIndicator(),
+                ),
+              ],
             );
           }
         });
