@@ -54,7 +54,8 @@ class RowIconButtonsEpisodes extends StatelessWidget {
             if (episodesState.status != EpisodesStatus.refreshing)
               IconButton(
                 onPressed: () async {
-                  final int currentCount = context.read<EpisodesBloc>().state.episodes.length;
+                  final int currentCount =
+                      context.read<EpisodesBloc>().state.episodes.length;
                   episodesBloc.add(RefreshEpisodes(
                     feedId: podcastState.currentPodcast.pId,
                     podcastTitle: podcastState.currentPodcast.title,
@@ -82,8 +83,7 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                                 duration: duration,
-                                content:
-                                    const Text("No new episodes.")),
+                                content: const Text("No new episodes.")),
                           );
                         } else {
                           // diff < 0 (episodes removed??),
@@ -130,6 +130,7 @@ class RowIconButtonsEpisodes extends StatelessWidget {
             },
             icon: Icon(
               podcastSettingsState.settings.filterByText ||
+                      podcastSettingsState.settings.showOnlyRead ||
                       podcastSettingsState.settings.showOnlyUnfinished ||
                       podcastSettingsState.settings.showOnlyFavorites ||
                       podcastSettingsState.settings.showOnlyDownloaded
@@ -181,16 +182,21 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                           context
                               .read<PodcastSettingsCubit>()
                               .updateUiFilterSettings(
-                                filterRead: episodesState.settings.filterRead
-                                    ? false
-                                    : true,
+                                filterRead: false,
+                                showOnlyRead:
+                                    episodesState.settings.showOnlyRead
+                                        ? false
+                                        : true,
+                                showOnlyFavorites: false,
+                                showOnlyDownloaded: false,
+                                showOnlyUnfinished: false,
                               );
                           Navigator.of(context).pop();
                         },
                         child: Text(
-                          episodesState.settings.filterRead
-                              ? "Show read episodes"
-                              : "Hide read episodes",
+                          episodesState.settings.showOnlyRead
+                              ? "All"
+                              : "Read episodes",
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -205,13 +211,14 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                                         : true,
                                 showOnlyFavorites: false,
                                 showOnlyDownloaded: false,
+                                showOnlyRead: false,
                               );
                           Navigator.of(context).pop();
                         },
                         child: Text(
                           episodesState.settings.showOnlyUnfinished
-                              ? "Show all"
-                              : "Show only unfinished",
+                              ? "All"
+                              : "Unfinished",
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -226,13 +233,14 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                                         : true,
                                 showOnlyDownloaded: false,
                                 showOnlyUnfinished: false,
+                                showOnlyRead: false,
                               );
                           Navigator.of(context).pop();
                         },
                         child: Text(
                           episodesState.settings.showOnlyFavorites
-                              ? "Show all"
-                              : "Show only favorites",
+                              ? "All"
+                              : "Favorites",
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -247,13 +255,14 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                                         : true,
                                 showOnlyUnfinished: false,
                                 showOnlyFavorites: false,
+                                showOnlyRead: false,
                               );
                           Navigator.of(context).pop();
                         },
                         child: Text(
                           episodesState.settings.showOnlyDownloaded
-                              ? "Show all"
-                              : "Show only downloaded",
+                              ? "All"
+                              : "Downloaded",
                           textAlign: TextAlign.center,
                         ),
                       ),
