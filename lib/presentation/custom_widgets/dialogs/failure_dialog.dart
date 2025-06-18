@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -10,31 +12,41 @@ class FailureDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      elevation: 30,
-      shadowColor: Colors.black,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.error_outline,
-            color: Colors.red,
-            size: 60,
+    return Stack(
+      children: [
+        BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+          child: Container(
+            color: Colors.black26,
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
-            child: Text(message),
+        ),
+        AlertDialog(
+          elevation: 30,
+          shadowColor: Colors.black,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                color: Colors.red,
+                size: 60,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+                child: Text(message),
+              ),
+            ],
           ),
-        ],
-      ),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('Close'),
-          onPressed: () {
-            BlocProvider.of<PodcastBloc>(context).add(ToggleStateToSuccessAfterFailureEvent());
-            Navigator.of(context).pop();
-          },
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                BlocProvider.of<PodcastBloc>(context).add(ToggleStateToSuccessAfterFailureEvent());
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
         ),
       ],
     );
