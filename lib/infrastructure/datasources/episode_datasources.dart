@@ -17,7 +17,6 @@ import '../models/episode_model.dart';
 
 /// Local data source = objectBox database
 abstract class EpisodeLocalDatasource {
-
   Stream<List<EpisodeEntity>> getEpisodesStream({
     required int feedId,
     required String podcastTitle,
@@ -36,8 +35,7 @@ abstract class EpisodeLocalDatasource {
 }
 
 /// Remote data source = http requests
-class EpisodeLocalDatasourceImpl
-    implements EpisodeLocalDatasource {
+class EpisodeLocalDatasourceImpl implements EpisodeLocalDatasource {
   Future<List<EpisodeEntity>> _fetchRemoteEpisodes(
       {required int feedId, required String podcastTitle}) async {
     dartz.Either<Failure, List<EpisodeEntity>> response =
@@ -82,7 +80,6 @@ class EpisodeLocalDatasourceImpl
 
   @override
   Stream<int> unreadLocalEpisodesCount({required int feedId}) {
-
     final podcastQuery =
         podcastBox.query(PodcastEntity_.pId.equals(feedId)).build();
     final PodcastEntity? podcast = podcastQuery.findFirst();
@@ -98,8 +95,9 @@ class EpisodeLocalDatasourceImpl
 
     late QueryBuilder<EpisodeEntity> queryBuilder;
     // Base condition for the query
-    Condition<EpisodeEntity> baseCondition =
-        EpisodeEntity_.feedId.equals(feedId).and(EpisodeEntity_.read.equals(false));
+    Condition<EpisodeEntity> baseCondition = EpisodeEntity_.feedId
+        .equals(feedId)
+        .and(EpisodeEntity_.read.equals(false));
 
     // Integrate persistent filter settings to the baseCondition
     if (persistentSettings != null) {
@@ -126,8 +124,7 @@ class EpisodeLocalDatasourceImpl
       }
     }
 
-    queryBuilder =
-        episodeBox.query(baseCondition);
+    queryBuilder = episodeBox.query(baseCondition);
     return queryBuilder
         .watch(triggerImmediately: true)
         .map((query) => query.count());
@@ -194,7 +191,8 @@ class EpisodeLocalDatasourceImpl
       // These episodes will be deleted from the database at app close if the podcast stays unsubscribed.
 
       // User may have called the episode list already: check this first.
-      final queryForCachedEpisodes = episodeBox.query(EpisodeEntity_.feedId.equals(feedId));
+      final queryForCachedEpisodes =
+          episodeBox.query(EpisodeEntity_.feedId.equals(feedId));
       final queryBuilderForCachedEpisodes = queryForCachedEpisodes.build();
       final cachedEpisodes = queryBuilderForCachedEpisodes.find();
       queryBuilderForCachedEpisodes.close();
@@ -235,7 +233,9 @@ class EpisodeLocalDatasourceImpl
     if (filterSettings.filterRead) {
       queryCondition = queryCondition.and(EpisodeEntity_.read.equals(false));
     }
-    if (filterSettings.showOnlyFavorites) {
+    if (filterSettings.showOnlyRead) {
+      queryCondition = queryCondition.and(EpisodeEntity_.read.equals(true));
+    } else if (filterSettings.showOnlyFavorites) {
       queryCondition = queryCondition.and(EpisodeEntity_.favorite.equals(true));
     } else if (filterSettings.showOnlyDownloaded) {
       queryCondition = queryCondition.and(EpisodeEntity_.filePath
@@ -300,7 +300,9 @@ abstract class EpisodeRemoteDataSource {
           {required int feedId, required String podcastTitle});
 
   Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb(
-      {required int feedId, required String podcastTitle, bool? markAsSubscribed});
+      {required int feedId,
+      required String podcastTitle,
+      bool? markAsSubscribed});
 }
 
 class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
@@ -314,7 +316,9 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
   // In both cases user may want to subscribe to the podcast.
   @override
   Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb(
-      {required int feedId, required String podcastTitle, bool? markAsSubscribed}) async {
+      {required int feedId,
+      required String podcastTitle,
+      bool? markAsSubscribed}) async {
     // first check if episodes already exist in the database
     final queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId));
     final query = queryBuilder.build();
@@ -342,14 +346,14 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
 
     // Episodes do not exist in the database: fetch them from the server.
     dartz.Either<Failure, List<EpisodeEntity>> serverResponse =
-    await fetchRemoteEpisodesByFeedId(
-        feedId: feedId, podcastTitle: podcastTitle);
+        await fetchRemoteEpisodesByFeedId(
+            feedId: feedId, podcastTitle: podcastTitle);
 
     await serverResponse.fold(
-          (failure) async {
+      (failure) async {
         return;
       },
-          (remoteEpisodes) async {
+      (remoteEpisodes) async {
         if (remoteEpisodes.isEmpty) {
           return;
         }
