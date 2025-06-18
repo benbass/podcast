@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
@@ -8,7 +7,7 @@ import 'package:podcast/presentation/custom_widgets/play_button.dart';
 
 import '../../../helpers/core/utilities/image_provider.dart';
 
-class FlexibleSpace extends StatelessWidget {
+class EpisodeDetailsFlexibleSpace extends StatelessWidget {
   final PodcastEntity podcast;
   final EpisodeEntity episode;
   final int? episodeIndex;
@@ -16,7 +15,7 @@ class FlexibleSpace extends StatelessWidget {
   final String title;
   final String? flag;
 
-  const FlexibleSpace({
+  const EpisodeDetailsFlexibleSpace({
     super.key,
     required this.podcast,
     required this.episode,
@@ -83,20 +82,15 @@ class FlexibleSpace extends StatelessWidget {
             ? snapshot.data!
             : const AssetImage('assets/placeholder.png');
 
-        return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-          child: Center(
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: podcast.subscribed
-                      ? podcast.artworkFilePath != null
-                          ? FileImage(File(podcast.artworkFilePath!))
-                          : const AssetImage('assets/placeholder.png')
-                      : imageProvider,
-                  fit: BoxFit.fitHeight,
-                ),
-              ),
+        return Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: podcast.subscribed
+                  ? podcast.artworkFilePath != null
+                      ? FileImage(File(podcast.artworkFilePath!))
+                      : const AssetImage('assets/placeholder.png')
+                  : imageProvider,
+              fit: BoxFit.fitHeight,
             ),
           ),
         );
