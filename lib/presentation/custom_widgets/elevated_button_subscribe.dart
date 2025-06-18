@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -136,33 +138,43 @@ class ElevatedButtonSubscribe extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-            title: const Text("Are you sure you want to unsubscribe?"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("Cancel"),
+        return Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+              child: Container(
+                color: Colors.black26,
               ),
-              TextButton(
-                onPressed: () async {
-                  await _deleteUnFlaggedEpisodes();
-                  if (context.mounted) {
-                    BlocProvider.of<PodcastBloc>(context)
-                        .add(UnSubscribeFromPodcastEvent(id: podcast.id));
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      SlideRouteWithCurve(
-                        page: const HomePage(),
-                      ),
-                    );
-                  }
-                },
-                child: const Text("Unsubscribe"),
-              ),
-            ]);
+            ),
+            AlertDialog(
+                title: const Text("Are you sure you want to unsubscribe?",),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Cancel",),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      await _deleteUnFlaggedEpisodes();
+                      if (context.mounted) {
+                        BlocProvider.of<PodcastBloc>(context)
+                            .add(UnSubscribeFromPodcastEvent(id: podcast.id));
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          SlideRouteWithCurve(
+                            page: const HomePage(),
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text("Unsubscribe",),
+                  ),
+                ]),
+          ],
+        );
       },
     );
   }
