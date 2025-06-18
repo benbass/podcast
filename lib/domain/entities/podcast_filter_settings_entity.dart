@@ -17,6 +17,7 @@ class PodcastFilterSettingsEntity extends Equatable {
 
   // UI-spezifische Filter (werden im State des UI-Layers oder im EpisodesBloc gehalten)
   final bool filterRead;
+  final bool showOnlyRead;
   final bool showOnlyUnfinished;
   final bool showOnlyFavorites;
   final bool showOnlyDownloaded;
@@ -34,6 +35,7 @@ class PodcastFilterSettingsEntity extends Equatable {
     this.minEpisodeDurationMinutes,
     // UI-Filter Defaults
     this.filterRead = true,
+    this.showOnlyRead = false,
     this.showOnlyUnfinished = false,
     this.showOnlyFavorites = false,
     this.showOnlyDownloaded = false,
@@ -51,6 +53,7 @@ class PodcastFilterSettingsEntity extends Equatable {
     bool? filterBonusEpisodes,
     int? minEpisodeDurationMinutes,
     bool? filterRead,
+    bool? showOnlyRead,
     bool? showOnlyUnfinished,
     bool? showOnlyFavorites,
     bool? showOnlyDownloaded,
@@ -66,6 +69,7 @@ class PodcastFilterSettingsEntity extends Equatable {
       filterBonusEpisodes: filterBonusEpisodes ?? this.filterBonusEpisodes,
       minEpisodeDurationMinutes: minEpisodeDurationMinutes ?? this.minEpisodeDurationMinutes,
       filterRead: filterRead ?? this.filterRead,
+      showOnlyRead: showOnlyRead ?? this.showOnlyRead,
       showOnlyUnfinished: showOnlyUnfinished ?? this.showOnlyUnfinished,
       showOnlyFavorites: showOnlyFavorites ?? this.showOnlyFavorites,
       showOnlyDownloaded: showOnlyDownloaded ?? this.showOnlyDownloaded,
@@ -99,6 +103,7 @@ class PodcastFilterSettingsEntity extends Equatable {
     filterBonusEpisodes,
     minEpisodeDurationMinutes,
     filterRead,
+    showOnlyRead,
     showOnlyUnfinished,
     showOnlyFavorites,
     showOnlyDownloaded,
