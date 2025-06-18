@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../../../domain/entities/episode_entity.dart';
@@ -9,25 +11,35 @@ class AudioFileDialog{
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-            title: Text(filePath == null
-                ? "Download episode audio file to device"
-                : "Delete episode audio file"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("Cancel"),
+        return Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+              child: Container(
+                color: Colors.black26,
               ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  AudioFileUtility.handleDownloadOnPressed(episode);
-                },
-                child: Text(filePath == null ? "Download" : "Delete"),
-              ),
-            ]);
+            ),
+            AlertDialog(
+                title: Text(filePath == null
+                    ? "Download episode audio file to device"
+                    : "Delete episode audio file"),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Cancel"),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      AudioFileUtility.handleDownloadOnPressed(episode);
+                    },
+                    child: Text(filePath == null ? "Download" : "Delete"),
+                  ),
+                ]),
+          ],
+        );
       },
     );
   }
