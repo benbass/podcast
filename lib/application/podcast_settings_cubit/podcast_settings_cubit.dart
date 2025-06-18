@@ -49,6 +49,7 @@ class PodcastSettingsCubit extends Cubit<PodcastSettingsState> {
         minEpisodeDurationMinutes: persistentSettings.minEpisodeDurationMinutes,
         // default filter settings
         filterRead: true,
+        showOnlyRead: false,
         showOnlyUnfinished: false,
         showOnlyFavorites: false,
         showOnlyDownloaded: false,
@@ -135,6 +136,7 @@ class PodcastSettingsCubit extends Cubit<PodcastSettingsState> {
 
   Future<void> updateUiFilterSettings({
     bool? filterRead,
+    bool? showOnlyRead,
     bool? showOnlyUnfinished,
     bool? showOnlyFavorites,
     bool? showOnlyDownloaded,
@@ -147,6 +149,7 @@ class PodcastSettingsCubit extends Cubit<PodcastSettingsState> {
     if (currentState is PodcastSettingsLoaded) {
       final newFilterSettings = currentState.settings.copyWith(
         filterRead: filterRead,
+        showOnlyRead: showOnlyRead,
         showOnlyUnfinished: showOnlyUnfinished,
         showOnlyFavorites: showOnlyFavorites,
         showOnlyDownloaded: showOnlyDownloaded,
