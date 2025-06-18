@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:podcast/helpers/audio_download/audio_download_queue_manager.dart';
 
@@ -33,15 +35,25 @@ class MyAppLifecycleObserver extends WidgetsBindingObserver {
     // We show an Overlay-Dialog over all other widgets.
     MyApp.navigatorKey.currentState?.overlay?.insert(
       OverlayEntry(
-        builder: (context) => AlertDialog(
-          title: const Text('Error!'),
-          content: Text(errorMessage),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
+        builder: (context) => Column(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+              child: Container(
+                color: Colors.black26,
+              ),
+            ),
+            AlertDialog(
+              title: const Text('Error!'),
+              content: Text(errorMessage),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
             ),
           ],
         ),
