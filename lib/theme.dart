@@ -62,84 +62,84 @@ class AppTheme {
       bodySmall: _bodyTextSmall);
 
   static final ThemeData lightTheme = ThemeData(
-    useMaterial3: true,
-    scaffoldBackgroundColor: _primaryVariantColor,
-    appBarTheme: AppBarTheme(
-      //color: _appbarColor,
-      titleTextStyle: _appBarText,
+      useMaterial3: true,
+      scaffoldBackgroundColor: _primaryVariantColor,
+      appBarTheme: AppBarTheme(
+        //color: _appbarColor,
+        titleTextStyle: _appBarText,
+        iconTheme: const IconThemeData(
+          color: _iconColor,
+        ),
+        backgroundColor: _appbarColor,
+        toolbarHeight: 60,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        shadowColor: _primaryVariantColor,
+      ),
+      bottomAppBarTheme: const BottomAppBarTheme(
+        color: _appbarColor,
+      ),
+      colorScheme: const ColorScheme.light(
+        primary: _primaryColor,
+        onPrimary: _onPrimaryColor,
+        secondary: _accentColor,
+        primaryContainer: _primaryVariantColor,
+      ),
+      textTheme: _textTheme,
+      drawerTheme: const DrawerThemeData(
+        backgroundColor: Colors.white12,
+      ),
+      elevatedButtonTheme: const ElevatedButtonThemeData(
+          style: ButtonStyle(
+        elevation: WidgetStatePropertyAll(30),
+        backgroundColor: WidgetStatePropertyAll(_iconColor),
+        foregroundColor: WidgetStatePropertyAll(_primaryVariantColor),
+      )),
+      textButtonTheme: TextButtonThemeData(
+          style: ButtonStyle(
+        textStyle: WidgetStatePropertyAll(
+            _bodyTextLarge.copyWith(fontWeight: FontWeight.bold)),
+      )),
+      buttonTheme: const ButtonThemeData(
+        buttonColor: _accentColor,
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: _onPrimaryColor,
+      ),
       iconTheme: const IconThemeData(
         color: _iconColor,
       ),
-      backgroundColor: _appbarColor,
-      toolbarHeight: 60,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      shadowColor: _primaryVariantColor,
-    ),
-    bottomAppBarTheme: const BottomAppBarTheme(
-      color: _appbarColor,
-    ),
-    colorScheme: const ColorScheme.light(
-      primary: _primaryColor,
-      onPrimary: _onPrimaryColor,
-      secondary: _accentColor,
-      primaryContainer: _primaryVariantColor,
-    ),
-    textTheme: _textTheme,
-    drawerTheme: const DrawerThemeData(
-      backgroundColor: _primaryVariantColor,
-    ),
-    elevatedButtonTheme: const ElevatedButtonThemeData(
-        style: ButtonStyle(
-      elevation: WidgetStatePropertyAll(30),
-      backgroundColor: WidgetStatePropertyAll(_iconColor),
-      foregroundColor: WidgetStatePropertyAll(_primaryVariantColor),
-    )),
-    textButtonTheme: const TextButtonThemeData(
-        style: ButtonStyle(
-      textStyle: WidgetStatePropertyAll(_bodyTextLarge),
-    )),
-    buttonTheme: const ButtonThemeData(
-      buttonColor: _accentColor,
-    ),
-    bottomSheetTheme: const BottomSheetThemeData(
-      backgroundColor: _onPrimaryColor,
-    ),
-    iconTheme: const IconThemeData(
-      color: _iconColor,
-    ),
-    dialogTheme: DialogTheme(
-      shape: ContinuousRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
+      dialogTheme: DialogTheme(
+        shape: ContinuousRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+        backgroundColor: Colors.white12,
+        titleTextStyle: _bodyTextLarge.copyWith(fontWeight: FontWeight.bold),
+        contentTextStyle: _bodyTextMedium.copyWith(fontWeight: FontWeight.bold),
       ),
-      backgroundColor: _primaryVariantColor,
-      titleTextStyle: _bodyTextLarge.copyWith(color: _primaryColor),
-      contentTextStyle: _bodyTextMedium,
-    ),
-    dropdownMenuTheme: const DropdownMenuThemeData(
-      menuStyle: MenuStyle(
-        backgroundColor: WidgetStatePropertyAll(_primaryColor),
-      ),
-    ),
-    snackBarTheme: SnackBarThemeData(
-      elevation: 30.0,
-      behavior: SnackBarBehavior.floating,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(0),
+      dropdownMenuTheme: const DropdownMenuThemeData(
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(_primaryColor),
         ),
       ),
-      backgroundColor: _onPrimaryColor,
-      contentTextStyle: _bodyTextLarge.copyWith(
-        color: _primaryVariantColor,
+      snackBarTheme: SnackBarThemeData(
+        elevation: 30.0,
+        behavior: SnackBarBehavior.floating,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(0),
+          ),
+        ),
+        backgroundColor: _onPrimaryColor,
+        contentTextStyle: _bodyTextLarge.copyWith(
+          color: _primaryVariantColor,
+        ),
       ),
-    ),
-    listTileTheme: const ListTileThemeData(textColor: _textColor),
-    progressIndicatorTheme:
-        const ProgressIndicatorThemeData(color: _accentColor),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: _onPrimaryColor,
-      foregroundColor: _primaryVariantColor,
-    )
-  );
+      listTileTheme: const ListTileThemeData(textColor: _textColor),
+      progressIndicatorTheme:
+          const ProgressIndicatorThemeData(color: _accentColor),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: _onPrimaryColor,
+        foregroundColor: _primaryVariantColor,
+      ));
 }
