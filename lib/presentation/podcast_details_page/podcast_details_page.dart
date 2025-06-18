@@ -43,6 +43,7 @@ class PodcastDetailsPage extends StatelessWidget {
   }
 
   Scaffold _buildPage(BuildContext context) {
+    final themeDate = Theme.of(context);
     PodcastState state = context.watch<PodcastBloc>().state;
     if (state.status == PodcastStatus.loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -71,7 +72,7 @@ class PodcastDetailsPage extends StatelessWidget {
                   SafeArea(
                     child: Drawer(
                       backgroundColor: Colors.white12,
-                      surfaceTintColor: Theme.of(context).colorScheme.secondary,
+                      surfaceTintColor: themeDate.colorScheme.secondary,
                       width: MediaQuery.of(context).size.width * 0.85,
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
@@ -122,7 +123,7 @@ class PodcastDetailsPage extends StatelessWidget {
                       )),
                 ),
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 140),
+                  padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 170),
                   sliver: SliverToBoxAdapter(
                     child: Container(
                       decoration: buildBoxDecoration(context),
@@ -135,7 +136,7 @@ class PodcastDetailsPage extends StatelessWidget {
                               padding: const EdgeInsets.only(bottom: 20.0),
                               child: Text(
                                 state.currentPodcast.title,
-                                style: Theme.of(context).textTheme.displayLarge,
+                                style: themeDate.textTheme.displayLarge,
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -188,6 +189,9 @@ class PodcastDetailsPage extends StatelessWidget {
                                 fontSize: 16,
                               ),
                             ),
+                            const SizedBox(
+                              height: 20,
+                            ),
                             Text(
                               state.currentPodcast.author,
                               style: const TextStyle(
@@ -199,8 +203,9 @@ class PodcastDetailsPage extends StatelessWidget {
                                   const EdgeInsets.symmetric(vertical: 20.0),
                               child: Row(
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.language,
+                                    color: themeDate.colorScheme.primary,
                                   ),
                                   const SizedBox(
                                     width: 10,
