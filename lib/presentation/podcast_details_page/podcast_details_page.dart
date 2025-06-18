@@ -54,7 +54,7 @@ class PodcastDetailsPage extends StatelessWidget {
           automaticallyImplyLeading: false,
           leading: _buildBackButton(context),
           actions: [
-              RowIconButtonsPodcasts(podcast: state.currentPodcast),
+            RowIconButtonsPodcasts(podcast: state.currentPodcast),
           ],
           actionsPadding: const EdgeInsets.symmetric(horizontal: 20),
         ),
@@ -62,22 +62,27 @@ class PodcastDetailsPage extends StatelessWidget {
           create: (context) => PodcastSettingsCubit()..loadSettings(podcastId),
           child: Builder(
             builder: (context) {
-              return BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: SafeArea(
-                  child: Drawer(
-                    backgroundColor: Colors.transparent,
-                    surfaceTintColor: Theme.of(context).colorScheme.secondary,
-                    width: MediaQuery.of(context).size.width * 0.85,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        bottomRight: Radius.circular(20),
-                      ),
-                    ),
-                    child: const PodcastSettingsDrawer(),
+              return Stack(
+                children: [
+                  BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                    child: Container(color: Colors.black26),
                   ),
-                ),
+                  SafeArea(
+                    child: Drawer(
+                      backgroundColor: Colors.white12,
+                      surfaceTintColor: Theme.of(context).colorScheme.secondary,
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                        ),
+                      ),
+                      child: const PodcastSettingsDrawer(),
+                    ),
+                  ),
+                ],
               );
             },
           ),
@@ -117,116 +122,102 @@ class PodcastDetailsPage extends StatelessWidget {
                       )),
                 ),
                 SliverPadding(
-                  padding: const EdgeInsets.only(
-                    bottom: 80.0, top: 0,
-                  ),
-                  sliver: SliverMainAxisGroup(
-                    slivers: [
-                      SliverPadding(
-                        padding:
-                            const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 140),
-                        sliver: SliverToBoxAdapter(
-                          child: Container(
-                            decoration: buildBoxDecoration(context),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 20.0),
-                                    child: Text(
-                                      state.currentPodcast.title,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .displayLarge,
-                                      textAlign: TextAlign.center,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                  padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 140),
+                  sliver: SliverToBoxAdapter(
+                    child: Container(
+                      decoration: buildBoxDecoration(context),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 20.0),
+                              child: Text(
+                                state.currentPodcast.title,
+                                style: Theme.of(context).textTheme.displayLarge,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                List<Widget> categoryColumns = [];
+                                List<String> categories =
+                                    state.currentPodcast.categories;
+                                int maxItemsPerColumn = 3;
+
+                                for (int i = 0;
+                                    i < categories.length;
+                                    i += maxItemsPerColumn) {
+                                  List<Widget> currentColumnItems = [];
+                                  for (int j = 0;
+                                      j < maxItemsPerColumn &&
+                                          (i + j) < categories.length;
+                                      j++) {
+                                    currentColumnItems.add(
+                                      PodcastCategory(
+                                        value: categories[i + j],
+                                      ),
+                                    );
+                                  }
+                                  categoryColumns.add(
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: currentColumnItems,
                                     ),
-                                  ),
-                                  LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      List<Widget> categoryColumns = [];
-                                      List<String> categories =
-                                          state.currentPodcast.categories;
-                                      int maxItemsPerColumn = 3;
+                                  );
+                                }
 
-                                      for (int i = 0;
-                                          i < categories.length;
-                                          i += maxItemsPerColumn) {
-                                        List<Widget> currentColumnItems = [];
-                                        for (int j = 0;
-                                            j < maxItemsPerColumn &&
-                                                (i + j) < categories.length;
-                                            j++) {
-                                          currentColumnItems.add(
-                                            PodcastCategory(
-                                              value: categories[i + j],
-                                            ),
-                                          );
-                                        }
-                                        categoryColumns.add(
-                                          Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: currentColumnItems,
-                                          ),
-                                        );
-                                      }
-
-                                      return Wrap(
-                                        spacing: 8.0,
-                                        runSpacing: 0.0,
-                                        children: categoryColumns,
-                                      );
-                                    },
+                                return Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 0.0,
+                                  children: categoryColumns,
+                                );
+                              },
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              state.currentPodcast.description,
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              state.currentPodcast.author,
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 20.0),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.language,
                                   ),
                                   const SizedBox(
-                                    height: 20,
+                                    width: 10,
                                   ),
                                   Text(
-                                    state.currentPodcast.description,
+                                    state.currentPodcast.language.toUpperCase(),
                                     style: const TextStyle(
                                       fontSize: 16,
-                                    ),
-                                  ),
-                                  Text(
-                                    state.currentPodcast.author,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 20.0),
-                                    child: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.language,
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          state.currentPodcast.language
-                                              .toUpperCase(),
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ],
@@ -245,7 +236,7 @@ class PodcastDetailsPage extends StatelessWidget {
     return podcast.artworkFilePath ?? podcast.artwork;
   }
 
-  /// Builds the background image with blur effect.
+  /// Builds the background image..
   Widget _buildBackgroundImage(
     String imageUrl,
     PodcastEntity podcast,
