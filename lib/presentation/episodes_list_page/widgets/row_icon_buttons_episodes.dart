@@ -54,7 +54,7 @@ class RowIconButtonsEpisodes extends StatelessWidget {
             if (episodesState.status != EpisodesStatus.refreshing)
               IconButton(
                 onPressed: () async {
-                  final int currentCount = episodesState.episodes.length;
+                  final int currentCount = context.read<EpisodesBloc>().state.episodes.length;
                   episodesBloc.add(RefreshEpisodes(
                     feedId: podcastState.currentPodcast.pId,
                     podcastTitle: podcastState.currentPodcast.title,
@@ -76,14 +76,14 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                                 duration: duration,
-                                content: Text("$diff new episodes added.")),
+                                content: Text("$diff new episodes.")),
                           );
                         } else if (diff == 0) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                                 duration: duration,
                                 content:
-                                    const Text("No new episodes were found.")),
+                                    const Text("No new episodes.")),
                           );
                         } else {
                           // diff < 0 (episodes removed??),
