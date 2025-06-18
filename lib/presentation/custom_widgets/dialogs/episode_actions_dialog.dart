@@ -12,7 +12,6 @@ import '../../../domain/usecases/episode_usecases.dart';
 import '../../../helpers/audio_download/audio_file_utility.dart';
 import '../../../injection.dart';
 import '../action_feedback/action_feedback.dart';
-import '../decoration/box_decoration.dart';
 import 'audio_file_dialog.dart';
 
 class EpisodeActionsDialog {
@@ -91,34 +90,35 @@ class EpisodeActionsDialog {
                 color: Colors.black26,
               ),
             ),
-            Container(
-              decoration: buildBoxDecoration(context),
-              child: AlertDialog(
-                  backgroundColor: Colors.white12,
-                  title:
-                      const Text("Choose an action for the selected episodes", style: TextStyle(fontWeight: FontWeight.bold),),
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 40.0, vertical: 20.0),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (var menuItem in menuItems)
-                        TextButton(
-                          onPressed: () => menuItem["onPressed"](),
-                          child: Text(menuItem["title"], style: const TextStyle(fontWeight: FontWeight.bold),),
-                        ),
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.bold),),
-                    )
-                  ],
+            AlertDialog(
+              title: const Text(
+                "Choose an action for the selected episodes",
               ),
+              contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 40.0, vertical: 20.0),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (var menuItem in menuItems)
+                    TextButton(
+                      onPressed: () => menuItem["onPressed"](),
+                      child: Text(
+                        menuItem["title"],
+                      ),
+                    ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "Cancel",
+                  ),
+                )
+              ],
             ),
           ],
         );
@@ -202,30 +202,28 @@ class EpisodeActionsDialog {
                   color: Colors.black26,
                 ),
               ),
-              Container(
-                decoration: buildBoxDecoration(context),
-                child: AlertDialog(
-                  backgroundColor: Colors.white12,
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (var menuItem in menuItems)
-                        TextButton(
-                          onPressed: () => menuItem["onPressed"](),
-                          child: Text(menuItem["title"], style: const TextStyle(fontWeight: FontWeight.bold),),
-                        ),
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.bold),),
-                    )
+              AlertDialog(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var menuItem in menuItems)
+                      TextButton(
+                        onPressed: () => menuItem["onPressed"](),
+                        child: Text(menuItem["title"]),
+                      ),
                   ],
                 ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      "Cancel",
+                    ),
+                  )
+                ],
               ),
             ],
           );
