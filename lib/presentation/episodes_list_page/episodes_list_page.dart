@@ -193,6 +193,39 @@ class EpisodesListPage extends StatelessWidget {
                               children: [
                                 const AnimatedDownloadIcon(),
                                 const SizedBox(width: 30),
+                                BlocBuilder<PodcastSettingsCubit,
+                                        PodcastSettingsState>(
+                                    builder: (context, settingsState) {
+                                  if (settingsState is PodcastSettingsLoaded) {
+                                    return IconButton(
+                                      onPressed: () {
+                                        context
+                                            .read<PodcastSettingsCubit>()
+                                            .updateUiFilterSettings(
+                                              filterRead: settingsState
+                                                      .settings.filterRead
+                                                  ? false
+                                                  : true,
+                                              showOnlyRead: false,
+                                            );
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                content: Text("Read episodes are ${settingsState.settings.filterRead ? "not hidden" : "hidden"}"),
+                                                duration: const Duration(
+                                                    milliseconds: 1500)));
+                                      },
+                                      icon: Icon(
+                                        settingsState.settings.filterRead
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
+                                        size: 30,
+                                      ),
+                                    );
+                                  } else {
+                                    return const SizedBox();
+                                  }
+                                }),
+                                const SizedBox(width: 30),
                                 IconButton(
                                   onPressed: () => Navigator.push(
                                       context,
