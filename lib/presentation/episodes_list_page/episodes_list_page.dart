@@ -189,8 +189,7 @@ class EpisodesListPage extends StatelessWidget {
                           flexibleSpace: Padding(
                             padding: const EdgeInsets.all(4.0),
                             child: Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 const AnimatedDownloadIcon(),
                                 const SizedBox(width: 30),
@@ -198,8 +197,7 @@ class EpisodesListPage extends StatelessWidget {
                                   onPressed: () => Navigator.push(
                                       context,
                                       ScaleRoute(
-                                        page:
-                                            const PodcastDetailsPage(),
+                                        page: const PodcastDetailsPage(),
                                       )),
                                   icon: const Icon(
                                     Icons.info_outline_rounded,
