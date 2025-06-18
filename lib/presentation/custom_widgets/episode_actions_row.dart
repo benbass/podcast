@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:podcast/domain/usecases/episode_usecases.dart';
 
@@ -120,28 +122,42 @@ class _EpisodeActionsRowState extends State<EpisodeActionsRow> {
                       showDialog(
                         context: context,
                         builder: (context) {
-                          return AlertDialog(
-                            title: Text(filePath != null
-                                ? "Delete the downloaded file?"
-                                : "Download the episode?"),
-                            content: Text(filePath != null
-                                ? "The file will be deleted from your device."
-                                : "This will download the file to your device."),
-                            actions: [
-                              TextButton(
-                                onPressed: () => {
-                                  Navigator.pop(context),
-                                },
-                                child: const Text("Cancel"),
+                          return Stack(
+                            children: [
+                              BackdropFilter(
+                                filter:
+                                    ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+                                child: Container(color: Colors.black26),
                               ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  AudioFileUtility.handleDownloadOnPressed(
-                                      widget.episode);
-                                },
-                                child: Text(
-                                    filePath != null ? "Delete" : "Download"),
+                              AlertDialog(
+                                title: Text(
+                                  filePath != null
+                                      ? "Delete the downloaded file?"
+                                      : "Download the episode?",
+                                ),
+                                content: Text(filePath != null
+                                    ? "The file will be deleted from your device."
+                                    : "This will download the file to your device."),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => {
+                                      Navigator.pop(context),
+                                    },
+                                    child: const Text(
+                                      "Cancel",
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      AudioFileUtility.handleDownloadOnPressed(
+                                          widget.episode);
+                                    },
+                                    child: Text(
+                                      filePath != null ? "Delete" : "Download",
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           );
