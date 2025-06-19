@@ -6,7 +6,9 @@ import 'package:podcast/injection.dart';
 
 import 'package:podcast/presentation/episodes_list_page/widgets/animated_download_icon.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/conditional_floating_action_buttons.dart';
+import 'package:podcast/presentation/episodes_list_page/widgets/dropdown_filter_menu.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
+import 'package:podcast/presentation/episodes_list_page/widgets/toggle_read_visibility.dart';
 import '../../application/episodes_bloc/episodes_bloc.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
@@ -170,12 +172,6 @@ class EpisodesListPage extends StatelessWidget {
                         message: episodesState.errorMessage ??
                             'Error loading episodes for\n${currentPodcast.title}'),
                   );
-                } else if (episodesState.episodes.isEmpty &&
-                    (episodesState.status == EpisodesStatus.success ||
-                        episodesState.status == EpisodesStatus.refreshing)) {
-                  return Center(
-                      child: Text(
-                          "No episodes found for\n${currentPodcast.title}"));
                 } else {
                   return SafeArea(
                     child: CustomScrollView(
@@ -191,40 +187,13 @@ class EpisodesListPage extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                const AnimatedDownloadIcon(),
-                                const SizedBox(width: 30),
-                                BlocBuilder<PodcastSettingsCubit,
-                                        PodcastSettingsState>(
-                                    builder: (context, settingsState) {
-                                  if (settingsState is PodcastSettingsLoaded) {
-                                    return IconButton(
-                                      onPressed: () {
-                                        context
-                                            .read<PodcastSettingsCubit>()
-                                            .updateUiFilterSettings(
-                                              filterRead: settingsState
-                                                      .settings.filterRead
-                                                  ? false
-                                                  : true,
-                                              showOnlyRead: false,
-                                            );
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                                content: Text("Read episodes are ${settingsState.settings.filterRead ? "not hidden" : "hidden"}"),
-                                                duration: const Duration(
-                                                    milliseconds: 1500)));
-                                      },
-                                      icon: Icon(
-                                        settingsState.settings.filterRead
-                                            ? Icons.visibility_outlined
-                                            : Icons.visibility_off_outlined,
-                                        size: 30,
-                                      ),
-                                    );
-                                  } else {
-                                    return const SizedBox();
-                                  }
-                                }),
+                                if (podcastState.currentPodcast.subscribed) ...[
+                                  const DropdownFilterMenu(),
+                                  const Spacer(),
+                                  const AnimatedDownloadIcon(),
+                                  const SizedBox(width: 30),
+                                  const ToggleReadVisibility(),
+                                ],
                                 const SizedBox(width: 30),
                                 IconButton(
                                   onPressed: () => Navigator.push(
@@ -241,6 +210,19 @@ class EpisodesListPage extends StatelessWidget {
                             ),
                           ),
                         ),
+                        if (episodesState.episodes.isEmpty &&
+                            (episodesState.status == EpisodesStatus.success ||
+                                episodesState.status ==
+                                    EpisodesStatus.refreshing))
+                          SliverFillRemaining(
+                            child: Center(
+                              child: Text(
+                                "No episodes found for\n${currentPodcast.title}",
+                                style: Theme.of(context).textTheme.bodyLarge,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
                         SliverPadding(
                           padding: const EdgeInsets.only(
                             bottom: 80.0,
@@ -270,3 +252,5 @@ class EpisodesListPage extends StatelessWidget {
     );
   }
 }
+
+
