@@ -105,7 +105,7 @@ void main() async {
                 create: (context) =>
                     EpisodesBloc(episodeUseCases: getIt<EpisodeUseCases>())),
             BlocProvider<PlaylistDetailsCubit>(
-              create: (context) => getIt<PlaylistDetailsCubit>()..loadPlaylist(),
+              create: (context) => getIt<PlaylistDetailsCubit>(),
             ),
           ],
           child: const MyApp(),
