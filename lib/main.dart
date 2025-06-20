@@ -22,11 +22,13 @@ import 'package:provider/provider.dart';
 import 'application/episode_playback_cubit/episode_playback_cubit.dart';
 import 'application/episode_selection_cubit/episode_selection_cubit.dart';
 import 'application/episodes_bloc/episodes_bloc.dart';
+import 'application/playlist_details_cubit/playlist_details_cubit.dart';
 import 'application/podcast_bloc/podcast_bloc.dart';
 import 'application/podcast_settings_cubit/podcast_settings_cubit.dart';
 import 'core/globals.dart';
 import 'core/objectbox.dart';
 import 'domain/entities/persistent_podcast_settings_entity.dart';
+import 'domain/entities/playlist_entity.dart';
 import 'domain/usecases/episode_usecases.dart';
 import 'helpers/audio_download/audio_download_queue_manager.dart';
 import 'helpers/core/lifecycle_oberserver.dart';
@@ -44,6 +46,7 @@ void main() async {
   podcastBox = objectBox.store.box<PodcastEntity>();
   episodeBox = objectBox.store.box<EpisodeEntity>();
   settingsBox = objectBox.store.box<PersistentPodcastSettingsEntity>();
+  playlistBox = objectBox.store.box<AppPlaylist>();
 
   // Initialize the lifecycle observer
   final observer = MyAppLifecycleObserver();
@@ -101,6 +104,9 @@ void main() async {
             BlocProvider<EpisodesBloc>(
                 create: (context) =>
                     EpisodesBloc(episodeUseCases: getIt<EpisodeUseCases>())),
+            BlocProvider<PlaylistDetailsCubit>(
+              create: (context) => getIt<PlaylistDetailsCubit>()..loadPlaylist(),
+            ),
           ],
           child: const MyApp(),
         ),
