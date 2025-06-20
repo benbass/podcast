@@ -9,6 +9,7 @@ import 'package:podcast/infrastructure/repositories/podcast_repository_impl.dart
 
 import 'application/episode_playback_cubit/episode_playback_cubit.dart';
 import 'application/episode_selection_cubit/episode_selection_cubit.dart';
+import 'application/playlist_details_cubit/playlist_details_cubit.dart';
 import 'application/podcast_bloc/podcast_bloc.dart';
 import 'application/podcast_settings_cubit/podcast_settings_cubit.dart';
 import 'application/textfield_cubit/text_field_cubit.dart';
@@ -32,6 +33,7 @@ Future<void> init() async {
   getIt.registerFactory(() => EpisodeSelectionCubit());
   getIt.registerFactory(() => PodcastSettingsCubit());
   getIt.registerFactory(() => EpisodesBloc(episodeUseCases: getIt(), podcastSettingsCubit: getIt()));
+  getIt.registerFactory(() => PlaylistDetailsCubit());
 
   // Use cases
   getIt
