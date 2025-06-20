@@ -16,6 +16,7 @@ import '../../injection.dart';
 import '../custom_widgets/dialogs/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
 import '../episodes_list_page/widgets/animated_download_icon.dart';
+import '../playlist/playlist_details_page.dart';
 import '../podcast_details_page/podcast_details_page.dart';
 import '../podcasts_search_page/widgets/podcast_card.dart';
 import 'widgets/subscribed_podcast_card.dart';
@@ -115,8 +116,8 @@ class HomePage extends StatelessWidget {
     playerStatesListener.setResetPlaybackEpisodeCallback(
         () => context.read<EpisodePlaybackCubit>().resetPlayback());
     // listener needs current playback episode from cubit (initially null)
-    playerStatesListener
-        .setGetCurrentEpisode(() => context.read<EpisodePlaybackCubit>().state.episode);
+    playerStatesListener.setGetCurrentEpisode(
+        () => context.read<EpisodePlaybackCubit>().state.episode);
 
     // Listen for connectivity changes
     ConnectivityDialog.showConnectivityDialogs(context);
@@ -146,7 +147,18 @@ class HomePage extends StatelessWidget {
   Scaffold _buildPage(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Podcasts"),
+          //title: const Text("Podcasts"),
+          leading: IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                ScaleRoute(
+                  page: const PlaylistDetailsPage(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.featured_play_list_rounded),
+          ),
           actions: [
             _buildButtons(context),
           ],
