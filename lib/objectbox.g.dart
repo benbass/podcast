@@ -16,6 +16,7 @@ import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'domain/entities/episode_entity.dart';
 import 'domain/entities/persistent_podcast_settings_entity.dart';
+import 'domain/entities/playlist_entity.dart';
 import 'domain/entities/podcast_entity.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -317,6 +318,35 @@ final _entities = <obx_int.ModelEntity>[
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(5, 4281661072562383720),
+      name: 'AppPlaylist',
+      lastPropertyId: const obx_int.IdUid(4, 7342938097302703364),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 6993534284241746247),
+            name: 'id',
+            type: 6,
+            flags: 129),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 1648994079516446541),
+            name: 'episodeIds',
+            type: 27,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 5813533059101897652),
+            name: 'currentPlayingIndex',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 7342938097302703364),
+            name: 'autoPlayEnabled',
+            type: 1,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -355,7 +385,7 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(4, 608649504811762363),
+      lastEntityId: const obx_int.IdUid(5, 4281661072562383720),
       lastIndexId: const obx_int.IdUid(4, 4003899417538329055),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
@@ -698,6 +728,44 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
           return object;
+        }),
+    AppPlaylist: obx_int.EntityDefinition<AppPlaylist>(
+        model: _entities[3],
+        toOneRelations: (AppPlaylist object) => [],
+        toManyRelations: (AppPlaylist object) => {},
+        getId: (AppPlaylist object) => object.id,
+        setId: (AppPlaylist object, int id) {
+          object.id = id;
+        },
+        objectToFB: (AppPlaylist object, fb.Builder fbb) {
+          final episodeIdsOffset = fbb.writeListInt64(object.episodeIds);
+          fbb.startTable(5);
+          fbb.addInt64(0, object.id);
+          fbb.addOffset(1, episodeIdsOffset);
+          fbb.addInt64(2, object.currentPlayingIndex);
+          fbb.addBool(3, object.autoPlayEnabled);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final idParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final episodeIdsParam =
+              const fb.ListReader<int>(fb.Int64Reader(), lazy: false)
+                  .vTableGet(buffer, rootOffset, 6, []);
+          final currentPlayingIndexParam =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 8);
+          final autoPlayEnabledParam =
+              const fb.BoolReader().vTableGet(buffer, rootOffset, 10, false);
+          final object = AppPlaylist(
+              id: idParam,
+              episodeIds: episodeIdsParam,
+              currentPlayingIndex: currentPlayingIndexParam,
+              autoPlayEnabled: autoPlayEnabledParam);
+
+          return object;
         })
   };
 
@@ -929,4 +997,23 @@ class PersistentPodcastSettingsEntity_ {
   static final minEpisodeDurationMinutes =
       obx.QueryIntegerProperty<PersistentPodcastSettingsEntity>(
           _entities[2].properties[5]);
+}
+
+/// [AppPlaylist] entity fields to define ObjectBox queries.
+class AppPlaylist_ {
+  /// See [AppPlaylist.id].
+  static final id =
+      obx.QueryIntegerProperty<AppPlaylist>(_entities[3].properties[0]);
+
+  /// See [AppPlaylist.episodeIds].
+  static final episodeIds =
+      obx.QueryIntegerVectorProperty<AppPlaylist>(_entities[3].properties[1]);
+
+  /// See [AppPlaylist.currentPlayingIndex].
+  static final currentPlayingIndex =
+      obx.QueryIntegerProperty<AppPlaylist>(_entities[3].properties[2]);
+
+  /// See [AppPlaylist.autoPlayEnabled].
+  static final autoPlayEnabled =
+      obx.QueryBooleanProperty<AppPlaylist>(_entities[3].properties[3]);
 }

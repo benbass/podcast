@@ -302,9 +302,38 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "5:4281661072562383720",
+      "lastPropertyId": "4:7342938097302703364",
+      "name": "AppPlaylist",
+      "properties": [
+        {
+          "id": "1:6993534284241746247",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:1648994079516446541",
+          "name": "episodeIds",
+          "type": 27
+        },
+        {
+          "id": "3:5813533059101897652",
+          "name": "currentPlayingIndex",
+          "type": 6
+        },
+        {
+          "id": "4:7342938097302703364",
+          "name": "autoPlayEnabled",
+          "type": 1
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "4:608649504811762363",
+  "lastEntityId": "5:4281661072562383720",
   "lastIndexId": "4:4003899417538329055",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
