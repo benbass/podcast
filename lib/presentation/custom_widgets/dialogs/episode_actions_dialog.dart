@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/helpers/database/episode_action_helper.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../application/episode_selection_cubit/episode_selection_cubit.dart';
+import '../../../application/playlist_details_cubit/playlist_details_cubit.dart';
 import '../../../core/globals.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../domain/usecases/episode_usecases.dart';
@@ -187,6 +188,20 @@ class EpisodeActionsDialog {
                         context, episode, filePath)
                 };
         },
+      },
+      {
+        "title": "Add to playlist",
+        "onPressed": () {
+          context.read<PlaylistDetailsCubit>().addEpisodeToPlaylist([episode.id]);
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Episode added to playlist"),
+              duration: Duration(milliseconds: 1500),
+            ),
+          );
+          // snackBar
+        }
       },
     ];
 
