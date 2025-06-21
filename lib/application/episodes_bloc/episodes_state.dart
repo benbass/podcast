@@ -12,6 +12,9 @@ class EpisodesState extends Equatable {
     this.activeFilters,
     this.filterText,
     this.errorMessage,
+    this.newlyAddedCount,
+    this.wasRefreshOperation,
+
   });
 
   final EpisodesStatus status;
@@ -22,6 +25,8 @@ class EpisodesState extends Equatable {
   final PodcastFilterSettingsEntity? activeFilters;
   final String? filterText;
   final String? errorMessage;
+  final int? newlyAddedCount;
+  final bool? wasRefreshOperation;
 
   EpisodesState copyWith({
     EpisodesStatus? status,
@@ -33,6 +38,10 @@ class EpisodesState extends Equatable {
     String? filterText,
     String? errorMessage,
     bool clearErrorMessage = false,
+    int? newlyAddedCount,
+    bool? wasRefreshOperation,
+    bool clearNewlyAddedCount = false,
+    bool clearWasRefreshOperation = false,
   }) {
     return EpisodesState(
       status: status ?? this.status,
@@ -43,6 +52,8 @@ class EpisodesState extends Equatable {
       activeFilters: activeFilters ?? this.activeFilters,
       filterText: filterText ?? this.filterText,
       errorMessage: clearErrorMessage ? null : errorMessage ?? this.errorMessage,
+      newlyAddedCount: clearNewlyAddedCount ? null : (newlyAddedCount ?? this.newlyAddedCount),
+      wasRefreshOperation: clearWasRefreshOperation ? null : (wasRefreshOperation ?? this.wasRefreshOperation),
     );
   }
 
@@ -56,5 +67,7 @@ class EpisodesState extends Equatable {
     activeFilters,
     filterText,
     errorMessage,
+    newlyAddedCount,
+    wasRefreshOperation,
   ];
 }
