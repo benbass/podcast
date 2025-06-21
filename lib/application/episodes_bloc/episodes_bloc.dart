@@ -26,6 +26,7 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
     on<_EpisodesUpdated>(_onEpisodesUpdated);
     on<_FilterSettingsChanged>(_onFilterSettingsChanged);
     on<RefreshEpisodes>(_onRefreshEpisodes);
+    on<NotificationShownEvent>(_onNotificationShown);
 
     // Listen to PodcastSettingsCubit when it's available
     _settingsSubscription =
@@ -120,6 +121,7 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
   }
 
   Future<void> _onRefreshEpisodes(event, emit) async {
+    final int countBeforeRefresh = state.episodes.length;
     emit(state.copyWith(status: EpisodesStatus.refreshing));
     try {
       await episodeUseCases.refreshEpisodesFromServer(
@@ -127,11 +129,27 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
         podcastTitle: event.podcastTitle,
       );
 
-      // The state.status is set to Success by _onEpisodesUpdated only when new episodes were found.
-      // That's why we explicitly set it now to Success in case server did not return any new episodes.
-      if (state.status == EpisodesStatus.refreshing) {
-        emit(state.copyWith(status: EpisodesStatus.success));
-      }
+
+      final List<EpisodeEntity> currentEpisodesAfterRefresh = await episodeUseCases
+          .getEpisodesStream(
+          feedId: event.feedId,
+          podcastTitle: state.podcastTitle,
+          isSubscribed: state.isSubscribed,
+          filterSettings: state.activeFilters!)
+          .first;
+
+      final int finalCountBeforeRefresh = countBeforeRefresh;
+      final int finalCountAfterRefresh = currentEpisodesAfterRefresh.length;
+
+      final int diff = finalCountAfterRefresh - finalCountBeforeRefresh;
+
+        emit(state.copyWith(
+          status: EpisodesStatus.success,
+          episodes: currentEpisodesAfterRefresh,
+          newlyAddedCount: diff,
+          wasRefreshOperation: true,
+        ));
+
     } catch (error) {
       emit(state.copyWith(
         status: EpisodesStatus.failure,
@@ -139,6 +157,10 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
             error is Failure ? error.message : "Failed to refresh episodes",
       ));
     }
+  }
+
+  void _onNotificationShown(event, emit) {
+    emit(state.copyWith(clearNewlyAddedCount: true, clearWasRefreshOperation: true));
   }
 
   @override
