@@ -7,12 +7,12 @@ abstract class EpisodesEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-// Event, um Episoden für einen bestimmten Podcast zu laden/beobachten
+// Loads/observes episodes for a specific podcast
 class LoadEpisodes extends EpisodesEvent {
-  final int feedId; // Die ID des Podcast-Feeds
-  final String podcastTitle; // Für UI-Zwecke oder Fehlerbehandlung
-  final bool isSubscribed;   // Ist der Podcast abonniert?
-  final PodcastFilterSettingsEntity? initialFilterSettings; // Optionale initiale Filter
+  final int feedId; // Podcast-Feed id
+  final String podcastTitle; // For UI purposes
+  final bool isSubscribed;
+  final PodcastFilterSettingsEntity? initialFilterSettings;
 
   const LoadEpisodes({
     required this.feedId,
@@ -25,7 +25,7 @@ class LoadEpisodes extends EpisodesEvent {
   List<Object?> get props => [feedId, podcastTitle, isSubscribed, initialFilterSettings];
 }
 
-// Internes Event, das gefeuert wird, wenn der Stream neue Episoden liefert
+// Internal event that is fired when the stream provides new episodes
 class _EpisodesUpdated extends EpisodesEvent {
   final List<EpisodeEntity> episodes;
 
@@ -35,7 +35,7 @@ class _EpisodesUpdated extends EpisodesEvent {
   List<Object> get props => [episodes];
 }
 
-// Internes Event, das gefeuert wird, wenn die Podcast-Filtereinstellungen sich ändern
+// Internal event that is fired when the podcast filter settings change
 class _FilterSettingsChanged extends EpisodesEvent {
   final PodcastFilterSettingsEntity newSettings;
 
@@ -45,7 +45,7 @@ class _FilterSettingsChanged extends EpisodesEvent {
   List<Object> get props => [newSettings];
 }
 
-// Event, um ein manuelles Neuladen/Aktualisieren vom Server zu erzwingen
+
 class RefreshEpisodes extends EpisodesEvent {
   final int feedId;
   final String podcastTitle;
@@ -60,3 +60,6 @@ class RefreshEpisodes extends EpisodesEvent {
   @override
   List<Object?> get props => [feedId, podcastTitle, isSubscribed];
 }
+
+// Event fired when a notification is shown after refresh
+class NotificationShownEvent extends EpisodesEvent {}
