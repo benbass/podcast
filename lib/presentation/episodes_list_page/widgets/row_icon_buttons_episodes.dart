@@ -15,7 +15,6 @@ class RowIconButtonsEpisodes extends StatelessWidget {
   Widget build(BuildContext context) {
     final PodcastState podcastState = context.watch<PodcastBloc>().state;
     final EpisodesBloc episodesBloc = BlocProvider.of<EpisodesBloc>(context);
-    final EpisodesState episodesState = context.watch<EpisodesBloc>().state;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -43,74 +42,51 @@ class RowIconButtonsEpisodes extends StatelessWidget {
         if (podcastState.currentPodcast.subscribed)
           Stack(
             children: [
-              if (episodesState.status != EpisodesStatus.refreshing)
-                IconButton(
-                  onPressed: () async {
-                    final int currentCount =
-                        context.read<EpisodesBloc>().state.episodes.length;
-                    episodesBloc.add(RefreshEpisodes(
-                      feedId: podcastState.currentPodcast.pId,
-                      podcastTitle: podcastState.currentPodcast.title,
-                      isSubscribed: podcastState.currentPodcast.subscribed,
-                    ));
-                    Duration duration = const Duration(milliseconds: 1500);
-                    try {
-                      final finalState = await episodesBloc.stream.firstWhere(
-                          (state) =>
-                              state.status != EpisodesStatus.refreshing &&
-                              state.status != EpisodesStatus.loading);
-
-                      if (context.mounted) {
-                        if (finalState.status == EpisodesStatus.success) {
-                          final int newCount = finalState.episodes.length;
-                          final int diff = newCount - currentCount;
-
-                          if (diff > 0) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  duration: duration,
-                                  content: Text("$diff new episodes.")),
-                            );
-                          } else if (diff == 0) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  duration: duration,
-                                  content: const Text("No new episodes.")),
-                            );
-                          } else {
-                            // diff < 0 (episodes removed??),
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  duration: duration,
-                                  content:
-                                      const Text("Episodes were updated.")),
-                            );
-                          }
+                BlocListener<EpisodesBloc, EpisodesState>(
+                  listener: (context, state) {
+                    if (state.wasRefreshOperation == true) {
+                      if (state.status == EpisodesStatus.success &&
+                          state.newlyAddedCount != null) {
+                        final int diff = state.newlyAddedCount!;
+                        Duration duration = const Duration(milliseconds: 1500);
+                        String message;
+                        if (diff > 0) {
+                          message = "$diff new episodes.";
+                        } else if (diff == 0) {
+                          message = "No new episodes.";
+                        } else {
+                          message =
+                              "Episodes were updated.";
                         }
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(duration: duration, content: Text(message)),
+                        );
+                      } else if (state.status == EpisodesStatus.failure) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                              duration: duration,
-                              content: const Text("An error occurred.")),
+                            duration: const Duration(milliseconds: 1500),
+                            content: Text(
+                                state.errorMessage ?? "An error occurred."),
+                            backgroundColor: Colors.red,
+                          ),
                         );
                       }
+                      episodesBloc.add(NotificationShownEvent());
                     }
                   },
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: const Icon(
-                    Icons.refresh_rounded,
-                    size: 30,
-                  ),
-                ),
-              if (episodesState.status == EpisodesStatus.refreshing)
-                const SizedBox(
-                  width: 30,
-                  height: 30,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
+                  child: IconButton(
+                    onPressed: () async {
+                      episodesBloc.add(RefreshEpisodes(
+                        feedId: podcastState.currentPodcast.pId,
+                        podcastTitle: podcastState.currentPodcast.title,
+                        isSubscribed: podcastState.currentPodcast.subscribed,
+                      ));
+                    },
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: (context.watch<EpisodesBloc>().state.status == EpisodesStatus.refreshing)
+                        ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.refresh_rounded, size: 30),
                   ),
                 ),
             ],
