@@ -229,7 +229,7 @@ class HomePage extends StatelessWidget {
                                       onTap: () async {
                                         if (context.mounted) {
                                           context.read<PodcastBloc>().add(
-                                              PodcastTappedEvent(podcast: e));
+                                              PodcastSelectedEvent(podcast: e));
                                           Navigator.push(
                                             context,
                                             ScaleRoute(
