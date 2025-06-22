@@ -5,9 +5,9 @@ import 'package:podcast/application/podcast_bloc/podcast_bloc.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/presentation/custom_widgets/episode_actions_row.dart';
 import 'package:podcast/presentation/episode_details_page/widgets/player_controls.dart';
-import 'package:podcast/presentation/episodes_list_page/episodes_list_page.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../domain/entities/podcast_entity.dart';
 import '../../domain/usecases/episode_usecases.dart';
 import '../../helpers/core/utilities/format_utilities.dart';
 import '../../helpers/player/audiohandler.dart';
@@ -62,8 +62,6 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final podcastState =
-        BlocProvider.of<PodcastBloc>(context, listen: false).state;
     final List<EpisodeEntity> episodes = widget.episodes;
 
     // We wrap this widget in PopScope so we can apply a method on the OS back-button
@@ -78,11 +76,11 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
           }
           return;
         }
-        Navigator.of(context).push(
+        /*Navigator.of(context).push(
           ScaleRoute(
             page: const EpisodesListPageWrapper(),
           ),
-        );
+        );*/
       },
       child: BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
         builder: (context, episodePlaybackState) {
@@ -116,22 +114,36 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
             body: Stack(
               fit: StackFit.expand,
               children: [
-                if (podcastState.currentPodcast.artworkFilePath != null)
-                  OpacityBody(
-                    state: podcastState,
-                    assetImage: null,
-                  ),
+                BlocBuilder<PodcastBloc, PodcastState>(
+                  builder: (context, podcastState) {
+                    return OpacityBody(
+                      state: podcastState,
+                      assetImage: null,
+                    );
+                  },
+                ),
                 const BackdropFilterBody(),
                 PageView.builder(
                     controller: pageController,
                     onPageChanged: (index) async {
-                      // Handle mini player overlay visibility
                       final episodeOnNewPage = episodes[index];
 
+                      final PodcastState podcastState =
+                          context.read<PodcastBloc>().state;
+                      if (episodeOnNewPage.feedId !=
+                          podcastState.currentPodcast.pId) {
+                        final podcast = podcastState.subscribedPodcasts
+                            .firstWhere((podcast) =>
+                                podcast.pId == episodeOnNewPage.feedId);
+                        context
+                            .read<PodcastBloc>()
+                            .add(PodcastSelectedEvent(podcast: podcast));
+                      }
+
+                      // Handle mini player overlay visibility
                       if (episodePlaybackState.episode == null) {
                         return;
                       }
-
                       if (episodePlaybackState.episode!.eId !=
                           episodeOnNewPage.eId) {
                         if (overlayEntry == null &&
@@ -159,185 +171,211 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                         removeOverlayPlayerMin();
                       }
 
-                      return Stack(
-                        children: [
-                          CustomScrollView(
-                            physics: const BouncingScrollPhysics(),
-                            slivers: [
-                              EpisodeDetailsFlexibleSpace(
-                                podcast: podcastState.currentPodcast,
-                                episode: episodeToDisplay,
-                                episodeIndex: index,
-                                playlist: episodes,
-                                title: episodeToDisplay.title,
-                              ),
-                              SliverMainAxisGroup(
+                      return BlocBuilder<PodcastBloc, PodcastState>(
+                        buildWhen: (prev, curr) =>
+                            prev.currentPodcast.pId != curr.currentPodcast.pId,
+                        builder: (context, podcastState) {
+                          PodcastEntity relevantPodcast =
+                              podcastState.currentPodcast;
+                          if (relevantPodcast.pId != episodeToDisplay.feedId) {
+                            final found = podcastState.subscribedPodcasts
+                                .firstWhere(
+                                    (p) => p.pId == episodeToDisplay.feedId,
+                                    orElse: () => relevantPodcast);
+                            relevantPodcast = found;
+                          }
+                          return Stack(
+                            children: [
+                              CustomScrollView(
+                                physics: const BouncingScrollPhysics(),
                                 slivers: [
-                                  SliverPadding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        20.0, 0.0, 20.0, 20.0),
-                                    sliver: SliverToBoxAdapter(
-                                      child: Container(
-                                        decoration: buildBoxDecoration(context),
-                                        child: Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                            16.0, 8.0, 16.0, 16.0,
-                                          ),
-                                          child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceAround,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
+                                  EpisodeDetailsFlexibleSpace(
+                                    podcast: relevantPodcast,
+                                    episode: episodeToDisplay,
+                                    episodeIndex: index,
+                                    playlist: episodes,
+                                    title: episodeToDisplay.title,
+                                  ),
+                                  SliverMainAxisGroup(
+                                    slivers: [
+                                      SliverPadding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            20.0, 0.0, 20.0, 20.0),
+                                        sliver: SliverToBoxAdapter(
+                                          child: Container(
+                                            decoration:
+                                                buildBoxDecoration(context),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                16.0,
+                                                8.0,
+                                                16.0,
+                                                16.0,
+                                              ),
+                                              child: Column(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
                                                           .spaceAround,
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
-                                                    Text(FormatUtilities
-                                                        .formatTimestamp(
-                                                            episodeToDisplay
-                                                                .datePublished)),
-                                                    if (episodeToDisplay
-                                                        .isSubscribed)
-                                                      Expanded(
-                                                        child: EpisodeActionsRow(
-                                                            episode:
-                                                                episodeToDisplay),
-                                                      ),
-                                                    if (episodeToDisplay
-                                                        .isSubscribed)
-                                                      IconButton(
-                                                        onPressed: () =>
-                                                            EpisodeActionsDialog
-                                                                .showEpisodeActionsDialog(
-                                                                    context,
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Text(FormatUtilities
+                                                            .formatTimestamp(
+                                                                episodeToDisplay
+                                                                    .datePublished)),
+                                                        if (episodeToDisplay
+                                                            .isSubscribed)
+                                                          Expanded(
+                                                            child: EpisodeActionsRow(
+                                                                episode:
                                                                     episodeToDisplay),
-                                                        icon: const Icon(
-                                                          Icons
-                                                              .more_horiz_rounded,
-                                                        ),
+                                                          ),
+                                                        if (episodeToDisplay
+                                                            .isSubscribed)
+                                                          IconButton(
+                                                            onPressed: () =>
+                                                                EpisodeActionsDialog
+                                                                    .showEpisodeActionsDialog(
+                                                                        context,
+                                                                        episodeToDisplay),
+                                                            icon: const Icon(
+                                                              Icons
+                                                                  .more_horiz_rounded,
+                                                            ),
+                                                          ),
+                                                      ],
+                                                    ),
+                                                    if (!episodeToDisplay
+                                                        .isSubscribed)
+                                                      const SizedBox(
+                                                        height: 20.0,
                                                       ),
-                                                  ],
-                                                ),
-                                                if (!episodeToDisplay
-                                                    .isSubscribed)
-                                                  const SizedBox(
-                                                    height: 20.0,
-                                                  ),
-                                                Text(
-                                                  episodeToDisplay.duration! ==
-                                                          0
-                                                      ? ""
-                                                      : FormatUtilities
-                                                          .intToDurationFormatted(
-                                                          episodeToDisplay
-                                                              .duration!,
-                                                        ),
-                                                ),
-                                              ]),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SliverPadding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        20.0, 0.0, 20.0, 220.0),
-                                    sliver: SliverToBoxAdapter(
-                                      child: Container(
-                                        decoration: buildBoxDecoration(context),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                episodeToDisplay.description,
-                                                style: const TextStyle(
-                                                  fontSize: 16.0,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 16.0),
-                                              if (episodeToDisplay.episodeNr !=
-                                                  0) ...[
-                                                Text(
-                                                  "${episodeToDisplay.episodeNr}${podcastState.currentPodcast.episodeCount != null ? "/${podcastState.currentPodcast.episodeCount}" : ""}",
-                                                ),
-                                                const SizedBox(height: 16.0),
-                                              ],
-                                              if (podcastState.currentPodcast
-                                                          .link !=
-                                                      null &&
-                                                  podcastState.currentPodcast
-                                                      .link!.isNotEmpty &&
-                                                  podcastState
-                                                      .currentPodcast.link!
-                                                      .contains('://'))
-                                                Row(
-                                                  children: [
-                                                    PodcastWebsiteLink(
-                                                        link: podcastState
-                                                            .currentPodcast
-                                                            .link!),
-                                                  ],
-                                                ),
-                                            ],
+                                                    Text(
+                                                      episodeToDisplay
+                                                                  .duration! ==
+                                                              0
+                                                          ? ""
+                                                          : FormatUtilities
+                                                              .intToDurationFormatted(
+                                                              episodeToDisplay
+                                                                  .duration!,
+                                                            ),
+                                                    ),
+                                                  ]),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
+                                      SliverPadding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            20.0, 0.0, 20.0, 220.0),
+                                        sliver: SliverToBoxAdapter(
+                                          child: Container(
+                                            decoration:
+                                                buildBoxDecoration(context),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(16.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    episodeToDisplay
+                                                        .description,
+                                                    style: const TextStyle(
+                                                      fontSize: 16.0,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 16.0),
+                                                  if (episodeToDisplay
+                                                          .episodeNr !=
+                                                      0) ...[
+                                                    Text(
+                                                      "${episodeToDisplay.episodeNr}${relevantPodcast.episodeCount != null ? "/${relevantPodcast.episodeCount}" : ""}",
+                                                    ),
+                                                    const SizedBox(
+                                                        height: 16.0),
+                                                  ],
+                                                  if (relevantPodcast.link !=
+                                                          null &&
+                                                      relevantPodcast
+                                                          .link!.isNotEmpty &&
+                                                      relevantPodcast.link!
+                                                          .contains('://'))
+                                                    Row(
+                                                      children: [
+                                                        PodcastWebsiteLink(
+                                                            link:
+                                                                relevantPodcast
+                                                                    .link!),
+                                                      ],
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                          BlocBuilder<EpisodePlaybackCubit,
-                              EpisodePlaybackState>(
-                            buildWhen: (previous, current) {
-                              return previous.episode?.eId !=
-                                  current.episode?.eId;
-                            },
-                            builder: (context, currentlyPlayingEpisodeState) {
-                              return Positioned(
-                                top: 0,
-                                left: 0,
-                                child: StreamBuilder<EpisodeEntity?>(
-                                    stream: getIt<EpisodeUseCases>()
-                                        .getEpisodeStream(
-                                            episodeId: episodeToDisplay.id),
-                                    initialData: episodeToDisplay,
-                                    builder: (context, snapshot) {
-                                      final episodeInProgress =
-                                          snapshot.data ?? episodeToDisplay;
-                                      return PlaybackLinearProgressIndicator(
-                                        themeData: Theme.of(context),
-                                        episode: episodeInProgress,
-                                        currentlyPlayingEpisode:
-                                            currentlyPlayingEpisodeState
-                                                .episode,
-                                        paddingHoriz: 0.0,
-                                        paddingVert: 0.0,
-                                      );
-                                    }),
-                              );
-                            },
-                          ),
-                          Visibility(
-                            visible: shouldShowPlayerControls,
-                            child: Positioned(
-                              bottom: MediaQuery.of(context).padding.bottom,
-                              left: 0,
-                              right: 0,
-                              child: PlayerControls(
-                                pageController: pageController,
-                                podcast: podcastState.currentPodcast,
+                              BlocBuilder<EpisodePlaybackCubit,
+                                  EpisodePlaybackState>(
+                                buildWhen: (previous, current) {
+                                  return previous.episode?.eId !=
+                                      current.episode?.eId;
+                                },
+                                builder:
+                                    (context, currentlyPlayingEpisodeState) {
+                                  return Positioned(
+                                    top: 0,
+                                    left: 0,
+                                    child: StreamBuilder<EpisodeEntity?>(
+                                        stream: getIt<EpisodeUseCases>()
+                                            .getEpisodeStream(
+                                                episodeId: episodeToDisplay.id),
+                                        initialData: episodeToDisplay,
+                                        builder: (context, snapshot) {
+                                          final episodeInProgress =
+                                              snapshot.data ?? episodeToDisplay;
+                                          return PlaybackLinearProgressIndicator(
+                                            themeData: Theme.of(context),
+                                            episode: episodeInProgress,
+                                            currentlyPlayingEpisode:
+                                                currentlyPlayingEpisodeState
+                                                    .episode,
+                                            paddingHoriz: 0.0,
+                                            paddingVert: 0.0,
+                                          );
+                                        }),
+                                  );
+                                },
                               ),
-                            ),
-                          )
-                        ],
+                              Visibility(
+                                visible: shouldShowPlayerControls,
+                                child: Positioned(
+                                  bottom: MediaQuery.of(context).padding.bottom,
+                                  left: 0,
+                                  right: 0,
+                                  child: PlayerControls(
+                                    pageController: pageController,
+                                    podcast: relevantPodcast,
+                                  ),
+                                ),
+                              )
+                            ],
+                          );
+                        },
                       );
                     }),
               ],
@@ -368,12 +406,14 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                 showOverlayPlayerMin(context);
               }
 
-              Navigator.of(context).pushAndRemoveUntil(
+              Navigator.of(context).pop();
+
+              /*Navigator.of(context).pushAndRemoveUntil(
                 ScaleRoute(
                   page: const EpisodesListPageWrapper(),
                 ),
                 ModalRoute.withName('/'),
-              );
+              );*/
             },
             icon: const BackButtonIcon(),
           ),
