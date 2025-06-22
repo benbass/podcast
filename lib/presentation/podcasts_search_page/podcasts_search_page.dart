@@ -88,7 +88,7 @@ class PodcastsSearchPage extends StatelessWidget {
           ),
           onTap: (index) async {
             podcastBloc.add(
-                PodcastTappedEvent(podcast: state.queryResultPodcasts[index]));
+                PodcastSelectedEvent(podcast: state.queryResultPodcasts[index]));
             if(context.mounted) {
               Navigator.push(
               context,
