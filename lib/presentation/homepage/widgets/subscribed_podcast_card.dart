@@ -23,7 +23,7 @@ class SubscribedPodcastCard extends StatelessWidget {
       onTap: () {
         //context.read<PodcastSettingsCubit>().loadSettings(podcast.id);
 
-        podcastBloc.add(PodcastTappedEvent(podcast: podcast));
+        podcastBloc.add(PodcastSelectedEvent(podcast: podcast));
         Navigator.push(
           context,
           ScaleRoute(
