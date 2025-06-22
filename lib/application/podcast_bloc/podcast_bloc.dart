@@ -35,7 +35,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
 
     /// END REMOTE
 
-    on<PodcastTappedEvent>(_onPodcastTappedEvent);
+    on<PodcastSelectedEvent>(_onPodcastTappedEvent);
     on<ToggleStateToSuccessAfterFailureEvent>(
         _onToggleStateToSuccessAfterFailureEvent);
   }
