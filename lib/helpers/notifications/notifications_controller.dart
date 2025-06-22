@@ -53,6 +53,7 @@ class NotificationController {
       getIt<MyAudioHandler>().playNext();
     } else if (receivedAction.buttonKeyPressed == 'STOP') {
       getIt<MyAudioHandler>().stop();
+      return;
     } else if (receivedAction.payload?[_notificationPayloadActionKey] ==
             _showQueueAction ||
         receivedAction.buttonKeyPressed == showQueueActionKey) {
