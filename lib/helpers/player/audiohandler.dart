@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../application/playlist_details_cubit/playlist_details_cubit.dart';
 import '../../core/globals.dart';
 import '../../injection.dart';
 import '../../main.dart';
@@ -89,9 +90,9 @@ class MyAudioHandler {
         getIt<MyAudioHandler>().player.position.inSeconds;
     episodeBox.put(currentEpisode);
 
-    if (context.mounted) {
-      BlocProvider.of<EpisodePlaybackCubit>(context).resetPlayback();
-    }
+    context.read<EpisodePlaybackCubit>().resetPlayback();
+    context.read<PlaylistDetailsCubit>().setCurrentPlayingIndex(null);
+
     await player.stop();
 
     removeOverlayPlayerMin();
