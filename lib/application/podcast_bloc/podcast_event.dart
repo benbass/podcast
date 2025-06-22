@@ -47,9 +47,9 @@ final class UpdateQueryEvent extends PodcastEvent {}
 
 
 /// None
-final class PodcastTappedEvent extends PodcastEvent {
+final class PodcastSelectedEvent extends PodcastEvent {
   final PodcastEntity podcast;
-  const PodcastTappedEvent({
+  const PodcastSelectedEvent({
     required this.podcast,
   });
   @override
