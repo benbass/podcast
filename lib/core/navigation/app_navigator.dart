@@ -14,7 +14,7 @@ import '../../presentation/episode_details_page/episode_details_page.dart';
 class AppNavigator {
   // The EpisodeDetailsPage is a PageView depending on a specific list of episodes.
   // If user called a different podcast after tapping on Play, the episode being played doesn't exist for this podcast.
-  /// Reset the PodcastBloc state with the podcast the playback episode belongs to and and the EpisodesBloc state with the correct episode list.
+  /// Reset the PodcastBloc state with the podcast the playback episode belongs to and the EpisodesBloc state with the correct episode list.
   /// Then navigate to the EpisodeDetailsPage.
   static void navigateToEpisodeDetailsFromGlobalAction() {
     final BuildContext? context = MyApp.navigatorKey.currentContext;
@@ -45,7 +45,7 @@ class AppNavigator {
     ));
 
     final podcastBloc = BlocProvider.of<PodcastBloc>(context);
-    podcastBloc.add(PodcastTappedEvent(podcast: podcast));
+    podcastBloc.add(PodcastSelectedEvent(podcast: podcast));
 
     Navigator.of(context).push(
       MaterialPageRoute<void>(
