@@ -232,13 +232,11 @@ class PlaylistDetailsPage extends StatelessWidget {
       episodeBox.put(currentEpisode);
     }
 
-    final PodcastEntity podcast = episode.podcast.target!;
 
     context.read<EpisodePlaybackCubit>().setPlaybackEpisode(
           episodeToPlay: episode,
           startIndexInPlaylist: index,
           playlist: episodes,
-          podcast: podcast,
         );
 
     await getIt<MyAudioHandler>().play();
