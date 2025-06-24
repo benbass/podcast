@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,6 +11,7 @@ import '../../../domain/usecases/episode_usecases.dart';
 import '../../../helpers/audio_download/audio_file_utility.dart';
 import '../../../injection.dart';
 import '../action_feedback/action_feedback.dart';
+import '../effects/backdropfilter.dart';
 import 'audio_file_dialog.dart';
 
 class EpisodeActionsDialog {
@@ -85,18 +84,13 @@ class EpisodeActionsDialog {
       builder: (context) {
         return Stack(
           children: [
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-              child: Container(
-                color: Colors.black26,
-              ),
-            ),
+            const BackdropFilterWidget(sigma: 4.0),
             AlertDialog(
               title: const Text(
                 "Choose an action for the selected episodes",
               ),
-              contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 40.0, vertical: 20.0),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,7 +186,9 @@ class EpisodeActionsDialog {
       {
         "title": "Add to playlist",
         "onPressed": () {
-          context.read<PlaylistDetailsCubit>().addEpisodeToPlaylist([episode.id]);
+          context
+              .read<PlaylistDetailsCubit>()
+              .addEpisodeToPlaylist([episode.id]);
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -211,12 +207,7 @@ class EpisodeActionsDialog {
         builder: (context) {
           return Stack(
             children: [
-              BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-                child: Container(
-                  color: Colors.black26,
-                ),
-              ),
+              const BackdropFilterWidget(sigma: 4.0),
               AlertDialog(
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
