@@ -28,10 +28,7 @@ class AppNavigator {
         BlocProvider.of<EpisodePlaybackCubit>(context, listen: false)
             .state
             .episodes!;
-    PodcastEntity podcast =
-        BlocProvider.of<EpisodePlaybackCubit>(context, listen: false)
-            .state
-            .podcast!;
+    PodcastEntity podcast = episode.podcast.target!;
     PodcastFilterSettingsEntity settings =
         podcast.persistentSettings.target!.toFilterSettings();
 
