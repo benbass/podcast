@@ -50,7 +50,7 @@ class PodcastRepositoryImpl implements PodcastRepository {
       final String artworkFilePath =
           await ArtworkToFile.saveArtworkToFile(podcast.artwork) ?? "null";
       if (artworkFilePath != "null") {
-        // Update the artwork status of the podcast.
+        // Update the artwork and subscribed status of the podcast.
         final PodcastEntity podcastWithArtwork = podcast.copyWith(
           artworkFilePath: artworkFilePath,
           subscribed: false,
