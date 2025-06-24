@@ -88,7 +88,6 @@ class PlayButtonActive extends StatelessWidget {
             episodeToPlay: episodeToPlay,
             startIndexInPlaylist: episodeIndex,
             playlist: playlist,
-            podcast: podcast,
           );
 
         getIt<MyAudioHandler>().play();
