@@ -191,23 +191,10 @@ class PlaylistDetailsCubit extends Cubit<PlaylistDetailsState> {
       // --- End Update currentPlayingIndex ---
 
       playlistBox.put(playlist);
-
       final List<EpisodeEntity?> allPlaylistEpisodes =
           episodeBox.getMany(playlist.episodeIds);
-      final List<EpisodeEntity> allEpisodeEntities = [];
 
-      // In case getMany() does not keep the order of the episodes in the playlist or returns nulls
-      Map<int, EpisodeEntity> episodeMap = {
-        for (var ep in allPlaylistEpisodes.whereType<EpisodeEntity>())
-          ep.eId: ep
-      };
-      for (var id in playlist.episodeIds) {
-        if (episodeMap.containsKey(id)) {
-          allEpisodeEntities.add(episodeMap[id]!);
-        }
-      }
-
-      emit(PlaylistDetailsLoaded(List<EpisodeEntity>.from(allEpisodeEntities),
+      emit(PlaylistDetailsLoaded(List<EpisodeEntity>.from(allPlaylistEpisodes),
           playlist.currentPlayingIndex, playlist.autoPlayEnabled));
     } catch (e) {
       emit(PlaylistDetailsError("Error reordering playlist."));
