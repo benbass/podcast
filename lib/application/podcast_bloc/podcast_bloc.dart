@@ -35,7 +35,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
 
     /// END REMOTE
 
-    on<PodcastSelectedEvent>(_onPodcastTappedEvent);
+    on<PodcastSelectedEvent>(_onPodcastSelectedEvent);
     on<ToggleStateToSuccessAfterFailureEvent>(
         _onToggleStateToSuccessAfterFailureEvent);
   }
@@ -134,7 +134,7 @@ class PodcastBloc extends Bloc<PodcastEvent, PodcastState> {
     }
   }
 
-  Future<void> _onPodcastTappedEvent(event, emit) async {
+  Future<void> _onPodcastSelectedEvent(event, emit) async {
     emit(state.copyWith(status: PodcastStatus.loading));
     if (!event.podcast.subscribed) {
       final PodcastEntity podcast =
