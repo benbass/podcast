@@ -1,25 +1,22 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/podcast_bloc/podcast_bloc.dart';
+import '../effects/backdropfilter.dart';
 
 class FailureDialog extends StatelessWidget {
   final String message;
 
-  const FailureDialog({super.key, required this.message,});
+  const FailureDialog({
+    super.key,
+    required this.message,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-          child: Container(
-            color: Colors.black26,
-          ),
-        ),
+        const BackdropFilterWidget(sigma: 4.0),
         AlertDialog(
           elevation: 30,
           shadowColor: Colors.black,
@@ -42,7 +39,8 @@ class FailureDialog extends StatelessWidget {
             TextButton(
               child: const Text('Close'),
               onPressed: () {
-                BlocProvider.of<PodcastBloc>(context).add(ToggleStateToSuccessAfterFailureEvent());
+                BlocProvider.of<PodcastBloc>(context)
+                    .add(ToggleStateToSuccessAfterFailureEvent());
                 Navigator.of(context).pop();
               },
             ),
