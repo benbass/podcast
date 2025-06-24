@@ -16,7 +16,7 @@ import '../custom_widgets/dialogs/episode_actions_dialog.dart';
 import '../../helpers/listeners/player_listener.dart';
 import '../../injection.dart';
 import '../audioplayer_overlays/audioplayer_overlays.dart';
-import '../custom_widgets/effects/backdropfilter_body.dart';
+import '../custom_widgets/effects/backdropfilter.dart';
 import '../custom_widgets/effects/opacity_body.dart';
 import '../custom_widgets/playback_linear_progress_indicator.dart';
 import '../episodes_list_page/widgets/animated_download_icon.dart';
@@ -118,11 +118,12 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                   builder: (context, podcastState) {
                     return OpacityBody(
                       state: podcastState,
-                      assetImage: null,
                     );
                   },
                 ),
-                const BackdropFilterBody(),
+                const BackdropFilterWidget(
+                  sigma: 25.0,
+                ),
                 PageView.builder(
                     controller: pageController,
                     onPageChanged: (index) async {
@@ -132,9 +133,7 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                           context.read<PodcastBloc>().state;
                       if (episodeOnNewPage.feedId !=
                           podcastState.currentPodcast.pId) {
-                        final podcast = podcastState.subscribedPodcasts
-                            .firstWhere((podcast) =>
-                                podcast.pId == episodeOnNewPage.feedId);
+                        final PodcastEntity podcast = episodeOnNewPage.podcast.target!;
                         context
                             .read<PodcastBloc>()
                             .add(PodcastSelectedEvent(podcast: podcast));
