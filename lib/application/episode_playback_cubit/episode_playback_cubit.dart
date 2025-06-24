@@ -15,13 +15,11 @@ class EpisodePlaybackCubit extends Cubit<EpisodePlaybackState> {
   EpisodePlaybackCubit() : super(const EpisodePlaybackState());
 
   void setPlaybackEpisode({
-    PodcastEntity? podcast,
     EpisodeEntity? episodeToPlay,
     List<EpisodeEntity>? playlist,
     int? startIndexInPlaylist,
   }) {
     emit(state.copyWith(
-      podcast: podcast,
       episode: episodeToPlay,
       episodes: playlist,
       currentIndexInPlaylist: startIndexInPlaylist,
