@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +13,7 @@ import '../custom_widgets/dialogs/connectivity_dialogs.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../injection.dart';
 import '../custom_widgets/dialogs/failure_dialog.dart';
+import '../custom_widgets/effects/backdropfilter.dart';
 import '../custom_widgets/page_transition.dart';
 import '../episodes_list_page/widgets/animated_download_icon.dart';
 import '../playlist/playlist_details_page.dart';
@@ -39,12 +39,7 @@ class HomePage extends StatelessWidget {
         context: context,
         builder: (context) => Stack(
           children: [
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-              child: Container(
-                color: Colors.black26,
-              ),
-            ),
+            const BackdropFilterWidget(sigma: 4.0),
             AlertDialog(
               title: const Text('Downloads aktiv'),
               content: const Text(
@@ -77,12 +72,7 @@ class HomePage extends StatelessWidget {
         context: context,
         builder: (context) => Stack(
           children: [
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-              child: Container(
-                color: Colors.black26,
-              ),
-            ),
+            const BackdropFilterWidget(sigma: 4.0),
             AlertDialog(
               title: const Text('Do you really want to close the app?'),
               actions: <Widget>[
