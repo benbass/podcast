@@ -437,7 +437,7 @@ class _PlaylistListItem extends StatelessWidget {
                                                           .textTheme.bodyMedium,
                                                     ),
                                                     Text(
-                                                      episode.podcastTitle,
+                                                      episode.podcast.target!.title,
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                       softWrap: true,
