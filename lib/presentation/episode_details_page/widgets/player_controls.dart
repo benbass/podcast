@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:podcast/presentation/episode_details_page/widgets/playback_position_slider.dart';
 
 import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../../application/playlist_details_cubit/playlist_details_cubit.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/notifications/utilities_notifications.dart';
 import '../../../helpers/player/audiohandler.dart';
@@ -93,6 +94,7 @@ class PlayerControls extends StatelessWidget {
                       IconButton(
                         onPressed: () {
                           getIt<MyAudioHandler>().stop();
+                          context.read<PlaylistDetailsCubit>().setCurrentPlayingIndex(null);
                         },
                         icon: const Icon(
                           Icons.stop_rounded,
