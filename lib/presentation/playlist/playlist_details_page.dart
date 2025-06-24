@@ -176,15 +176,12 @@ class PlaylistDetailsPage extends StatelessWidget {
                             if (currentPlayingIndex == index) {
                               removeOverlayPlayerMin();
                             }
-                            final PodcastState podcastState =
-                                context.read<PodcastBloc>().state;
-                            if (episode.feedId !=
-                                podcastState.currentPodcast.pId) {
-                              final PodcastEntity podcast = episode.podcast.target!;
-                              context
-                                  .read<PodcastBloc>()
-                                  .add(PodcastSelectedEvent(podcast: podcast));
-                            }
+
+                            final podcast = episode.podcast.target!;
+                            context
+                                .read<PodcastBloc>()
+                                .add(PodcastSelectedEvent(podcast: podcast));
+
                             Navigator.push(
                                 context,
                                 ScaleRoute(
