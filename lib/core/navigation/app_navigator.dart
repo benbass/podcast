@@ -39,7 +39,6 @@ class AppNavigator {
 
     BlocProvider.of<EpisodesBloc>(context).add(LoadEpisodes(
       feedId: podcast.pId,
-      podcastTitle: podcast.title,
       isSubscribed: podcast.subscribed,
       initialFilterSettings: settings,
     ));

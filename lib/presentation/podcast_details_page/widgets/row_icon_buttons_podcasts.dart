@@ -43,7 +43,7 @@ class RowIconButtonsPodcasts extends StatelessWidget {
         });
     try {
       await getIt<EpisodeUseCases>().fetchRemoteEpisodesByFeedIdAndSaveToDb(
-          feedId: podcast.pId, podcastTitle: podcast.title);
+          feedId: podcast.pId);
       if (context.mounted) {
         Navigator.of(context).pop();
         Navigator.of(context).pushAndRemoveUntil(

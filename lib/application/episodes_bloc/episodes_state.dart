@@ -7,7 +7,6 @@ class EpisodesState extends Equatable {
     this.status = EpisodesStatus.initial,
     this.episodes = const <EpisodeEntity>[],
     this.feedId,
-    this.podcastTitle = '',
     this.isSubscribed = false,
     this.activeFilters,
     this.filterText,
@@ -20,7 +19,6 @@ class EpisodesState extends Equatable {
   final EpisodesStatus status;
   final List<EpisodeEntity> episodes;
   final int? feedId;
-  final String podcastTitle;
   final bool isSubscribed;
   final PodcastFilterSettingsEntity? activeFilters;
   final String? filterText;
@@ -32,7 +30,6 @@ class EpisodesState extends Equatable {
     EpisodesStatus? status,
     List<EpisodeEntity>? episodes,
     int? feedId,
-    String? podcastTitle,
     bool? isSubscribed,
     PodcastFilterSettingsEntity? activeFilters,
     String? filterText,
@@ -47,7 +44,6 @@ class EpisodesState extends Equatable {
       status: status ?? this.status,
       episodes: episodes ?? this.episodes,
       feedId: feedId ?? this.feedId,
-      podcastTitle: podcastTitle ?? this.podcastTitle,
       isSubscribed: isSubscribed ?? this.isSubscribed,
       activeFilters: activeFilters ?? this.activeFilters,
       filterText: filterText ?? this.filterText,
@@ -62,7 +58,6 @@ class EpisodesState extends Equatable {
     status,
     episodes,
     feedId,
-    podcastTitle,
     isSubscribed,
     activeFilters,
     filterText,

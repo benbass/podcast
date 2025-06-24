@@ -77,7 +77,6 @@ class EpisodeEntity {
     bool? completed,
     int? position,
     String? filePath,
-    String? podcastTitle
   }) {
     return EpisodeEntity(
       eId: eId,

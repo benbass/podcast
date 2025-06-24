@@ -10,19 +10,17 @@ abstract class EpisodesEvent extends Equatable {
 // Loads/observes episodes for a specific podcast
 class LoadEpisodes extends EpisodesEvent {
   final int feedId; // Podcast-Feed id
-  final String podcastTitle; // For UI purposes
   final bool isSubscribed;
   final PodcastFilterSettingsEntity? initialFilterSettings;
 
   const LoadEpisodes({
     required this.feedId,
-    required this.podcastTitle,
     required this.isSubscribed,
     this.initialFilterSettings,
   });
 
   @override
-  List<Object?> get props => [feedId, podcastTitle, isSubscribed, initialFilterSettings];
+  List<Object?> get props => [feedId, isSubscribed, initialFilterSettings];
 }
 
 // Internal event that is fired when the stream provides new episodes
@@ -48,17 +46,15 @@ class _FilterSettingsChanged extends EpisodesEvent {
 
 class RefreshEpisodes extends EpisodesEvent {
   final int feedId;
-  final String podcastTitle;
   final bool isSubscribed;
 
   const RefreshEpisodes({
     required this.feedId,
-    required this.podcastTitle,
     required this.isSubscribed,
   });
 
   @override
-  List<Object?> get props => [feedId, podcastTitle, isSubscribed];
+  List<Object?> get props => [feedId, isSubscribed];
 }
 
 // Event fired when a notification is shown after refresh

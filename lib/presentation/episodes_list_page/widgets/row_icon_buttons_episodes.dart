@@ -78,7 +78,6 @@ class RowIconButtonsEpisodes extends StatelessWidget {
                     onPressed: () async {
                       episodesBloc.add(RefreshEpisodes(
                         feedId: podcastState.currentPodcast.pId,
-                        podcastTitle: podcastState.currentPodcast.title,
                         isSubscribed: podcastState.currentPodcast.subscribed,
                       ));
                     },

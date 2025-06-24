@@ -46,7 +46,6 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
     if (state.feedId == event.feedId &&
         state.status != EpisodesStatus.initial) {
       emit(state.copyWith(
-        podcastTitle: event.podcastTitle,
         isSubscribed: event.isSubscribed,
         activeFilters: event.initialFilterSettings ?? state.activeFilters,
         status: EpisodesStatus.loading,
@@ -55,7 +54,6 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
       emit(state.copyWith(
         status: EpisodesStatus.loading,
         feedId: event.feedId,
-        podcastTitle: event.podcastTitle,
         isSubscribed: event.isSubscribed,
         activeFilters: event.initialFilterSettings,
         episodes: [],
@@ -66,7 +64,6 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
     _episodesSubscription = episodeUseCases
         .getEpisodesStream(
       feedId: event.feedId,
-      podcastTitle: event.podcastTitle,
       isSubscribed: event.isSubscribed,
       filterSettings: event.initialFilterSettings,
     )
@@ -101,7 +98,6 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
     _episodesSubscription = episodeUseCases
         .getEpisodesStream(
       feedId: state.feedId!,
-      podcastTitle: state.podcastTitle,
       isSubscribed: state.isSubscribed,
       filterSettings: event.newSettings,
     )
@@ -126,14 +122,12 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
     try {
       await episodeUseCases.refreshEpisodesFromServer(
         feedId: event.feedId,
-        podcastTitle: event.podcastTitle,
       );
 
 
       final List<EpisodeEntity> currentEpisodesAfterRefresh = await episodeUseCases
           .getEpisodesStream(
           feedId: event.feedId,
-          podcastTitle: state.podcastTitle,
           isSubscribed: state.isSubscribed,
           filterSettings: state.activeFilters!)
           .first;

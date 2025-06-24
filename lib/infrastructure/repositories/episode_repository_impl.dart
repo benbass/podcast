@@ -15,13 +15,11 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   @override
   Stream<List<EpisodeEntity>> getEpisodesStream({
     required int feedId,
-    required String podcastTitle,
     required bool isSubscribed,
     required PodcastFilterSettingsEntity filterSettings,
   }) {
     return episodeLocalDatasource.getEpisodesStream(
       feedId: feedId,
-      podcastTitle: podcastTitle,
       isSubscribed: isSubscribed,
       filterSettings: filterSettings,
     );
@@ -40,12 +38,10 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   @override
   Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb({
     required int feedId,
-    required String podcastTitle,
     bool? markAsSubscribed,
   }) {
     return episodeRemoteDatasource.fetchRemoteEpisodesByFeedIdAndSaveToDb(
       feedId: feedId,
-      podcastTitle: podcastTitle,
       markAsSubscribed: markAsSubscribed,
     );
   }
@@ -53,11 +49,9 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   @override
   Future<void> refreshEpisodesFromServer({
     required int feedId,
-    required String podcastTitle,
   }) {
     return episodeRemoteDatasource.refreshEpisodesFromServer(
       feedId: feedId,
-      podcastTitle: podcastTitle,
     );
   }
 }

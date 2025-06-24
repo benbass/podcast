@@ -20,7 +20,6 @@ abstract class EpisodeLocalDatasource {
 
   Stream<List<EpisodeEntity>> getEpisodesStream({
     required int feedId,
-    required String podcastTitle,
     required bool isSubscribed,
     required PodcastFilterSettingsEntity filterSettings,
   });
@@ -101,7 +100,6 @@ class EpisodeLocalDatasourceImpl implements EpisodeLocalDatasource {
   @override
   Stream<List<EpisodeEntity>> getEpisodesStream({
     required int feedId,
-    required String podcastTitle,
     required bool isSubscribed,
     required PodcastFilterSettingsEntity filterSettings,
   }) async* {
@@ -120,7 +118,7 @@ class EpisodeLocalDatasourceImpl implements EpisodeLocalDatasource {
       if (cachedEpisodes.isEmpty) {
         await getIt<EpisodeRemoteDataSource>()
             .fetchRemoteEpisodesByFeedIdAndSaveToDb(
-                feedId: feedId, podcastTitle: podcastTitle);
+                feedId: feedId);
       }
     }
 
@@ -209,14 +207,12 @@ abstract class EpisodeRemoteDataSource {
 
   Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb({
     required int feedId,
-    required String podcastTitle,
     bool? markAsSubscribed,
   });
 
   // Explicitly fetch new episodes from the server and save them to the local database.
   Future<void> refreshEpisodesFromServer({
     required int feedId,
-    required String podcastTitle,
   });
 }
 
@@ -232,7 +228,6 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
   @override
   Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb({
     required int feedId,
-    required String podcastTitle,
     bool? markAsSubscribed,
   }) async {
     // first check if episodes already exist in the database
@@ -264,7 +259,7 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
     // fetch them from the server and save them to the database with updated parameters.
     dartz.Either<Failure, List<EpisodeEntity>> serverResponse =
         await _fetchRemoteEpisodesByFeedId(
-            feedId: feedId, podcastTitle: podcastTitle);
+            feedId: feedId);
 
     await serverResponse.fold(
       (failure) async {
@@ -299,7 +294,7 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
 
   Future<dartz.Either<Failure, List<EpisodeEntity>>>
       _fetchRemoteEpisodesByFeedId(
-          {required int feedId, required String podcastTitle}) async {
+          {required int feedId}) async {
     // Authorization:
     Map<String, String> headers = headersForAuth();
 
@@ -313,9 +308,7 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
       if (response.statusCode == 200) {
         var jsonItems = json.decode(response.body);
         List<EpisodeEntity> episodes = List<EpisodeEntity>.from(
-                jsonItems['items'].map((x) => EpisodeModel.fromJson(x)))
-            .map((e) => e.copyWith(podcastTitle: podcastTitle))
-            .toList();
+                jsonItems['items'].map((x) => EpisodeModel.fromJson(x)));
 
         return dartz.Right(episodes);
       } else if (response.statusCode == 401 || response.statusCode == 403) {
@@ -349,20 +342,17 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
   @override
   Future<void> refreshEpisodesFromServer({
     required int feedId,
-    required String podcastTitle,
   }) async {
     await _fetchAndSaveNewEpisodesByFeedId(
       feedId: feedId,
-      podcastTitle: podcastTitle,
     );
   }
 
   Future<void> _fetchAndSaveNewEpisodesByFeedId(
-      {required int feedId, required String podcastTitle}) async {
+      {required int feedId}) async {
     dartz.Either<Failure, List<EpisodeEntity>> response =
     await _fetchRemoteEpisodesByFeedId(
-      feedId: feedId,
-      podcastTitle: podcastTitle,
+      feedId: feedId
     );
     List<EpisodeEntity> remoteEpisodes = response.fold((failure) {
       return [];

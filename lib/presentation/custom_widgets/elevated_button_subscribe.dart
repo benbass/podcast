@@ -64,7 +64,6 @@ class ElevatedButtonSubscribe extends StatelessWidget {
     try {
       await getIt<EpisodeUseCases>().fetchRemoteEpisodesByFeedIdAndSaveToDb(
         feedId: podcast.pId,
-        podcastTitle: podcast.title,
         markAsSubscribed: true,
       );
     } catch (e) {

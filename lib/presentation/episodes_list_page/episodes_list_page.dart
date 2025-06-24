@@ -72,7 +72,6 @@ class _EpisodesListPageWrapperState extends State<EpisodesListPageWrapper> {
 
           BlocProvider.of<EpisodesBloc>(context).add(LoadEpisodes(
             feedId: currentPodcast.pId,
-            podcastTitle: currentPodcast.title,
             isSubscribed: currentPodcast.subscribed,
             initialFilterSettings: initialFilters,
           ));
