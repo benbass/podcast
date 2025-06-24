@@ -145,9 +145,9 @@ class EpisodeActionsDialog {
         "title": "Share",
         "onPressed": () async {
           await SharePlus.instance.share(ShareParams(
-            subject: episode.podcastTitle,
+            subject: episode.podcast.target!.title,
             text:
-                "${episode.podcastTitle}\n${episode.title}\n\nLink to episode:\n${episode.enclosureUrl}",
+                "${episode.podcast.target!.title}\n${episode.title}\n\nLink to episode:\n${episode.enclosureUrl}",
           ));
           if (context.mounted) {
             Navigator.pop(context);
