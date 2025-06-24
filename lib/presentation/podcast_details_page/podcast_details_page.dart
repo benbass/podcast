@@ -1,7 +1,7 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'dart:ui' as ui;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/podcast_details_page/widgets/drawer.dart';
 
@@ -12,7 +12,7 @@ import '../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../custom_widgets/decoration/box_decoration.dart';
 import '../custom_widgets/dialogs/failure_dialog.dart';
-import '../custom_widgets/effects/backdropfilter_body.dart';
+import '../custom_widgets/effects/backdropfilter.dart';
 import '../custom_widgets/effects/opacity_body.dart';
 import '../custom_widgets/elevated_button_subscribe.dart';
 import '../custom_widgets/page_transition.dart';
@@ -63,27 +63,22 @@ class PodcastDetailsPage extends StatelessWidget {
           create: (context) => PodcastSettingsCubit()..loadSettings(podcastId),
           child: Builder(
             builder: (context) {
-              return Stack(
-                children: [
-                  BackdropFilter(
-                    filter: ui.ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-                    child: Container(color: Colors.black26),
-                  ),
-                  SafeArea(
-                    child: Drawer(
-                      backgroundColor: Colors.white12,
-                      surfaceTintColor: themeDate.colorScheme.secondary,
-                      width: MediaQuery.of(context).size.width * 0.85,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(20),
-                          bottomRight: Radius.circular(20),
-                        ),
+              return SafeArea(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
+                  child: Drawer(
+                    backgroundColor: Colors.white12,
+                    surfaceTintColor: themeDate.colorScheme.secondary,
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
                       ),
-                      child: const PodcastSettingsDrawer(),
                     ),
+                    child: const PodcastSettingsDrawer(),
                   ),
-                ],
+                ),
               );
             },
           ),
@@ -94,9 +89,8 @@ class PodcastDetailsPage extends StatelessWidget {
             if (state.currentPodcast.artworkFilePath != null)
               OpacityBody(
                 state: state,
-                assetImage: null,
               ),
-            const BackdropFilterBody(),
+            const BackdropFilterWidget(sigma: 25.0,),
             CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
