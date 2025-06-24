@@ -17,6 +17,7 @@ import '../models/episode_model.dart';
 
 /// Local data source = objectBox database
 abstract class EpisodeLocalDatasource {
+
   Stream<List<EpisodeEntity>> getEpisodesStream({
     required int feedId,
     required String podcastTitle,
@@ -24,46 +25,13 @@ abstract class EpisodeLocalDatasource {
     required PodcastFilterSettingsEntity filterSettings,
   });
 
-  // Methode, um Episoden explizit vom Server zu laden und in die DB zu speichern
-  Future<void> refreshEpisodesFromServer({
-    required int feedId,
-    required String podcastTitle,
-  });
   Stream<EpisodeEntity?> getEpisodeStream({required int episodeId});
+
   Stream<int> unreadLocalEpisodesCount(
-      {required int feedId}); // this is only needed for subscribed = true
+      {required int feedId});
 }
 
-/// Remote data source = http requests
 class EpisodeLocalDatasourceImpl implements EpisodeLocalDatasource {
-  Future<List<EpisodeEntity>> _fetchRemoteEpisodes(
-      {required int feedId, required String podcastTitle}) async {
-    dartz.Either<Failure, List<EpisodeEntity>> response =
-        await getIt<EpisodeRemoteDataSource>().fetchRemoteEpisodesByFeedId(
-      feedId: feedId,
-      podcastTitle: podcastTitle,
-    );
-    List<EpisodeEntity> remoteEpisodes = response.fold((failure) {
-      return [];
-    }, (episodes) {
-      return episodes;
-    });
-
-    // Retrieve locally stored episodes for the given feed ID.
-    final localEpisodes = _getLocalEpisodesByFeedId(feedId: feedId);
-
-    // Create a map of local episodes for efficient lookup by episode ID.
-    final localEpisodeMap = {
-      for (final episode in localEpisodes) episode.eId: episode
-    };
-
-    // Merge remote episodes with local data, prioritizing local versions if available.
-    return remoteEpisodes.map((remoteEpisode) {
-      // If a local episode with the same ID exists, return the local episode;
-      // otherwise, return the remote episode.
-      return localEpisodeMap[remoteEpisode.eId] ?? remoteEpisode;
-    }).toList();
-  }
 
   @override
   Stream<EpisodeEntity?> getEpisodeStream({required int episodeId}) {
@@ -130,54 +98,6 @@ class EpisodeLocalDatasourceImpl implements EpisodeLocalDatasource {
         .map((query) => query.count());
   }
 
-  // This gets all episodes (unfiltered!) from db
-  List<EpisodeEntity> _getLocalEpisodesByFeedId({required int feedId}) {
-    final queryBuilder =
-        episodeBox.query(EpisodeEntity_.feedId.equals(feedId)).build();
-    final results = queryBuilder.find();
-    return results;
-  }
-
-  // Helper function to get local episode IDs for a given feed ID.
-  Set<int> _getLocalEpisodeIdsByFeedId({required int feedId}) {
-    return _getLocalEpisodesByFeedId(feedId: feedId)
-        .map((ep) => ep.eId)
-        .toSet();
-  }
-
-  Future<void> _getAndSaveNewEpisodesByFeedId(
-      {required int feedId, required String podcastTitle}) async {
-    dartz.Either<Failure, List<EpisodeEntity>> response =
-        await getIt<EpisodeRemoteDataSource>().fetchRemoteEpisodesByFeedId(
-      feedId: feedId,
-      podcastTitle: podcastTitle,
-    );
-    List<EpisodeEntity> remoteEpisodes = response.fold((failure) {
-      return [];
-    }, (episodes) {
-      return episodes;
-    });
-
-    // Get the IDs of episodes currently stored locally for this feed ID.
-    final Set<int> localEpisodeIds =
-        _getLocalEpisodeIdsByFeedId(feedId: feedId);
-
-    // Filter out remote episodes that are already in the database.
-    final List<EpisodeEntity> newEpisodes = remoteEpisodes
-        .where((episode) => !localEpisodeIds.contains(episode.eId))
-        .toList();
-
-    // Add the new episodes to the local database.
-    if (newEpisodes.isNotEmpty) {
-      final List<EpisodeEntity> newEpisodesSubscribed = [];
-      for (var episode in newEpisodes) {
-        newEpisodesSubscribed.add(episode.copyWith(isSubscribed: true));
-      }
-
-      episodeBox.putMany(newEpisodesSubscribed);
-    }
-  }
-
   @override
   Stream<List<EpisodeEntity>> getEpisodesStream({
     required int feedId,
@@ -198,9 +118,9 @@ class EpisodeLocalDatasourceImpl implements EpisodeLocalDatasource {
       queryBuilderForCachedEpisodes.close();
 
       if (cachedEpisodes.isEmpty) {
-        final episodes = await _fetchRemoteEpisodes(
-            feedId: feedId, podcastTitle: podcastTitle);
-        episodeBox.putMany(episodes);
+        await getIt<EpisodeRemoteDataSource>()
+            .fetchRemoteEpisodesByFeedIdAndSaveToDb(
+                feedId: feedId, podcastTitle: podcastTitle);
       }
     }
 
@@ -282,27 +202,22 @@ class EpisodeLocalDatasourceImpl implements EpisodeLocalDatasource {
       return foundEpisodes;
     });
   }
-
-  @override
-  Future<void> refreshEpisodesFromServer({
-    required int feedId,
-    required String podcastTitle,
-  }) async {
-    await _getAndSaveNewEpisodesByFeedId(
-        feedId: feedId, podcastTitle: podcastTitle);
-  }
 }
 
 /// Remote data source = http requests
 abstract class EpisodeRemoteDataSource {
-  Future<dartz.Either<Failure, List<EpisodeEntity>>>
-      fetchRemoteEpisodesByFeedId(
-          {required int feedId, required String podcastTitle});
 
-  Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb(
-      {required int feedId,
-      required String podcastTitle,
-      bool? markAsSubscribed});
+  Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb({
+    required int feedId,
+    required String podcastTitle,
+    bool? markAsSubscribed,
+  });
+
+  // Explicitly fetch new episodes from the server and save them to the local database.
+  Future<void> refreshEpisodesFromServer({
+    required int feedId,
+    required String podcastTitle,
+  });
 }
 
 class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
@@ -310,15 +225,16 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
 
   EpisodeRemoteDataSourceImpl({required this.httpClient});
 
+  // This method is called only when podcast is not yet subscribed:
+  // 1. WHEN podcast is being subscribed BEFORE episodes are fetched: we make episodes available in db.
+  // 2. OR WHEN list of episodes is needed but podcast still is not subscribed: we "cache" the episodes in db.
+  // In both cases, the episodes are saved to db, in the first case, the flag isSubscribed is set to true.
   @override
-  // This Methode is used as soon the user calls an unsubscribed! podcast (we "cache" the episodes in db).
-  // It can can also be called when the episodes are already in the db.
-  // In both cases user may want to subscribe to the podcast.
-  @override
-  Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb(
-      {required int feedId,
-      required String podcastTitle,
-      bool? markAsSubscribed}) async {
+  Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb({
+    required int feedId,
+    required String podcastTitle,
+    bool? markAsSubscribed,
+  }) async {
     // first check if episodes already exist in the database
     final queryBuilder = episodeBox.query(EpisodeEntity_.feedId.equals(feedId));
     final query = queryBuilder.build();
@@ -344,9 +260,10 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
       return;
     }
 
-    // Episodes do not exist in the database: fetch them from the server.
+    // Episodes do not exist in the database:
+    // fetch them from the server and save them to the database with updated parameters.
     dartz.Either<Failure, List<EpisodeEntity>> serverResponse =
-        await fetchRemoteEpisodesByFeedId(
+        await _fetchRemoteEpisodesByFeedId(
             feedId: feedId, podcastTitle: podcastTitle);
 
     await serverResponse.fold(
@@ -357,21 +274,31 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
         if (remoteEpisodes.isEmpty) {
           return;
         }
-        if (markAsSubscribed != null) {
-          // Podcast is being subscribed: update the isSubscribed flag.
-          for (var episode in remoteEpisodes) {
+        // Get the parent podcast for the given feed ID.
+        final query =
+            podcastBox.query(PodcastEntity_.pId.equals(feedId)).build();
+        PodcastEntity? parentPodcast = query.findFirst();
+        query.close();
+
+        for (var episode in remoteEpisodes) {
+          if (parentPodcast != null) {
+            episode.podcast.target = parentPodcast;
+          }
+          if (markAsSubscribed != null) {
+            // Podcast is being subscribed: update the isSubscribed flag.
             episode.isSubscribed = markAsSubscribed;
           }
         }
+
         // Save the fetched episodes to the database.
         episodeBox.putMany(remoteEpisodes);
       },
     );
   }
 
-  @override
+
   Future<dartz.Either<Failure, List<EpisodeEntity>>>
-      fetchRemoteEpisodesByFeedId(
+      _fetchRemoteEpisodesByFeedId(
           {required int feedId, required String podcastTitle}) async {
     // Authorization:
     Map<String, String> headers = headersForAuth();
@@ -417,5 +344,73 @@ class EpisodeRemoteDataSourceImpl implements EpisodeRemoteDataSource {
       return dartz.Left(
           UnexpectedFailure(message: e.toString(), stackTrace: s));
     }
+  }
+
+  @override
+  Future<void> refreshEpisodesFromServer({
+    required int feedId,
+    required String podcastTitle,
+  }) async {
+    await _fetchAndSaveNewEpisodesByFeedId(
+      feedId: feedId,
+      podcastTitle: podcastTitle,
+    );
+  }
+
+  Future<void> _fetchAndSaveNewEpisodesByFeedId(
+      {required int feedId, required String podcastTitle}) async {
+    dartz.Either<Failure, List<EpisodeEntity>> response =
+    await _fetchRemoteEpisodesByFeedId(
+      feedId: feedId,
+      podcastTitle: podcastTitle,
+    );
+    List<EpisodeEntity> remoteEpisodes = response.fold((failure) {
+      return [];
+    }, (episodes) {
+      return episodes;
+    });
+
+    // Get the IDs of episodes currently stored locally for this feed ID.
+    final Set<int> localEpisodeIds =
+    _getLocalEpisodeIdsByFeedId(feedId: feedId);
+
+    // Filter out remote episodes that are already in the database.
+    final List<EpisodeEntity> newEpisodes = remoteEpisodes
+        .where((episode) => !localEpisodeIds.contains(episode.eId))
+        .toList();
+
+    // Get the parent podcast for the given feed ID.
+    final query = podcastBox.query(PodcastEntity_.pId.equals(feedId)).build();
+    PodcastEntity? parentPodcast = query.findFirst();
+    query.close();
+
+    // Add the new episodes to the local database.
+    if (newEpisodes.isNotEmpty) {
+      final List<EpisodeEntity> newEpisodesSubscribed = [];
+      for (var episode in newEpisodes) {
+        episode.isSubscribed = true;
+        if (parentPodcast != null) {
+          episode.podcast.target = parentPodcast;
+        }
+        newEpisodesSubscribed.add(episode);
+      }
+
+      episodeBox.putMany(newEpisodesSubscribed);
+    }
+  }
+
+// Helper function to get local episode IDs for a given feed ID.
+  Set<int> _getLocalEpisodeIdsByFeedId({required int feedId}) {
+    return _getLocalEpisodesByFeedId(feedId: feedId)
+        .map((ep) => ep.eId)
+        .toSet();
+  }
+
+  // This gets all episodes (unfiltered!) from db
+  List<EpisodeEntity> _getLocalEpisodesByFeedId({required int feedId}) {
+    final queryBuilder =
+    episodeBox.query(EpisodeEntity_.feedId.equals(feedId)).build();
+    final results = queryBuilder.find();
+    return results;
   }
 }
