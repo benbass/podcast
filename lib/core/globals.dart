@@ -15,34 +15,3 @@ late Box<AppPlaylist> playlistBox;
 const String kCurrentDownloadFilePath = "current_download_filepath";
 const int globalPlaylistId = 1;
 
-/// For testing: create a fake episode
-DateTime now = DateTime.now();
-int secondsSinceEpochUtc = now.millisecondsSinceEpoch ~/ 1000;
-EpisodeEntity fakeEpisode = EpisodeEntity(
-  eId: 9009090100,
-  title: "FAKE EPISODE",
-  description: "description",
-  guid: "00098",
-  datePublished: secondsSinceEpochUtc,
-  datePublishedPretty: "null",
-  enclosureUrl: "enclosureUrl",
-  enclosureLength: 1994398,
-  duration: 213242432,
-  explicit: 0,
-  episodeNr: 0,
-  episodeType: null,
-  season: null,
-  image: "",
-  feedUrl: "feedUrl",
-  link: "link",
-  feedImage: "",
-  feedId: 202500000000, // podcast.pId,
-  podcastGuid: "abcdefghFake", // podcast.podcastGuid,
-  podcastTitle: "Podcast for TEST",
-  isSubscribed: false,
-  favorite: true,
-  read: false,
-  completed: false,
-  position: 09789798,
-  filePath: null,
-);
