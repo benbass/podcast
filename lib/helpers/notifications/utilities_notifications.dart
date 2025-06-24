@@ -2,7 +2,6 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../application/podcast_bloc/podcast_bloc.dart';
 import 'notifications_controller.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
@@ -68,11 +67,7 @@ class UtilitiesNotifications {
       BuildContext context, bool isPausingState, int position) async {
     final EpisodeEntity episode =
         context.read<EpisodePlaybackCubit>().state.episode!;
-    final PodcastState podcastState =
-        context.read<PodcastBloc>().state;
-    final PodcastEntity podcast = podcastState
-        .subscribedPodcasts
-        .firstWhere((podcast) => podcast.pId == episode.feedId);
+    final PodcastEntity podcast = episode.podcast.target!;
     final String imageFilePath = podcast.artworkFilePath ?? "";
 
     // part of string for correct icon depending on boolean provided by the audioHandler methods (playTrack, pauseTrack, resumeTrack...)
