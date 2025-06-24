@@ -111,11 +111,11 @@ class MyAudioHandler {
   }
 
   // Handling Play and Pause
-  void handlePlayPause() {
+  void handlePlayPause() async {
     if (player.playing) {
       pause();
     } else {
-      player.play();
+      await player.play();
       final context = MyApp.navigatorKey.currentContext;
       if (context != null && context.mounted) {
         UtilitiesNotifications.createNotificationPlayback(
