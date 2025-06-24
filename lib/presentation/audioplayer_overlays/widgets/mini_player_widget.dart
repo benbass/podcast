@@ -19,7 +19,7 @@ class MiniPlayerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final episode = context.read<EpisodePlaybackCubit>().state.episode;
-    final podcast = context.read<EpisodePlaybackCubit>().state.podcast!;
+    final podcast = episode!.podcast.target;
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -49,9 +49,9 @@ class MiniPlayerWidget extends StatelessWidget {
                 children: [
                   FutureBuilder<ImageProvider>(
                       future: MyImageProvider(
-                              url: episode!.image.isNotEmpty
+                              url: episode.image.isNotEmpty
                                   ? episode.image
-                                  : podcast.artworkFilePath != null
+                                  : podcast!.artworkFilePath != null
                                       ? podcast.artworkFilePath!
                                       : podcast.artwork)
                           .imageProvider,
@@ -82,7 +82,7 @@ class MiniPlayerWidget extends StatelessWidget {
                       SizedBox(
                         height: 20,
                         child: Text(
-                          podcast.title,
+                          podcast!.title,
                         ),
                       ),
                       StreamBuilder<Duration>(
