@@ -8,11 +8,9 @@ class OpacityBody extends StatelessWidget {
   const OpacityBody({
     super.key,
     required this.state,
-    required this.assetImage,
   });
 
   final PodcastState? state;
-  final AssetImage? assetImage;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +24,7 @@ class OpacityBody extends StatelessWidget {
           return const SizedBox();
         },
       ) : Image.asset(
-        'assets/placeholder.png',
+        'assets/background.png',
         fit: BoxFit.cover,
       ),
     );
