@@ -1,12 +1,11 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:podcast/presentation/custom_widgets/effects/backdropfilter.dart';
 
 import '../../../injection.dart';
 import '../../../helpers/core/connectivity_manager.dart';
 
 class ConnectivityDialog {
-  static void showConnectivityDialogs(BuildContext context){
+  static void showConnectivityDialogs(BuildContext context) {
     getIt<ConnectivityManager>().connectionType.listen((type) {
       if (type == ConnectionType.none) {
         if (context.mounted) {
@@ -15,12 +14,7 @@ class ConnectivityDialog {
             barrierDismissible: false,
             builder: (context) => Stack(
               children: [
-                BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-                  child: Container(
-                    color: Colors.black26,
-                  ),
-                ),
+                const BackdropFilterWidget(sigma: 4.0),
                 AlertDialog(
                   title: const Text('No Internet Connection'),
                   content: const Text('Please check your internet connection.'),
@@ -45,12 +39,7 @@ class ConnectivityDialog {
             barrierDismissible: false,
             builder: (context) => Stack(
               children: [
-                BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-                  child: Container(
-                    color: Colors.black26,
-                  ),
-                ),
+                const BackdropFilterWidget(sigma: 4.0),
                 AlertDialog(
                   title: const Text('Mobile Data Detected'),
                   content: const Text(
