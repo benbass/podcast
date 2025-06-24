@@ -1,7 +1,7 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:podcast/domain/usecases/episode_usecases.dart';
+import 'package:podcast/presentation/custom_widgets/effects/backdropfilter.dart';
 
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/queued_audio_download/queued_audio_download.dart';
@@ -124,11 +124,7 @@ class _EpisodeActionsRowState extends State<EpisodeActionsRow> {
                         builder: (context) {
                           return Stack(
                             children: [
-                              BackdropFilter(
-                                filter:
-                                    ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-                                child: Container(color: Colors.black26),
-                              ),
+                              const BackdropFilterWidget(sigma: 4.0),
                               AlertDialog(
                                 title: Text(
                                   filePath != null
