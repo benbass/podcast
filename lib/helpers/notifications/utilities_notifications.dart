@@ -83,7 +83,7 @@ class UtilitiesNotifications {
         id: 1,
         channelKey: 'basic_channel',
         category: NotificationCategory.Transport,
-        title: episode.podcastTitle,
+        title: episode.podcast.target!.title,
         body: episode.title,
         duration: Duration(seconds: episode.duration ?? 0),
         progress: position / (episode.duration ?? 0) * 100,
