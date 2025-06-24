@@ -13,7 +13,7 @@ import '../../application/episodes_bloc/episodes_bloc.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
 import '../../domain/entities/podcast_filter_settings_entity.dart';
-import '../custom_widgets/effects/backdropfilter_body.dart';
+import '../custom_widgets/effects/backdropfilter.dart';
 import '../custom_widgets/effects/opacity_body.dart';
 import '../custom_widgets/failure_widget.dart';
 import '../custom_widgets/page_transition.dart';
@@ -158,9 +158,10 @@ class EpisodesListPage extends StatelessWidget {
             if (podcastState.currentPodcast.artworkFilePath != null)
               OpacityBody(
                 state: podcastState,
-                assetImage: null,
               ),
-            const BackdropFilterBody(),
+            const BackdropFilterWidget(
+              sigma: 25.0,
+            ),
             BlocBuilder<EpisodesBloc, EpisodesState>(
               builder: (context, episodesState) {
                 if (episodesState.status == EpisodesStatus.loading &&
@@ -252,5 +253,3 @@ class EpisodesListPage extends StatelessWidget {
     );
   }
 }
-
-
