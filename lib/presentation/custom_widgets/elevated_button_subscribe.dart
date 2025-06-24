@@ -1,10 +1,9 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
+import 'package:podcast/presentation/custom_widgets/effects/backdropfilter.dart';
 import 'package:podcast/presentation/custom_widgets/page_transition.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../domain/usecases/episode_usecases.dart';
@@ -71,8 +70,7 @@ class ElevatedButtonSubscribe extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text("Error fetching episodes.}")),
+          const SnackBar(content: Text("Error fetching episodes.}")),
         );
       }
       rethrow; // For try-catch bloc in _subscribeToPodcast (the caller)!
@@ -83,11 +81,36 @@ class ElevatedButtonSubscribe extends StatelessWidget {
     final String connectionType =
         await getIt<ConnectivityManager>().getConnectionTypeAsString();
     if (connectionType != 'none' && context.mounted) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) {
+          return const Stack(
+            children: [
+              BackdropFilterWidget(sigma: 4.0),
+              AlertDialog(
+                title: Text("Subscribing..."),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text("Please wait."),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      );
       try {
         await _handleEpisodes(context);
         if (context.mounted) {
           BlocProvider.of<PodcastBloc>(context)
               .add(SubscribeToPodcastEvent(podcast: podcast));
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
         }
       } catch (e) {
         if (context.mounted) {
@@ -140,29 +163,29 @@ class ElevatedButtonSubscribe extends StatelessWidget {
       builder: (context) {
         return Stack(
           children: [
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-              child: Container(
-                color: Colors.black26,
-              ),
-            ),
+            const BackdropFilterWidget(sigma: 4.0),
             AlertDialog(
-                title: const Text("Are you sure you want to unsubscribe?",),
+                title: const Text(
+                  "Are you sure you want to unsubscribe?",
+                ),
                 actions: [
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: const Text("Cancel",),
+                    child: const Text(
+                      "Cancel",
+                    ),
                   ),
                   TextButton(
                     onPressed: () async {
+                      Navigator.pop(context);
                       await _deleteUnFlaggedEpisodes();
                       if (context.mounted) {
                         BlocProvider.of<PodcastBloc>(context)
                             .add(UnSubscribeFromPodcastEvent(id: podcast.id));
-                        Navigator.pop(context);
-                        Navigator.push(
+
+                       Navigator.push(
                           context,
                           SlideRouteWithCurve(
                             page: const HomePage(),
@@ -170,7 +193,9 @@ class ElevatedButtonSubscribe extends StatelessWidget {
                         );
                       }
                     },
-                    child: const Text("Unsubscribe",),
+                    child: const Text(
+                      "Unsubscribe",
+                    ),
                   ),
                 ]),
           ],
