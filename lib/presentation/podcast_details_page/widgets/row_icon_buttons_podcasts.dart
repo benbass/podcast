@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:share_plus/share_plus.dart';
@@ -7,6 +5,7 @@ import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/core/connectivity_manager.dart';
 import '../../../injection.dart';
 import '../../custom_widgets/dialogs/failure_dialog.dart';
+import '../../custom_widgets/effects/backdropfilter.dart';
 import '../../custom_widgets/page_transition.dart';
 import '../../episodes_list_page/episodes_list_page.dart';
 import '../../episodes_list_page/widgets/animated_download_icon.dart';
@@ -27,15 +26,10 @@ class RowIconButtonsPodcasts extends StatelessWidget {
         context: context,
         barrierDismissible: false,
         builder: (context) {
-          return Stack(
+          return const Stack(
             children: [
-              BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-                child: Container(
-                  color: Colors.black26,
-                ),
-              ),
-              const AlertDialog(
+              BackdropFilterWidget(sigma: 4.0),
+              AlertDialog(
                 content: Row(
                   children: [
                     CircularProgressIndicator(),
