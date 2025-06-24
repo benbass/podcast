@@ -3,13 +3,11 @@ part of 'episode_playback_cubit.dart';
 
 
 class EpisodePlaybackState extends Equatable {
-  final PodcastEntity? podcast;
   final EpisodeEntity? episode;
   final List<EpisodeEntity>? episodes;
   final int currentIndexInPlaylist;
 
   const EpisodePlaybackState({
-    this.podcast,
     this.episode,
     this.episodes,
     this.currentIndexInPlaylist = -1,
@@ -22,7 +20,6 @@ class EpisodePlaybackState extends Equatable {
     int? currentIndexInPlaylist,
   }) {
     return EpisodePlaybackState(
-      podcast: podcast ?? this.podcast,
       episode: episode ?? this.episode,
       episodes: episodes ?? this.episodes,
       currentIndexInPlaylist: currentIndexInPlaylist ?? this.currentIndexInPlaylist,
@@ -31,6 +28,6 @@ class EpisodePlaybackState extends Equatable {
 
 
   @override
-  List<Object?> get props => [podcast, episode, episodes, currentIndexInPlaylist];
+  List<Object?> get props => [episode, episodes, currentIndexInPlaylist];
 
 }
