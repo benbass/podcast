@@ -28,6 +28,16 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
   }
 
   @override
+  Stream<EpisodeEntity?> getEpisodeStream({required int episodeId}) {
+    return episodeLocalDatasource.getEpisodeStream(episodeId: episodeId);
+  }
+
+  @override
+  Stream<int> unreadLocalEpisodesCount({required int feedId}) {
+    return episodeLocalDatasource.unreadLocalEpisodesCount(feedId: feedId);
+  }
+
+  @override
   Future<void> fetchRemoteEpisodesByFeedIdAndSaveToDb({
     required int feedId,
     required String podcastTitle,
@@ -45,19 +55,9 @@ class EpisodeRepositoryImpl implements EpisodeRepository {
     required int feedId,
     required String podcastTitle,
   }) {
-    return episodeLocalDatasource.refreshEpisodesFromServer(
+    return episodeRemoteDatasource.refreshEpisodesFromServer(
       feedId: feedId,
       podcastTitle: podcastTitle,
     );
-  }
-
-  @override
-  Stream<EpisodeEntity?> getEpisodeStream({required int episodeId}) {
-    return episodeLocalDatasource.getEpisodeStream(episodeId: episodeId);
-  }
-
-  @override
-  Stream<int> unreadLocalEpisodesCount({required int feedId}) {
-    return episodeLocalDatasource.unreadLocalEpisodesCount(feedId: feedId);
   }
 }
