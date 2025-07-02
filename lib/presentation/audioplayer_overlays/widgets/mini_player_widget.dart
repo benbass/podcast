@@ -4,7 +4,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
 import 'package:podcast/core/navigation/app_navigator.dart';
 
-import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../../application/playback_cubit/playback_cubit.dart';
 import '../../../helpers/core/utilities/image_provider.dart';
 import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';
@@ -18,7 +18,12 @@ class MiniPlayerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final episode = context.read<EpisodePlaybackCubit>().state.episode;
+    return BlocBuilder<PlaybackCubit, PlaybackState>(
+  builder: (context, playbackState) {
+    if (playbackState.episode == null){
+      return const SizedBox.shrink();
+    }
+    final episode = playbackState.episode;
     final podcast = episode!.podcast.target;
     return Material(
       color: Colors.transparent,
@@ -154,5 +159,7 @@ class MiniPlayerWidget extends StatelessWidget {
         ),
       ),
     );
+  },
+);
   }
 }
