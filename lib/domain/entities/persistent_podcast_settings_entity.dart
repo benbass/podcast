@@ -9,11 +9,12 @@ class PersistentPodcastSettingsEntity {
   @Index()
   int podcastId;
 
-  // Die 4 persistenten Einstellungen
+  // The 5 persistent settings
   bool filterExplicitEpisodes;
   bool filterTrailerEpisodes;
   bool filterBonusEpisodes;
   int? minEpisodeDurationMinutes;
+  bool autoplayEnabled;
 
   PersistentPodcastSettingsEntity({
     required this.podcastId,
@@ -21,12 +22,13 @@ class PersistentPodcastSettingsEntity {
     this.filterTrailerEpisodes = false,
     this.filterBonusEpisodes = false,
     this.minEpisodeDurationMinutes,
+    this.autoplayEnabled = false,
   });
 
-  // Optional: eine Methode, um diese in die umfassendere PodcastFilterSettingsEntity zu konvertieren
+  // Convert this to a PodcastFilterSettingsEntity
   PodcastFilterSettingsEntity toFilterSettings({
-    // Standardwerte für die nicht-persistenten UI-Filter
-    bool initialFilterRead = true, // Default: Ungelesene anzeigen
+    // Default values for non persistent settings
+    bool initialFilterRead = true, // Default: hide read episodes
     EpisodeSortProperty initialSortProperty = EpisodeSortProperty.datePublished,
     SortDirection initialSortDirection = SortDirection.descending,
   }) {
@@ -36,7 +38,9 @@ class PersistentPodcastSettingsEntity {
       filterTrailerEpisodes: filterTrailerEpisodes,
       filterBonusEpisodes: filterBonusEpisodes,
       minEpisodeDurationMinutes: minEpisodeDurationMinutes,
-      // Hier die UI-Filter mit ihren Defaults oder aktuellen Werten aus einem anderen State
+      autoplayEnabled: autoplayEnabled,
+
+      // Here the UI filters with their defaults or the current values from another state
       filterRead: initialFilterRead,
       showOnlyUnfinished: false,
       showOnlyFavorites: false,
@@ -48,11 +52,13 @@ class PersistentPodcastSettingsEntity {
     );
   }
 
-  static PersistentPodcastSettingsEntity defaultPersistentSettings(int feedId){
+  static PersistentPodcastSettingsEntity defaultPersistentSettings(int podcastId) {
     return PersistentPodcastSettingsEntity(
-      podcastId: feedId,
+      podcastId: podcastId,
       filterExplicitEpisodes: false,
       filterTrailerEpisodes: false,
-      filterBonusEpisodes: false,);
+      filterBonusEpisodes: false,
+      autoplayEnabled: false,
+    );
   }
 }
