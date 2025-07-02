@@ -6,25 +6,21 @@ class AppPlaylist {
   int id;
 
   List<int> episodeIds;
-  int? currentPlayingIndex;
   bool autoPlayEnabled;
 
   AppPlaylist({
     required this.id,
     required this.episodeIds,
-    this.currentPlayingIndex,
     this.autoPlayEnabled = false,
   });
 
   AppPlaylist copyWith({
     List<int>? episodeIds,
-    int? currentPlayingIndex,
     bool? autoPlayEnabled,
   }) {
     return AppPlaylist(
       id: id,
       episodeIds: episodeIds ?? this.episodeIds,
-      currentPlayingIndex: currentPlayingIndex ?? this.currentPlayingIndex,
       autoPlayEnabled: autoPlayEnabled ?? this.autoPlayEnabled,
     );
   }
