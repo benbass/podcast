@@ -16,7 +16,7 @@ class OpacityBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Opacity(
       opacity: 0.4,
-      child: state != null ? Image.file(
+      child: state != null && state!.currentPodcast.artworkFilePath != null ? Image.file(
         File(state!.currentPodcast.artworkFilePath!),
         fit: BoxFit.cover,
         errorBuilder: (BuildContext context, Object error,
