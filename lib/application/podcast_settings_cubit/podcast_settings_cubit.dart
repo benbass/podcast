@@ -26,27 +26,23 @@ class PodcastSettingsCubit extends Cubit<PodcastSettingsState> {
       PersistentPodcastSettingsEntity? persistentSettings =
           podcast.persistentSettings.target;
 
-      if (persistentSettings == null) {
-        persistentSettings = PersistentPodcastSettingsEntity(
-          podcastId: podcast.pId,
-          filterExplicitEpisodes: false,
-          filterTrailerEpisodes: false,
-          filterBonusEpisodes: false,
-          minEpisodeDurationMinutes: null,
-        );
-        settingsBox.put(persistentSettings);
-        // Relate the settings to the podcast and save the podcast again to persist the relationship
-        podcast.persistentSettings.target = persistentSettings;
-        podcastBox.put(podcast);
-      }
+      persistentSettings ??= PersistentPodcastSettingsEntity(
+        podcastId: podcast.id,
+        filterExplicitEpisodes: false,
+        filterTrailerEpisodes: false,
+        filterBonusEpisodes: false,
+        minEpisodeDurationMinutes: null,
+        autoplayEnabled: false,
+      );
 
       /// 2. create a state with the persistent settings and default filter settings
       final filterSettingsForState = PodcastFilterSettingsEntity(
-        podcastId: podcast.pId,
+        podcastId: podcast.id,
         filterExplicitEpisodes: persistentSettings.filterExplicitEpisodes,
         filterTrailerEpisodes: persistentSettings.filterTrailerEpisodes,
         filterBonusEpisodes: persistentSettings.filterBonusEpisodes,
         minEpisodeDurationMinutes: persistentSettings.minEpisodeDurationMinutes,
+        autoplayEnabled: persistentSettings.autoplayEnabled,
         // default filter settings
         filterRead: true,
         showOnlyRead: false,
@@ -71,6 +67,7 @@ class PodcastSettingsCubit extends Cubit<PodcastSettingsState> {
     bool? filterTrailerEpisodes,
     bool? filterBonusEpisodes,
     int? minEpisodeDurationMinutes,
+    bool? autoplayEnabled,
   }) async {
     final currentState = state;
     if (currentState is PodcastSettingsLoaded) {
@@ -87,6 +84,11 @@ class PodcastSettingsCubit extends Cubit<PodcastSettingsState> {
       }
 
       bool changed = false;
+      if (autoplayEnabled != null &&
+          persistentSettings.autoplayEnabled != autoplayEnabled) {
+        persistentSettings.autoplayEnabled = autoplayEnabled;
+        changed = true;
+      }
       if (filterExplicitEpisodes != null &&
           persistentSettings.filterExplicitEpisodes != filterExplicitEpisodes) {
         persistentSettings.filterExplicitEpisodes = filterExplicitEpisodes;
@@ -120,12 +122,12 @@ class PodcastSettingsCubit extends Cubit<PodcastSettingsState> {
             filterBonusEpisodes: persistentSettings.filterBonusEpisodes,
             minEpisodeDurationMinutes:
                 persistentSettings.minEpisodeDurationMinutes,
+            autoplayEnabled: persistentSettings.autoplayEnabled,
           );
           emit(PodcastSettingsLoaded(
               newFilterSettingsForState, currentState.podcast));
         } catch (e) {
-          emit(PodcastSettingsError(
-              "Fehler beim Speichern der Einstellungen."));
+          emit(PodcastSettingsError("Error updating the settings."));
         }
       }
     } else {
@@ -164,6 +166,7 @@ class PodcastSettingsCubit extends Cubit<PodcastSettingsState> {
       }
     } else {}
   }
+
   /// END fluctuating filter settings
 
   Future<void> loadSettingsForPodcast(PodcastEntity podcast) async {
@@ -174,17 +177,10 @@ class PodcastSettingsCubit extends Cubit<PodcastSettingsState> {
   PodcastFilterSettingsEntity? getSettingsForPodcast(int podcastId) {
     if (state is PodcastSettingsLoaded) {
       final loadedState = state as PodcastSettingsLoaded;
-      if (loadedState.podcast.pId == podcastId) {
+      if (loadedState.podcast.id == podcastId) {
         return loadedState.settings;
       }
     }
     return null;
-  }
-
-  Future<void> updateSettingsForPodcast(
-      PodcastEntity podcast, PodcastFilterSettingsEntity newSettings) async {
-    // Speichere die neuen Einstellungen
-    // await _saveSettingsToPrefs(podcast.pId, newSettings);
-    emit(PodcastSettingsLoaded(newSettings, podcast));
   }
 }
