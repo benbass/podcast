@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/application/episode_selection_cubit/episode_selection_cubit.dart';
@@ -38,13 +40,8 @@ class _EpisodesListPageWrapperState extends State<EpisodesListPageWrapper> {
     final currentPodcast = podcastState.currentPodcast;
     context.read<PodcastSettingsCubit>().loadSettings(currentPodcast.id);
     _unreadEpisodesStream = getIt<EpisodeUseCases>()
-        .unreadLocalEpisodesCount(feedId: currentPodcast.pId)
+        .unreadLocalEpisodesCount(feedId: currentPodcast.feedId)
         .asBroadcastStream(); // asBroadcastStream() so stream will be correctly canceled when podcast is being unsubscribed
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -71,7 +68,7 @@ class _EpisodesListPageWrapperState extends State<EpisodesListPageWrapper> {
               settingsState.settings;
 
           BlocProvider.of<EpisodesBloc>(context).add(LoadEpisodes(
-            feedId: currentPodcast.pId,
+            feedId: currentPodcast.feedId,
             isSubscribed: currentPodcast.subscribed,
             initialFilterSettings: initialFilters,
           ));
@@ -117,36 +114,7 @@ class EpisodesListPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: StreamBuilder<int>(
-            stream: unreadEpisodesStream,
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return const SizedBox();
-              }
-              if (snapshot.hasData) {
-                final unreadEpisodesCount = snapshot.data;
-                return Container(
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Theme.of(context).colorScheme.primary),
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text(
-                    unreadEpisodesCount.toString(),
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                    textAlign: TextAlign.center,
-                  ),
-                );
-              } else {
-                return const SizedBox();
-              }
-            },
-          ),
           actions: [
-            const SizedBox(width: 20),
             if (podcastState.currentPodcast.subscribed)
               const RowIconButtonsEpisodes(),
           ],
@@ -185,16 +153,56 @@ class EpisodesListPage extends StatelessWidget {
                           flexibleSpace: Padding(
                             padding: const EdgeInsets.all(4.0),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
+                                StreamBuilder<int>(
+                                  stream: unreadEpisodesStream,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasError) {
+                                      return const SizedBox();
+                                    }
+                                    if (snapshot.hasData) {
+                                      final unreadEpisodesCount = snapshot.data;
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 8.0),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                          ),
+                                          alignment: Alignment.center,
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Text(
+                                            unreadEpisodesCount.toString(),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium!
+                                                .copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primaryContainer,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return const SizedBox();
+                                    }
+                                  },
+                                ),
                                 if (podcastState.currentPodcast.subscribed) ...[
                                   const DropdownFilterMenu(),
                                   const Spacer(),
                                   const AnimatedDownloadIcon(),
-                                  const SizedBox(width: 30),
+                                  const SizedBox(width: 15),
                                   const ToggleReadVisibility(),
                                 ],
-                                const SizedBox(width: 30),
+                                const SizedBox(width: 15),
                                 IconButton(
                                   onPressed: () => Navigator.push(
                                       context,
