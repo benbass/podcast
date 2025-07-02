@@ -55,7 +55,7 @@ class SubscribedPodcastCard extends StatelessWidget {
                   height: 44,
                   child: StreamBuilder<int>(
                     stream: getIt<EpisodeUseCases>()
-                        .unreadLocalEpisodesCount(feedId: podcast.pId),
+                        .unreadLocalEpisodesCount(feedId: podcast.feedId),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         final unreadEpisodesCount = snapshot.data;
