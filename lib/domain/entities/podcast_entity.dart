@@ -9,7 +9,7 @@ class PodcastEntity {
 
   /// Data from json
   final int
-      pId; // internal PodcastIndex.org Feed ID. To be used for fetching episodes!
+      feedId; // internal PodcastIndex.org Feed ID. To be used for fetching episodes!
   final String? podcastGuid;
   final String title;
   final String url; // xml
@@ -37,7 +37,7 @@ class PodcastEntity {
 
   PodcastEntity({
     this.id = 0,
-    required this.pId,
+    required this.feedId,
     required this.podcastGuid,
     required this.title,
     required this.url,
@@ -62,7 +62,7 @@ class PodcastEntity {
   }) {
     return PodcastEntity(
       id: id,
-      pId: pId,
+      feedId: feedId,
       podcastGuid: podcastGuid,
       title: title,
       url: url,
@@ -83,7 +83,7 @@ class PodcastEntity {
   }
 
   factory PodcastEntity.emptyPodcast() => PodcastEntity(
-        pId: -1,
+        feedId: -1,
         podcastGuid: '',
         title: '',
         url: '',
