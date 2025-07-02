@@ -19,7 +19,7 @@ import 'package:podcast/presentation/podcast_details_page/podcast_details_page.d
 import 'package:podcast/presentation/podcasts_search_page/podcasts_search_page.dart';
 import 'package:podcast/theme.dart';
 import 'package:provider/provider.dart';
-import 'application/episode_playback_cubit/episode_playback_cubit.dart';
+import 'application/playback_cubit/playback_cubit.dart';
 import 'application/episode_selection_cubit/episode_selection_cubit.dart';
 import 'application/episodes_bloc/episodes_bloc.dart';
 import 'application/playlist_details_cubit/playlist_details_cubit.dart';
@@ -89,18 +89,18 @@ void main() async {
           providers: [
             BlocProvider(
                 create: (BuildContext context) =>
+                    getIt<PodcastSettingsCubit>()),
+            BlocProvider(
+                create: (BuildContext context) =>
                     getIt<EpisodeSelectionCubit>()),
             BlocProvider(
                 create: (BuildContext context) =>
-                    getIt<EpisodePlaybackCubit>()),
+                    getIt<PlaybackCubit>()),
             BlocProvider(
                 create: (BuildContext context) => getIt<TextFieldCubit>()),
             BlocProvider(
                 create: (BuildContext context) =>
                     getIt<PodcastBloc>()..add(LoadSubscribedPodcastsEvent())),
-            BlocProvider(
-                create: (BuildContext context) =>
-                    getIt<PodcastSettingsCubit>()),
             BlocProvider<EpisodesBloc>(
                 create: (context) =>
                     EpisodesBloc(episodeUseCases: getIt<EpisodeUseCases>())),
