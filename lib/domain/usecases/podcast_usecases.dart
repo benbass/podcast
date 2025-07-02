@@ -21,7 +21,7 @@ class PodcastUseCases {
   }
 
   Future<PodcastEntity> savePodcastAndArtwork(PodcastEntity podcast) async {
-    return await podcastRepository.savePodcastAndArtwork(podcast);
+    return await podcastRepository.savedPodcastWithArtwork(podcast);
   }
 
   Future<bool> subscribeToPodcast(PodcastEntity podcast) async {
