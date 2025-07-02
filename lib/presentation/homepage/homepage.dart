@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/homepage/widgets/scaling_carousel_sliver.dart';
 
-import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../application/playback_cubit/playback_cubit.dart';
 import '../../domain/queued_audio_download/queued_audio_download.dart';
 import '../../helpers/audio_download/audio_download_queue_manager.dart';
 import '../../helpers/listeners/player_listener.dart';
@@ -102,12 +102,9 @@ class HomePage extends StatelessWidget {
     // Init listener for player states and Listen for changes (e.g., playing, paused, buffering)
     PlayerStatesListener playerStatesListener = getIt<PlayerStatesListener>();
     // Inject methods to this listener
-    // Episode is set to null when and only when player state is completed
-    playerStatesListener.setResetPlaybackEpisodeCallback(
-        () => context.read<EpisodePlaybackCubit>().resetPlayback());
-    // listener needs current playback episode from cubit (initially null)
     playerStatesListener.setGetCurrentEpisode(
-        () => context.read<EpisodePlaybackCubit>().state.episode);
+        () => context.read<PlaybackCubit>().state.episode);
+    playerStatesListener.setGetAutoplayStatus(() => context.read<PlaybackCubit>().state.isAutoplayEnabled);
 
     // Listen for connectivity changes
     ConnectivityDialog.showConnectivityDialogs(context);
