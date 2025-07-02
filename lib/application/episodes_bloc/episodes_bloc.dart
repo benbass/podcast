@@ -34,14 +34,15 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
       if (settingsState is PodcastSettingsLoaded) {
         if (state.status != EpisodesStatus.initial &&
             state.feedId != null &&
-            state.feedId == settingsState.podcast.pId) {
+            state.feedId == settingsState.podcast.feedId) {
           add(_FilterSettingsChanged(settingsState.settings));
         }
       }
     });
   }
 
-  Future<void> _onLoadEpisodes(event, emit) async {
+  Future<void> _onLoadEpisodes(
+      LoadEpisodes event, Emitter<EpisodesState> emit) async {
     // If a stream for the same feed is already running, only update filters
     if (state.feedId == event.feedId &&
         state.status != EpisodesStatus.initial) {
@@ -65,7 +66,7 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
         .getEpisodesStream(
       feedId: event.feedId,
       isSubscribed: event.isSubscribed,
-      filterSettings: event.initialFilterSettings,
+      filterSettings: event.initialFilterSettings!,
     )
         .listen(
       (episodes) => add(_EpisodesUpdated(episodes)),
@@ -79,14 +80,15 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
     );
   }
 
-  void _onEpisodesUpdated(event, emit) {
+  void _onEpisodesUpdated(_EpisodesUpdated event, Emitter<EpisodesState> emit) {
     emit(state.copyWith(
       status: EpisodesStatus.success,
       episodes: event.episodes,
     ));
   }
 
-  Future<void> _onFilterSettingsChanged(event, emit) async {
+  Future<void> _onFilterSettingsChanged(
+      _FilterSettingsChanged event, Emitter<EpisodesState> emit) async {
     if (state.feedId == null) {
       return;
     }
@@ -102,9 +104,7 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
       filterSettings: event.newSettings,
     )
         .listen(
-      (episodes) {
-        add(_EpisodesUpdated(episodes));
-      },
+      (episodes) => add(_EpisodesUpdated(episodes)),
       onError: (error) {
         emit(state.copyWith(
           status: EpisodesStatus.failure,
@@ -116,7 +116,8 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
     );
   }
 
-  Future<void> _onRefreshEpisodes(event, emit) async {
+  Future<void> _onRefreshEpisodes(
+      RefreshEpisodes event, Emitter<EpisodesState> emit) async {
     final int countBeforeRefresh = state.episodes.length;
     emit(state.copyWith(status: EpisodesStatus.refreshing));
     try {
@@ -124,26 +125,25 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
         feedId: event.feedId,
       );
 
-
-      final List<EpisodeEntity> currentEpisodesAfterRefresh = await episodeUseCases
-          .getEpisodesStream(
-          feedId: event.feedId,
-          isSubscribed: state.isSubscribed,
-          filterSettings: state.activeFilters!)
-          .first;
+      final List<EpisodeEntity> currentEpisodesAfterRefresh =
+          await episodeUseCases
+              .getEpisodesStream(
+                  feedId: event.feedId,
+                  isSubscribed: state.isSubscribed,
+                  filterSettings: state.activeFilters!)
+              .first;
 
       final int finalCountBeforeRefresh = countBeforeRefresh;
       final int finalCountAfterRefresh = currentEpisodesAfterRefresh.length;
 
       final int diff = finalCountAfterRefresh - finalCountBeforeRefresh;
 
-        emit(state.copyWith(
-          status: EpisodesStatus.success,
-          episodes: currentEpisodesAfterRefresh,
-          newlyAddedCount: diff,
-          wasRefreshOperation: true,
-        ));
-
+      emit(state.copyWith(
+        status: EpisodesStatus.success,
+        episodes: currentEpisodesAfterRefresh,
+        newlyAddedCount: diff,
+        wasRefreshOperation: true,
+      ));
     } catch (error) {
       emit(state.copyWith(
         status: EpisodesStatus.failure,
@@ -153,8 +153,10 @@ class EpisodesBloc extends Bloc<EpisodesEvent, EpisodesState> {
     }
   }
 
-  void _onNotificationShown(event, emit) {
-    emit(state.copyWith(clearNewlyAddedCount: true, clearWasRefreshOperation: true));
+  void _onNotificationShown(
+      NotificationShownEvent event, Emitter<EpisodesState> emit) {
+    emit(state.copyWith(
+        clearNewlyAddedCount: true, clearWasRefreshOperation: true));
   }
 
   @override
