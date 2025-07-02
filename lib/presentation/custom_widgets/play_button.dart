@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/core/globals.dart';
 
-import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../application/playback_cubit/playback_cubit.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/player/audiohandler.dart';
@@ -24,7 +24,7 @@ class PlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
+    return BlocBuilder<PlaybackCubit, PlaybackState>(
       builder: (context, state) {
         if (state.episode?.eId != episode.eId) {
           return PlayButtonActive(
@@ -74,22 +74,20 @@ class PlayButtonActive extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () {
-        // Save the position to the episode being played, if any, before playing the new episode
-        final currentEpisode =
-            context.read<EpisodePlaybackCubit>().state.episode;
-        if (currentEpisode != null) {
-          currentEpisode.position =
+        final previousEpisode =
+            context.read<PlaybackCubit>().state.episode;
+        if (previousEpisode != null) {
+          previousEpisode.position =
               getIt<MyAudioHandler>().player.position.inSeconds;
-          episodeBox.put(currentEpisode);
+          episodeBox.put(previousEpisode);
         }
-
-        final episodeToPlay = episodeBox.get(episode.id);
-          BlocProvider.of<EpisodePlaybackCubit>(context).setPlaybackEpisode(
-            episodeToPlay: episodeToPlay,
-            startIndexInPlaylist: episodeIndex,
-            playlist: playlist,
-          );
-
+        final bool? autoplayEnabled = podcast.persistentSettings.target?.autoplayEnabled; // Null when podcast is not subscribed
+        BlocProvider.of<PlaybackCubit>(context).onPlay(
+          episode: episode,
+          playlist: playlist,
+          isAutoplayEnabled: autoplayEnabled ?? false,
+          isUserPlaylist: false,
+        );
         getIt<MyAudioHandler>().play();
       },
       padding: EdgeInsets.zero,
