@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/infrastructure/datasources/episode_datasources.dart';
+import '../../domain/entities/persistent_podcast_settings_entity.dart';
 import '../../domain/repositories/podcast_repository.dart';
 
 import '../../helpers/core/utilities/artwork_to_file.dart';
@@ -33,13 +34,13 @@ class PodcastRepositoryImpl implements PodcastRepository {
     return podcast;
   }
 
-  /// Cache podcast and artwork to file for unsubscribed podcasts
+  /// Cache podcast with settings, and artwork to file for unsubscribed podcasts
   @override
-  Future<PodcastEntity> savePodcastAndArtwork(PodcastEntity podcast) async {
+  Future<PodcastEntity> savedPodcastWithArtwork(PodcastEntity podcast) async {
     // Check if podcast is already in db, if so return it
     final savedPodcasts = podcastBox.getAll();
     for (var savedPodcast in savedPodcasts) {
-      if (savedPodcast.pId == podcast.pId) {
+      if (savedPodcast.feedId == podcast.feedId) {
         return savedPodcast;
       }
     }
@@ -60,6 +61,9 @@ class PodcastRepositoryImpl implements PodcastRepository {
       } else {
         id = podcastBox.put(podcast);
       }
+
+      podcastBox.put(podcast);
+
       return podcastBox.get(id)!;
     } catch (e) {
       print("Error caching artwork and podcast: $e");
@@ -74,6 +78,16 @@ class PodcastRepositoryImpl implements PodcastRepository {
       final unsubscribedPodcast = podcastBox.get(podcast.id)!;
 
       final subscribedPodcast = unsubscribedPodcast.copyWith(subscribed: true);
+
+      PersistentPodcastSettingsEntity? persistentSettings =
+          subscribedPodcast.persistentSettings.target;
+      if (persistentSettings == null) {
+        persistentSettings =
+            PersistentPodcastSettingsEntity.defaultPersistentSettings(
+                subscribedPodcast.id);
+        settingsBox.put(persistentSettings);
+        subscribedPodcast.persistentSettings.target = persistentSettings;
+      }
 
       // Persist the updated podcast data.
       podcastBox.put(subscribedPodcast);
@@ -98,6 +112,10 @@ class PodcastRepositoryImpl implements PodcastRepository {
         }
       }
     }
+    // Delete settings in db
+    if (podcast.persistentSettings.target != null) {
+      settingsBox.remove(podcast.persistentSettings.target!.id);
+    }
     // Delete podcast in db
     podcastBox.remove(podcast.id);
   }
@@ -112,16 +130,16 @@ class PodcastRepositoryImpl implements PodcastRepository {
       queryResult, currentPodcast) async {
     List<PodcastEntity> currentQueryResult = queryResult;
     if (currentQueryResult.isNotEmpty) {
-      // Create a map to store the API podcastIndex ids (pId) as keys
+      // Create a map to store the API podcastIndex ids (feedId) as keys
       Map<int, int> map = {};
       for (PodcastEntity podcast in currentQueryResult) {
-        map[podcast.pId] = 0;
+        map[podcast.feedId] = 0;
       }
       // Check if object is in map
-      if (map.containsKey(currentPodcast.pId)) {
+      if (map.containsKey(currentPodcast.feedId)) {
         // find index of object in query result
         final int index = currentQueryResult
-            .indexWhere((element) => element.pId == currentPodcast.pId);
+            .indexWhere((element) => element.feedId == currentPodcast.feedId);
 
         // Replace object in query result with passed object where subscribed is updated
         currentQueryResult[index] = currentPodcast;
