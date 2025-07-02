@@ -3,8 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/presentation/episode_details_page/widgets/playback_position_slider.dart';
 
-import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
-import '../../../application/playlist_details_cubit/playlist_details_cubit.dart';
+import '../../../application/playback_cubit/playback_cubit.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/notifications/utilities_notifications.dart';
 import '../../../helpers/player/audiohandler.dart';
@@ -22,11 +21,13 @@ class PlayerControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
-    return BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
+    return BlocBuilder<PlaybackCubit, PlaybackState>(
       builder: (context, state) {
         return Container(
           decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(10.0), topRight: Radius.circular(10.0)),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10.0),
+                topRight: Radius.circular(10.0)),
             color: Colors.white12,
             boxShadow: [
               BoxShadow(
@@ -50,11 +51,11 @@ class PlayerControls extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                        onPressed: state.currentIndexInPlaylist == 0
+                        onPressed: state.currentIndex == 0
                             ? null
                             : () async {
                                 // playPrevious() (and playNext()) handle the EpisodePlaybackCubit
-                                // update that will return true if success or false.
+                                // update that will return true if success.
                                 // If true, the audioHandler will handle the playback
                                 // of the new episode.
                                 bool result = await getIt<MyAudioHandler>()
@@ -71,12 +72,22 @@ class PlayerControls extends StatelessWidget {
                                       );
                                     }
                                   });
+                                } else {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Previous episode not found'),
+                                        duration: Duration(seconds: 2),
+                                      ),
+                                    );
+                                  }
                                 }
                               },
                         icon: Icon(
                           Icons.skip_previous_rounded,
                           size: 40,
-                          color: state.currentIndexInPlaylist == 0
+                          color: state.currentIndex == 0
                               ? themeData.colorScheme.onPrimary
                                   .withValues(alpha: 0.5)
                               : themeData.colorScheme.onPrimary,
@@ -94,7 +105,6 @@ class PlayerControls extends StatelessWidget {
                       IconButton(
                         onPressed: () {
                           getIt<MyAudioHandler>().stop();
-                          context.read<PlaylistDetailsCubit>().setCurrentPlayingIndex(null);
                         },
                         icon: const Icon(
                           Icons.stop_rounded,
@@ -130,8 +140,8 @@ class PlayerControls extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        onPressed: state.currentIndexInPlaylist ==
-                                state.episodes!.length - 1
+                        onPressed: state.currentIndex ==
+                                state.currentPlaylist.length - 1
                             ? null
                             : () async {
                                 bool result =
@@ -148,13 +158,22 @@ class PlayerControls extends StatelessWidget {
                                       );
                                     }
                                   });
+                                } else {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Next episode not found'),
+                                        duration: Duration(seconds: 2),
+                                      ),
+                                    );
+                                  }
                                 }
                               },
                         icon: Icon(
                           Icons.skip_next_rounded,
                           size: 40,
-                          color: state.currentIndexInPlaylist ==
-                                  state.episodes!.length - 1
+                          color: state.currentIndex ==
+                                  state.currentPlaylist.length - 1
                               ? themeData.colorScheme.onPrimary
                                   .withValues(alpha: 0.5)
                               : themeData.colorScheme.onPrimary,
