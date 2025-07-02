@@ -63,7 +63,7 @@ class ElevatedButtonSubscribe extends StatelessWidget {
   Future<void> _handleEpisodes(BuildContext context) async {
     try {
       await getIt<EpisodeUseCases>().fetchRemoteEpisodesByFeedIdAndSaveToDb(
-        feedId: podcast.pId,
+        feedId: podcast.feedId,
         markAsSubscribed: true,
       );
     } catch (e) {
@@ -76,7 +76,7 @@ class ElevatedButtonSubscribe extends StatelessWidget {
     }
   }
 
-  _subscribeToPodcast(BuildContext context) async {
+  Future<void> _subscribeToPodcast(BuildContext context) async {
     final String connectionType =
         await getIt<ConnectivityManager>().getConnectionTypeAsString();
     if (connectionType != 'none' && context.mounted) {
@@ -130,12 +130,12 @@ class ElevatedButtonSubscribe extends StatelessWidget {
   }
 
   /// UNSUBSCRIBE
-  _deleteUnFlaggedEpisodes() async {
+  Future<void> _deleteUnFlaggedEpisodes() async {
     // We do not just delete the episodes from the db: User may have
     // flagged some episodes so we  want to keep them.
     // 1. we set isSubscribed to false for all episodes anyway
     final episodesQueryBuilder =
-        episodeBox.query(EpisodeEntity_.feedId.equals(podcast.pId)).build();
+        episodeBox.query(EpisodeEntity_.feedId.equals(podcast.feedId)).build();
     final results = episodesQueryBuilder.find();
     for (var ep in results) {
       ep.isSubscribed = false;
@@ -145,7 +145,7 @@ class ElevatedButtonSubscribe extends StatelessWidget {
     // 2. We query all ids for episodes with no flag
     final idsQueryBuilder = episodeBox
         .query(EpisodeEntity_.feedId
-            .equals(podcast.pId)
+            .equals(podcast.feedId)
             .and(EpisodeEntity_.favorite.equals(false))
             .and(EpisodeEntity_.filePath.isNull())
             .and(EpisodeEntity_.position.equals(0)))
@@ -156,7 +156,7 @@ class ElevatedButtonSubscribe extends StatelessWidget {
     episodeBox.removeMany(determinedIds);
   }
 
-  _unsubscribe(BuildContext context) async {
+  Future<void> _unsubscribe(BuildContext context) async {
     showDialog(
       context: context,
       builder: (context) {
