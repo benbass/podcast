@@ -20,7 +20,7 @@ class PodcastCard extends StatelessWidget {
             ? snapshot.data!
             : const AssetImage('assets/placeholder.png');
         return Container(
-          key: ValueKey(podcast.pId),
+          key: ValueKey(podcast.feedId),
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10.0),
