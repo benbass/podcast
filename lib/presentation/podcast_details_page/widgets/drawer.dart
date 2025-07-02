@@ -17,6 +17,7 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
   late bool _currentFilterTrailer;
   late bool _currentFilterBonus;
   late int? _currentMinDurationMinutes;
+  //late bool _currentAutoplayEnabled;
   late String? _podcastTitle;
 
   // For Slider
@@ -35,12 +36,14 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
       _currentFilterBonus = cubitState.settings.filterBonusEpisodes;
       _currentMinDurationMinutes =
           cubitState.settings.minEpisodeDurationMinutes;
+      //_currentAutoplayEnabled = cubitState.settings.autoplayEnabled;
       _podcastTitle = cubitState.podcast.title;
     } else {
       _currentFilterExplicit = false;
       _currentFilterTrailer = false;
       _currentFilterBonus = false;
       _currentMinDurationMinutes = null;
+      //_currentAutoplayEnabled = false;
       _podcastTitle = "";
     }
   }
@@ -67,7 +70,7 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
     if (sliderUiValue > _maxSliderValue) sliderUiValue = _maxSliderValue;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 100.0, horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(vertical: 60.0, horizontal: 20.0),
       child: Column(
         children: [
           Text(
@@ -82,6 +85,27 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
                 "Note: These filters may not work if the podcast author doesn't provide this information or provides it incorrectly."),
           ),
           const SizedBox(height: 40),
+          /*  Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Enable autoplay permanently",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Switch(
+                value: _currentAutoplayEnabled,
+                onChanged: (value) {
+                  setState(() {
+                    _currentAutoplayEnabled = value;
+                    context
+                        .read<PodcastSettingsCubit>()
+                        .updatePersistentSettings(
+                        autoplayEnabled: value);
+                  });
+                },
+              ),
+            ],
+          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -180,7 +204,7 @@ class _PodcastSettingsDrawerState extends State<PodcastSettingsDrawer> {
           ),
           const SizedBox(height: 20),
           Divider(color: themeData.colorScheme.primary),
-          const SizedBox(height: 120),
+          const Spacer(),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
