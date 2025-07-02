@@ -6,7 +6,8 @@ import '../../domain/entities/podcast_entity.dart';
 
 /// For unsubscribed podcasts, clean device storage (artwork files) and database at app closing
 class UnsubscribedPodcastCleanup {
-  static final UnsubscribedPodcastCleanup _instance = UnsubscribedPodcastCleanup._internal();
+  static final UnsubscribedPodcastCleanup _instance =
+      UnsubscribedPodcastCleanup._internal();
   factory UnsubscribedPodcastCleanup() => _instance;
   UnsubscribedPodcastCleanup._internal();
 
@@ -25,10 +26,10 @@ class UnsubscribedPodcastCleanup {
     // Get the feedIds of these flagged episodes
     final flaggedFeedIds = flaggedEpisodesQuery.findIds();
 
-    // Build a query for unsubscribed podcasts whose pId is NOT in the list of flaggedFeedIds
+    // Build a query for unsubscribed podcasts whose feedId is NOT in the list of flaggedFeedIds
     final podcastsToDeleteQuery = podcastBox
         .query(PodcastEntity_.subscribed.equals(false).and(
-      PodcastEntity_.pId.notOneOf(flaggedFeedIds),
+      PodcastEntity_.feedId.notOneOf(flaggedFeedIds),
     ))
         .build();
 
@@ -55,11 +56,10 @@ class UnsubscribedPodcastCleanup {
   }
   */
 
-  static bool deletePodcastsAndArtworkFilesCurrentVersion() {
+  static bool deletePodcastsWithArtworkFilesAndSettings() {
     // Build a query for unsubscribed podcasts
-    final podcastsToDeleteQuery = podcastBox
-        .query(PodcastEntity_.subscribed.equals(false))
-        .build();
+    final podcastsToDeleteQuery =
+        podcastBox.query(PodcastEntity_.subscribed.equals(false)).build();
 
     final podcastsToDelete = podcastsToDeleteQuery.find();
 
@@ -77,9 +77,11 @@ class UnsubscribedPodcastCleanup {
           }
         }
       }
+      if (podcast.persistentSettings.target != null) {
+        settingsBox.remove(podcast.persistentSettings.target!.id);
+      }
       podcastBox.remove(podcast.id);
     }
     return success;
   }
 }
-
