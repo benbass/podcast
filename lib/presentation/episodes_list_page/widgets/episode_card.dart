@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/playback_linear_progress_indicator.dart';
 
-import '../../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../../application/playback_cubit/playback_cubit.dart';
 import '../../../application/episode_selection_cubit/episode_selection_cubit.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/utilities/format_utilities.dart';
@@ -48,7 +48,7 @@ class EpisodeCard extends StatelessWidget {
               Color cardColor = isSelected
                   ? themeData.colorScheme.secondary.withValues(alpha: 0.4)
                   : Colors.black12;
-              return BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
+              return BlocBuilder<PlaybackCubit, PlaybackState>(
                 builder: (context, currentlyPlayingEpisodeState) {
                   final isCurrentlyPlaying =
                       currentlyPlayingEpisodeState.episode?.eId == episode.eId;
