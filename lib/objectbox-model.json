@@ -152,7 +152,7 @@
     },
     {
       "id": "2:6590084371707452549",
-      "lastPropertyId": "21:5838812849290071290",
+      "lastPropertyId": "22:2720102083679431424",
       "name": "PodcastEntity",
       "properties": [
         {
@@ -160,11 +160,6 @@
           "name": "id",
           "type": 6,
           "flags": 1
-        },
-        {
-          "id": "2:4325799128129907292",
-          "name": "pId",
-          "type": 6
         },
         {
           "id": "3:704359096505156456",
@@ -253,13 +248,18 @@
           "flags": 520,
           "indexId": "4:4003899417538329055",
           "relationTarget": "PersistentPodcastSettingsEntity"
+        },
+        {
+          "id": "22:2720102083679431424",
+          "name": "feedId",
+          "type": 6
         }
       ],
       "relations": []
     },
     {
       "id": "4:608649504811762363",
-      "lastPropertyId": "6:1305076679239595773",
+      "lastPropertyId": "7:5031096565759601958",
       "name": "PersistentPodcastSettingsEntity",
       "properties": [
         {
@@ -294,6 +294,11 @@
           "id": "6:1305076679239595773",
           "name": "minEpisodeDurationMinutes",
           "type": 6
+        },
+        {
+          "id": "7:5031096565759601958",
+          "name": "autoplayEnabled",
+          "type": 1
         }
       ],
       "relations": []
@@ -313,11 +318,6 @@
           "id": "2:1648994079516446541",
           "name": "episodeIds",
           "type": 27
-        },
-        {
-          "id": "3:5813533059101897652",
-          "name": "currentPlayingIndex",
-          "type": 6
         },
         {
           "id": "4:7342938097302703364",
@@ -354,7 +354,9 @@
     4615198929745657932,
     1922259496943495004,
     6030078856056489527,
-    783881693732996932
+    783881693732996932,
+    5813533059101897652,
+    4325799128129907292
   ],
   "retiredRelationUids": [],
   "version": 1
