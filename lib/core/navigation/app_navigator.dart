@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../application/playback_cubit/playback_cubit.dart';
 import '../../application/episodes_bloc/episodes_bloc.dart';
 import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../domain/entities/podcast_filter_settings_entity.dart';
 import '../../main.dart';
-import '../../presentation/audioplayer_overlays/audioplayer_overlays.dart';
 import '../../presentation/episode_details_page/episode_details_page.dart';
 
 class AppNavigator {
@@ -21,21 +20,19 @@ class AppNavigator {
     if (context == null) return;
 
     EpisodeEntity episode =
-        BlocProvider.of<EpisodePlaybackCubit>(context, listen: false)
+        BlocProvider.of<PlaybackCubit>(context, listen: false)
             .state
             .episode!;
     List<EpisodeEntity> episodes =
-        BlocProvider.of<EpisodePlaybackCubit>(context, listen: false)
+        BlocProvider.of<PlaybackCubit>(context, listen: false)
             .state
-            .episodes!;
+            .currentPlaylist;
     PodcastEntity podcast = episode.podcast.target!;
     PodcastFilterSettingsEntity settings =
         podcast.persistentSettings.target!.toFilterSettings();
 
-    removeOverlayPlayerMin();
-
     BlocProvider.of<EpisodesBloc>(context).add(LoadEpisodes(
-      feedId: podcast.pId,
+      feedId: podcast.feedId,
       isSubscribed: podcast.subscribed,
       initialFilterSettings: settings,
     ));
