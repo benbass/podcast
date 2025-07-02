@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'notifications_controller.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
-import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../application/playback_cubit/playback_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 
 class UtilitiesNotifications {
@@ -66,7 +66,7 @@ class UtilitiesNotifications {
   static void createNotificationPlayback(
       BuildContext context, bool isPausingState, int position) async {
     final EpisodeEntity episode =
-        context.read<EpisodePlaybackCubit>().state.episode!;
+        context.read<PlaybackCubit>().state.episode!;
     final PodcastEntity podcast = episode.podcast.target!;
     final String imageFilePath = podcast.artworkFilePath ?? "";
 
