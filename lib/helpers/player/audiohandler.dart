@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 
-import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
-import '../../application/playlist_details_cubit/playlist_details_cubit.dart';
+import '../../application/playback_cubit/playback_cubit.dart';
 import '../../core/globals.dart';
 import '../../injection.dart';
 import '../../main.dart';
@@ -26,27 +25,10 @@ ProcessingState.completed: playback is completed
 class MyAudioHandler {
   final player = AudioPlayer(); // Instance of the JustAudio player.
 
-/*
-  MyAudioHandler() {
-    // Listen for player state changes (e.g., playing, paused, buffering)
-    player.playerStateStream.listen((playerState) {
-      final processingState = playerState.processingState;
-
-      if( processingState == ProcessingState.completed){
-        //player.seek(Duration.zero);
-        //player.pause();
-        stop();
-        removeOverlay();
-        // Here we cannot call any method that requires a context!
-      }
-    });
-  }
-*/
-
   // Start audio playback.
   Future<void> play() async {
     final context = MyApp.navigatorKey.currentContext;
-    final episode = context!.read<EpisodePlaybackCubit>().state.episode;
+    final episode = context!.read<PlaybackCubit>().state.episode;
     final String connectionType =
         await getIt<ConnectivityManager>().getConnectionTypeAsString();
     String filePath = episode!.filePath ?? episode.enclosureUrl;
@@ -59,7 +41,6 @@ class MyAudioHandler {
         );
       }
     } else {
-      removeOverlayPlayerMin();
       try {
         await player.setUrl(filePath);
 
@@ -85,17 +66,23 @@ class MyAudioHandler {
   Future<void> stop() async {
     final context = MyApp.navigatorKey.currentContext;
     // Save the current position to the episode
-    final currentEpisode = context!.read<EpisodePlaybackCubit>().state.episode;
+    final currentEpisode = context!.read<PlaybackCubit>().state.episode;
     currentEpisode!.position =
         getIt<MyAudioHandler>().player.position.inSeconds;
     episodeBox.put(currentEpisode);
-
-    context.read<EpisodePlaybackCubit>().resetPlayback();
-    context.read<PlaylistDetailsCubit>().setCurrentPlayingIndex(null);
+    UtilitiesNotifications.cancelNotificationPlayback();
+    context.read<PlaybackCubit>().resetPlayback();
 
     await player.stop();
 
-    removeOverlayPlayerMin();
+
+  }
+
+  Future<void> stopOnCompleted() async {
+    final context = MyApp.navigatorKey.currentContext;
+    context!.read<PlaybackCubit>().resetPlayback();
+
+    await player.stop();
 
     UtilitiesNotifications.cancelNotificationPlayback();
   }
@@ -145,13 +132,13 @@ class MyAudioHandler {
     player.seek(newPosition);
   }
 
-  Future<bool> playNext() async {
+  Future<bool> playNext({bool? autoplayEnabled}) async {
     bool playbackCubitIsReady = false;
     final context = MyApp.navigatorKey.currentContext;
     if (context!.mounted) {
       playbackCubitIsReady =
-          await BlocProvider.of<EpisodePlaybackCubit>(context)
-              .playNextInCubit();
+          await BlocProvider.of<PlaybackCubit>(context)
+              .onPlayNext(autoplayEnabled);
     }
     if (playbackCubitIsReady) {
       await play();
@@ -165,8 +152,8 @@ class MyAudioHandler {
 
     if (context!.mounted) {
       playbackCubitIsReady =
-          await BlocProvider.of<EpisodePlaybackCubit>(context)
-              .playPreviousInCubit();
+          await BlocProvider.of<PlaybackCubit>(context)
+              .onPlayPrevious();
     }
     if (playbackCubitIsReady) {
       await play();
