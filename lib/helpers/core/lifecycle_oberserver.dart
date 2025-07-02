@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/helpers/audio_download/audio_download_queue_manager.dart';
 import 'package:podcast/presentation/custom_widgets/effects/backdropfilter.dart';
 
-import '../../application/playlist_details_cubit/playlist_details_cubit.dart';
+import '../../application/playback_cubit/playback_cubit.dart';
 import '../../injection.dart';
 import '../../main.dart';
 import '../database/episode_cleanup.dart';
@@ -21,15 +21,15 @@ class MyAppLifecycleObserver extends WidgetsBindingObserver {
       getIt<ConnectivityManager>().dispose();
       // Clean database from objects related to unsubscribed podcasts
       EpisodeCleanup.deleteEpisodes();
-      //final bool = UnsubscribedPodcastCleanup.deletePodcastsAndArtworkFiles(); // This method keeps the podcasts and their artwork files. Will be used in a future version of the app.
       final bool = UnsubscribedPodcastCleanup
-          .deletePodcastsAndArtworkFilesCurrentVersion();
+          .deletePodcastsWithArtworkFilesAndSettings();
       if (!bool) {
         _showErrorDialog(
             "A problem occurred while cleaning the app storage from unneeded data\nWe will try again at the next app closing.");
       }
       AudioDownloadQueueManager().cancelAllDownloads();
-      MyApp.navigatorKey.currentContext?.read<PlaylistDetailsCubit>().setCurrentPlayingIndex(null);
+
+      MyApp.navigatorKey.currentContext?.read<PlaybackCubit>().resetPlayback();
     }
   }
 
