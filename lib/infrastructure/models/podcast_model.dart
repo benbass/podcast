@@ -3,7 +3,7 @@ import 'package:podcast/domain/entities/podcast_entity.dart';
 
 class PodcastModel extends PodcastEntity {
   PodcastModel({
-    required super.pId,
+    required super.feedId,
     required super.podcastGuid,
     required super.title,
     required super.url,
@@ -65,7 +65,7 @@ class PodcastModel extends PodcastEntity {
     }
 
     return PodcastModel(
-      pId: tryParseInt(json['id']) ?? -1, // Use -1 as invalid ID
+      feedId: tryParseInt(json['id']) ?? -1, // Use -1 as invalid ID
       podcastGuid: json['podcastGuid'] as String?,
       title: parseHtmlText(json['title']) ?? "",
       url: json['url'] as String? ?? "",
@@ -87,7 +87,7 @@ class PodcastModel extends PodcastEntity {
   ///
   PodcastEntity toPodcastEntity() {
     return PodcastEntity(
-      pId: pId,
+      feedId: feedId,
       podcastGuid: podcastGuid,
       title: title,
       url: url,
