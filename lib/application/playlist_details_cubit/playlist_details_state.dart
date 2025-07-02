@@ -9,9 +9,11 @@ final class PlaylistDetailsLoading extends PlaylistDetailsState {}
 
 final class PlaylistDetailsLoaded extends PlaylistDetailsState {
   final List<EpisodeEntity> playlist;
-  final int? currentPlayingIndex;
   final bool autoPlayEnabled;
-  PlaylistDetailsLoaded(this.playlist, this.currentPlayingIndex, this.autoPlayEnabled);
+  PlaylistDetailsLoaded({
+    required this.playlist,
+    required this.autoPlayEnabled,
+  });
 }
 
 final class PlaylistDetailsInfo extends PlaylistDetailsState {
