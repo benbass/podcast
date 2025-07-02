@@ -6,7 +6,7 @@ import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/presentation/custom_widgets/episode_actions_row.dart';
 import 'package:podcast/presentation/episode_details_page/widgets/player_controls.dart';
 
-import '../../application/episode_playback_cubit/episode_playback_cubit.dart';
+import '../../application/playback_cubit/playback_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../domain/usecases/episode_usecases.dart';
 import '../../helpers/core/utilities/format_utilities.dart';
@@ -82,7 +82,7 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
           ),
         );*/
       },
-      child: BlocBuilder<EpisodePlaybackCubit, EpisodePlaybackState>(
+      child: BlocBuilder<PlaybackCubit, PlaybackState>(
         builder: (context, episodePlaybackState) {
           return Scaffold(
             appBar: AppBar(
@@ -132,8 +132,9 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                       final PodcastState podcastState =
                           context.read<PodcastBloc>().state;
                       if (episodeOnNewPage.feedId !=
-                          podcastState.currentPodcast.pId) {
-                        final PodcastEntity podcast = episodeOnNewPage.podcast.target!;
+                          podcastState.currentPodcast.feedId) {
+                        final PodcastEntity podcast =
+                            episodeOnNewPage.podcast.target!;
                         context
                             .read<PodcastBloc>()
                             .add(PodcastSelectedEvent(podcast: podcast));
@@ -172,14 +173,14 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
 
                       return BlocBuilder<PodcastBloc, PodcastState>(
                         buildWhen: (prev, curr) =>
-                            prev.currentPodcast.pId != curr.currentPodcast.pId,
+                            prev.currentPodcast.feedId != curr.currentPodcast.feedId,
                         builder: (context, podcastState) {
                           PodcastEntity relevantPodcast =
                               podcastState.currentPodcast;
-                          if (relevantPodcast.pId != episodeToDisplay.feedId) {
+                          if (relevantPodcast.feedId != episodeToDisplay.feedId) {
                             final found = podcastState.subscribedPodcasts
                                 .firstWhere(
-                                    (p) => p.pId == episodeToDisplay.feedId,
+                                    (p) => p.feedId == episodeToDisplay.feedId,
                                     orElse: () => relevantPodcast);
                             relevantPodcast = found;
                           }
@@ -328,8 +329,8 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                                   ),
                                 ],
                               ),
-                              BlocBuilder<EpisodePlaybackCubit,
-                                  EpisodePlaybackState>(
+                              BlocBuilder<PlaybackCubit,
+                                  PlaybackState>(
                                 buildWhen: (previous, current) {
                                   return previous.episode?.eId !=
                                       current.episode?.eId;
@@ -371,7 +372,7 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                                     podcast: relevantPodcast,
                                   ),
                                 ),
-                              )
+                              ),
                             ],
                           );
                         },
