@@ -109,7 +109,7 @@ class AppTheme {
       iconTheme: const IconThemeData(
         color: _iconColor,
       ),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         shape: ContinuousRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),
         ),
