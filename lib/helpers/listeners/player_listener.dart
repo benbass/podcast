@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:podcast/application/playlist_details_cubit/playlist_details_cubit.dart';
 import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/main.dart';
@@ -25,7 +27,8 @@ class PlayerStatesListener {
   StreamSubscription<PlayerState>? _audioPlayerStateSubscription;
 
   PlayerStatesListener() {
-    _audioPlayerStateSubscription = player.playerStateStream.listen(_handlePlayerStateChanged);
+    _audioPlayerStateSubscription =
+        player.playerStateStream.listen(_handlePlayerStateChanged);
   }
 
   void setGetCurrentEpisode(EpisodeEntity? Function() getter) {
@@ -43,10 +46,17 @@ class PlayerStatesListener {
     if (currentEpisode == null) return;
     switch (playerState.processingState) {
       case ProcessingState.completed:
-        _updateEpisodePosition(episode: currentEpisode, position: 0, isCompleted: true);
+        await _updateEpisodePosition(
+            episode: currentEpisode, position: 0, isCompleted: true);
+        if (context!.mounted) {
+          context.read<PlaylistDetailsCubit>().loadPlaylist();
+        }
         if (autoplayStatus == true) {
-          await getIt<MyAudioHandler>().playNext(autoplayEnabled: autoplayStatus);
-          if (context!.mounted && autoplayStatus == true && overlayEntry == null) {
+          await getIt<MyAudioHandler>()
+              .playNext(autoplayEnabled: autoplayStatus);
+          if (context.mounted &&
+              autoplayStatus == true &&
+              overlayEntry == null) {
             showOverlayPlayerMin(context);
           }
         } else {
@@ -56,20 +66,21 @@ class PlayerStatesListener {
       case ProcessingState.ready:
         if (player.position.inSeconds > 0) {
           _updateEpisodePosition(
-              episode: currentEpisode, position: player.position.inSeconds, isCompleted: false);
+              episode: currentEpisode,
+              position: player.position.inSeconds,
+              isCompleted: false);
         }
-
         break;
       default:
         break;
     }
   }
 
-  void _updateEpisodePosition({
+  Future<void> _updateEpisodePosition({
     required EpisodeEntity episode,
     required int position,
     required bool isCompleted,
-  }) {
+  }) async {
     episode.position = position;
     if (isCompleted) {
       episode.completed = true;
@@ -80,7 +91,7 @@ class PlayerStatesListener {
   }
 
   void dispose() {
-   _audioPlayerStateSubscription?.cancel();
+    _audioPlayerStateSubscription?.cancel();
     player.dispose();
   }
 }
