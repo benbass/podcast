@@ -40,6 +40,7 @@ class PlaybackState extends Equatable {
   PlaybackState clearEpisode(){
     return PlaybackState(
       episode: null,
+      currentPlaylist: [],
       currentIndex: null,
       playbackStatus: PlaybackStatus.stopped,
     );
