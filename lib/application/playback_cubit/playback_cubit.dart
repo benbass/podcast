@@ -13,7 +13,7 @@ part 'playback_state.dart';
 class PlaybackCubit extends Cubit<PlaybackState> {
   PlaybackCubit() : super(const PlaybackState());
 
-  void onPlay({
+  Future<void> onPlay({
     required EpisodeEntity episode,
     required List<EpisodeEntity> playlist,
     required bool isAutoplayEnabled,
@@ -78,6 +78,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         return true;
         // true: playback is handled by audioHandler that will also update the notification
       } else {
+        resetPlayback();
         return false;
         // End of playlist reached
       }
@@ -177,52 +178,77 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     required int indexToRemove,
   }) async {
     final List<EpisodeEntity> originalPlaylist = state.currentPlaylist;
-    final int? originalPlayerIdx = state.currentIndex;
+    final int? originalPlaybackIndex = state.currentIndex;
+    final bool isAutoplayEnabled = state.isAutoplayEnabled;
 
     // 1. Out of bounds check
     if (indexToRemove < 0 || indexToRemove >= originalPlaylist.length) {
       return;
     }
 
-    // The removed episode, in case we need it later
-    // final EpisodeEntity removedEpisodeEntity = originalPlaylist[indexToRemove];
-
     // 2. Create the new playlist and remove the episode from it
     final List<EpisodeEntity> updatedPlaylist = List.from(originalPlaylist);
-    updatedPlaylist.removeAt(indexToRemove);
+    final EpisodeEntity removedEpisode = updatedPlaylist.removeAt(indexToRemove);
 
     // 3. Define the new state
     if (updatedPlaylist.isEmpty) {
       await getIt<MyAudioHandler>().stop();
-      emit(state.clearEpisode());
+      resetPlayback();
       return;
     }
 
-    int? newPlayerIdx;
-    PlaybackStatus newStatus = state.playbackStatus;
+    int? newPlaybackIndex;
+    if (originalPlaybackIndex != null) {
+      // An episode is currently playing
+      if (indexToRemove == originalPlaybackIndex) {
+        // Episode to remove is the current episode
 
-    if (originalPlayerIdx != null) {
-      if (indexToRemove < originalPlayerIdx) {
-        newPlayerIdx = originalPlayerIdx - 1;
-        emit(state.copyWith(
-          currentPlaylist: updatedPlaylist,
-          currentIndex: newPlayerIdx,
-        ));
-      } else if (indexToRemove == originalPlayerIdx) {
-        // Current playback is removed: we stop the player
+        // save the position of the episode to remove
+        _saveEpisodePosition(removedEpisode);
+        if (isAutoplayEnabled) {
+          // Autoplay is enabled: stop the player, emit the next episode, next index and updated playlist
+          newPlaybackIndex = originalPlaybackIndex - 1;
+          emit(state.copyWith(
+            episode: updatedPlaylist[newPlaybackIndex],
+            currentPlaylist: updatedPlaylist,
+            currentIndex: newPlaybackIndex,
+          ));
+          // Play the next episode.
+          getIt<MyAudioHandler>().playNext(autoplayEnabled: isAutoplayEnabled);
+          return;
+        } else {
+          // Autoplay is disabled: stop the player and reset the playback
+          await getIt<MyAudioHandler>().player.stop();
+          newPlaybackIndex = null;
+          resetPlayback();
+          return;
+        }
+      }
+
+      // Episode to remove is not the current episode.
+      // Find it first:
+      newPlaybackIndex = updatedPlaylist.indexWhere((episode) =>
+          episode.id == originalPlaylist[originalPlaybackIndex].id);
+
+      if (newPlaybackIndex == -1) {
+        // no episode found in the new playlist: stop the player and reset the playback
+        newPlaybackIndex = null;
         await getIt<MyAudioHandler>().stop();
-        emit(state.clearEpisode());
-      } else if (indexToRemove > originalPlayerIdx) {
+        resetPlayback();
+        return;
+      } else {
+        newPlaybackIndex = newPlaybackIndex;
         emit(state.copyWith(
           currentPlaylist: updatedPlaylist,
+          currentIndex: newPlaybackIndex,
         ));
       }
     } else {
-      newStatus = PlaybackStatus.stopped;
+      // No current playback: just update the playlist
       emit(state.copyWith(
         currentPlaylist: updatedPlaylist,
-        playbackStatus: newStatus,
       ));
+      return;
     }
   }
 }
