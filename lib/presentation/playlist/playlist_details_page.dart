@@ -5,6 +5,7 @@ import 'package:podcast/presentation/audioplayer_overlays/audioplayer_overlays.d
 
 import '../../application/playback_cubit/playback_cubit.dart';
 import '../../application/playlist_details_cubit/playlist_details_cubit.dart';
+import '../../core/globals.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/core/utilities/image_provider.dart';
@@ -209,11 +210,6 @@ class PlaylistDetailsPage extends StatelessWidget {
                                 ));
                           },
                           onRemoveTap: () async {
-                            if (context.mounted) {
-                              await context
-                                  .read<PlaylistDetailsCubit>()
-                                  .removeEpisodeFromPlaylist(episode.id);
-                            }
                             bool? isUserPlaylist =
                                 episodePlaybackState.isUserPlaylist;
                             if (currentPlayingIndex != null && isUserPlaylist) {
@@ -221,9 +217,13 @@ class PlaylistDetailsPage extends StatelessWidget {
                                 context
                                     .read<PlaybackCubit>()
                                     .updateCurrentPlaylistAfterRemovingEpisode(
-                                    indexToRemove: index);
+                                        indexToRemove: index);
                               }
-
+                            }
+                            if (context.mounted) {
+                              await context
+                                  .read<PlaylistDetailsCubit>()
+                                  .removeEpisodeFromPlaylist(episode.id);
                             }
                           },
                         );
@@ -264,7 +264,13 @@ class PlaylistDetailsPage extends StatelessWidget {
     List<EpisodeEntity> episodes,
     bool autoplayEnabled,
   ) async {
-    context.read<PlaybackCubit>().onPlay(
+    if (context.read<PlaybackCubit>().state.episode != null) {
+      final previousEpisode = context.read<PlaybackCubit>().state.episode;
+      previousEpisode!.position =
+          getIt<MyAudioHandler>().player.position.inSeconds;
+      episodeBox.put(previousEpisode);
+    }
+    await context.read<PlaybackCubit>().onPlay(
           episode: episode,
           playlist: episodes,
           isAutoplayEnabled: autoplayEnabled,
