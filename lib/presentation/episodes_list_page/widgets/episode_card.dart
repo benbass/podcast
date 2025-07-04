@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/playback_linear_progress_indicator.dart';
 
+import '../../../application/episodes/episode_selection_cubit/episode_selection_cubit.dart';
 import '../../../application/playback_cubit/playback_cubit.dart';
-import '../../../application/episode_selection_cubit/episode_selection_cubit.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/utilities/format_utilities.dart';
 import '../../../helpers/core/utilities/image_provider.dart';
@@ -95,7 +95,7 @@ class EpisodeCard extends StatelessWidget {
                                     themeData: themeData,
                                     episode: episode,
                                     currentlyPlayingEpisode:
-                                    currentlyPlayingEpisodeState.episode,
+                                        currentlyPlayingEpisodeState.episode,
                                     paddingVert: 0.0,
                                   ),
                                   Padding(
@@ -106,42 +106,49 @@ class EpisodeCard extends StatelessWidget {
                                       0.0,
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           children: [
                                             ConstrainedBox(
                                               constraints: BoxConstraints(
-                                                  maxWidth: MediaQuery.of(context)
-                                                          .size
-                                                          .width /
-                                                      2,
-                                                  minWidth: MediaQuery.of(context)
-                                                          .size
-                                                          .width /
-                                                      2),
-                                              child: _buildEpisodeDetails(themeData),
+                                                  maxWidth:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width /
+                                                          2,
+                                                  minWidth:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width /
+                                                          2),
+                                              child: _buildEpisodeDetails(
+                                                  themeData),
                                             ),
                                             const SizedBox(
                                               width: 36,
                                             ),
                                             if (episode.isSubscribed)
                                               IconButton(
-                                                onPressed: () => EpisodeActionsDialog
-                                                    .showEpisodeActionsDialog(
-                                                        context, episode),
+                                                onPressed: () =>
+                                                    EpisodeActionsDialog
+                                                        .showEpisodeActionsDialog(
+                                                            context, episode),
                                                 icon: const Icon(
                                                   Icons.more_horiz_rounded,
                                                 ),
                                               ),
                                           ],
                                         ),
-                                        if (episode.isSubscribed) _buildEpisodeIconsRow(context),
+                                        if (episode.isSubscribed)
+                                          _buildEpisodeIconsRow(context),
                                       ],
                                     ),
                                   ),

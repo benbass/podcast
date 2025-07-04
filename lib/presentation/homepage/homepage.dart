@@ -5,18 +5,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/homepage/widgets/scaling_carousel_sliver.dart';
 
 import '../../application/playback_cubit/playback_cubit.dart';
+import '../../application/podcast/podcast_bloc/podcast_bloc.dart';
 import '../../domain/queued_audio_download/queued_audio_download.dart';
 import '../../helpers/audio_download/audio_download_queue_manager.dart';
 import '../../helpers/listeners/player_listener.dart';
 import '../custom_widgets/decoration/box_decoration.dart';
 import '../custom_widgets/dialogs/connectivity_dialogs.dart';
-import '../../application/podcast_bloc/podcast_bloc.dart';
 import '../../injection.dart';
 import '../custom_widgets/dialogs/failure_dialog.dart';
 import '../custom_widgets/effects/backdropfilter.dart';
 import '../custom_widgets/page_transition.dart';
 import '../episodes_list_page/widgets/animated_download_icon.dart';
-import '../playlist/playlist_page.dart';
+import '../user_playlist/user_playlist_page.dart';
 import '../podcast_details_page/podcast_details_page.dart';
 import '../podcasts_search_page/widgets/podcast_card.dart';
 import 'widgets/subscribed_podcast_card.dart';
@@ -140,7 +140,7 @@ class HomePage extends StatelessWidget {
               Navigator.push(
                 context,
                 ScaleRoute(
-                  page: const PlaylistPage(),
+                  page: const UserPlaylistPage(),
                 ),
               );
             },

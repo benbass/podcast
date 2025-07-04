@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../application/podcast_bloc/podcast_bloc.dart';
-import '../../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
+import '../../../application/podcast/podcast_bloc/podcast_bloc.dart';
+import '../../../application/podcast/podcast_settings_cubit/podcast_settings_cubit.dart';
 
 class IconButtonWithPopupText extends StatefulWidget {
   const IconButtonWithPopupText({super.key});

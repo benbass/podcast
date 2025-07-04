@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/custom_widgets/dialogs/failure_dialog.dart';
-
-import '../../../application/podcast_bloc/podcast_bloc.dart';
-import '../../../application/textfield_cubit/text_field_cubit.dart';
+import '../../../application/episodes/textfield_cubit/text_field_cubit.dart';
+import '../../../application/podcast/podcast_bloc/podcast_bloc.dart';
 import '../../../helpers/core/connectivity_manager.dart';
 import '../../../injection.dart';
 

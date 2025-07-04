@@ -8,7 +8,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:podcast/application/textfield_cubit/text_field_cubit.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/helpers/notifications/notifications_controller.dart';
@@ -19,16 +18,17 @@ import 'package:podcast/presentation/podcast_details_page/podcast_details_page.d
 import 'package:podcast/presentation/podcasts_search_page/podcasts_search_page.dart';
 import 'package:podcast/theme.dart';
 import 'package:provider/provider.dart';
+import 'application/episodes/episode_selection_cubit/episode_selection_cubit.dart';
+import 'application/episodes/episodes_bloc/episodes_bloc.dart';
+import 'application/episodes/textfield_cubit/text_field_cubit.dart';
 import 'application/playback_cubit/playback_cubit.dart';
-import 'application/episode_selection_cubit/episode_selection_cubit.dart';
-import 'application/episodes_bloc/episodes_bloc.dart';
-import 'application/playlist_details_cubit/playlist_details_cubit.dart';
-import 'application/podcast_bloc/podcast_bloc.dart';
-import 'application/podcast_settings_cubit/podcast_settings_cubit.dart';
+import 'application/podcast/podcast_bloc/podcast_bloc.dart';
+import 'application/podcast/podcast_settings_cubit/podcast_settings_cubit.dart';
+import 'application/user_playlist/user_playlist_cubit/user_playlist_cubit.dart';
 import 'core/globals.dart';
 import 'core/objectbox.dart';
 import 'domain/entities/persistent_podcast_settings_entity.dart';
-import 'domain/entities/playlist_entity.dart';
+import 'domain/entities/user_playlist_entity.dart';
 import 'domain/usecases/episode_usecases.dart';
 import 'helpers/audio_download/audio_download_queue_manager.dart';
 import 'helpers/core/lifecycle_oberserver.dart';
@@ -46,7 +46,7 @@ void main() async {
   podcastBox = objectBox.store.box<PodcastEntity>();
   episodeBox = objectBox.store.box<EpisodeEntity>();
   settingsBox = objectBox.store.box<PersistentPodcastSettingsEntity>();
-  playlistBox = objectBox.store.box<AppPlaylist>();
+  userPlaylistBox = objectBox.store.box<UserPlaylistEntity>();
 
   // Initialize the lifecycle observer
   final observer = MyAppLifecycleObserver();
@@ -104,8 +104,8 @@ void main() async {
             BlocProvider<EpisodesBloc>(
                 create: (context) =>
                     EpisodesBloc(episodeUseCases: getIt<EpisodeUseCases>())),
-            BlocProvider<PlaylistDetailsCubit>(
-              create: (context) => getIt<PlaylistDetailsCubit>(),
+            BlocProvider<UserPlaylistCubit>(
+              create: (context) => getIt<UserPlaylistCubit>(),
             ),
           ],
           child: const MyApp(),

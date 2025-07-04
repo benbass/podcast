@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:podcast/application/podcast_bloc/podcast_bloc.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/presentation/custom_widgets/episode_actions_row.dart';
 import 'package:podcast/presentation/episode_details_page/widgets/player_controls.dart';
 
 import '../../application/playback_cubit/playback_cubit.dart';
+import '../../application/podcast/podcast_bloc/podcast_bloc.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../domain/usecases/episode_usecases.dart';
 import '../../helpers/core/utilities/format_utilities.dart';
@@ -173,11 +173,13 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
 
                       return BlocBuilder<PodcastBloc, PodcastState>(
                         buildWhen: (prev, curr) =>
-                            prev.currentPodcast.feedId != curr.currentPodcast.feedId,
+                            prev.currentPodcast.feedId !=
+                            curr.currentPodcast.feedId,
                         builder: (context, podcastState) {
                           PodcastEntity relevantPodcast =
                               podcastState.currentPodcast;
-                          if (relevantPodcast.feedId != episodeToDisplay.feedId) {
+                          if (relevantPodcast.feedId !=
+                              episodeToDisplay.feedId) {
                             final found = podcastState.subscribedPodcasts
                                 .firstWhere(
                                     (p) => p.feedId == episodeToDisplay.feedId,
@@ -329,8 +331,7 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                                   ),
                                 ],
                               ),
-                              BlocBuilder<PlaybackCubit,
-                                  PlaybackState>(
+                              BlocBuilder<PlaybackCubit, PlaybackState>(
                                 buildWhen: (previous, current) {
                                   return previous.episode?.eId !=
                                       current.episode?.eId;

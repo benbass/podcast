@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/custom_widgets/home_button.dart';
 import 'package:podcast/presentation/podcasts_search_page/widgets/podcast_card.dart';
 
-import '../../application/podcast_bloc/podcast_bloc.dart';
-import '../../application/textfield_cubit/text_field_cubit.dart';
+import '../../application/episodes/textfield_cubit/text_field_cubit.dart';
+import '../../application/podcast/podcast_bloc/podcast_bloc.dart';
 import '../custom_widgets/dialogs/failure_dialog.dart';
 import '../custom_widgets/page_transition.dart';
 import '../podcast_details_page/podcast_details_page.dart';

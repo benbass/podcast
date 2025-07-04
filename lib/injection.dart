@@ -1,18 +1,18 @@
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
-import 'package:podcast/application/episodes_bloc/episodes_bloc.dart';
 import 'package:podcast/domain/repositories/podcast_repository.dart';
 import 'package:podcast/domain/usecases/podcast_usecases.dart';
 import 'package:podcast/helpers/listeners/player_listener.dart';
 import 'package:podcast/helpers/player/audiohandler.dart';
 import 'package:podcast/infrastructure/repositories/podcast_repository_impl.dart';
 
+import 'application/episodes/episode_selection_cubit/episode_selection_cubit.dart';
+import 'application/episodes/episodes_bloc/episodes_bloc.dart';
+import 'application/episodes/textfield_cubit/text_field_cubit.dart';
 import 'application/playback_cubit/playback_cubit.dart';
-import 'application/episode_selection_cubit/episode_selection_cubit.dart';
-import 'application/playlist_details_cubit/playlist_details_cubit.dart';
-import 'application/podcast_bloc/podcast_bloc.dart';
-import 'application/podcast_settings_cubit/podcast_settings_cubit.dart';
-import 'application/textfield_cubit/text_field_cubit.dart';
+import 'application/podcast/podcast_bloc/podcast_bloc.dart';
+import 'application/podcast/podcast_settings_cubit/podcast_settings_cubit.dart';
+import 'application/user_playlist/user_playlist_cubit/user_playlist_cubit.dart';
 import 'domain/repositories/episode_repository.dart';
 import 'domain/usecases/episode_usecases.dart';
 import 'helpers/core/connectivity_manager.dart';
@@ -32,7 +32,7 @@ Future<void> init() async {
   getIt.registerFactory(() => EpisodesBloc(episodeUseCases: getIt(), podcastSettingsCubit: getIt()));
   getIt.registerFactory(() => PlaybackCubit());
   getIt.registerFactory(() => EpisodeSelectionCubit());
-  getIt.registerFactory(() => PlaylistDetailsCubit());
+  getIt.registerFactory(() => UserPlaylistCubit());
   getIt.registerFactory(() => TextFieldCubit());
 
   // Use cases

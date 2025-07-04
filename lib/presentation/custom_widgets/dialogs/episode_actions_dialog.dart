@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:podcast/helpers/database/episode_action_helper.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../../application/episode_selection_cubit/episode_selection_cubit.dart';
-import '../../../application/playlist_details_cubit/playlist_details_cubit.dart';
+import '../../../application/episodes/episode_selection_cubit/episode_selection_cubit.dart';
+import '../../../application/user_playlist/user_playlist_cubit/user_playlist_cubit.dart';
 import '../../../core/globals.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../domain/usecases/episode_usecases.dart';
@@ -186,9 +186,7 @@ class EpisodeActionsDialog {
       {
         "title": "Add to playlist",
         "onPressed": () {
-          context
-              .read<PlaylistDetailsCubit>()
-              .addEpisodeToPlaylist([episode.id]);
+          context.read<UserPlaylistCubit>().addEpisodeToPlaylist([episode.id]);
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:podcast/application/episode_selection_cubit/episode_selection_cubit.dart';
 import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:podcast/injection.dart';
 
@@ -11,9 +10,10 @@ import 'package:podcast/presentation/episodes_list_page/widgets/conditional_floa
 import 'package:podcast/presentation/episodes_list_page/widgets/dropdown_filter_menu.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/episode_card.dart';
 import 'package:podcast/presentation/episodes_list_page/widgets/toggle_read_visibility.dart';
-import '../../application/episodes_bloc/episodes_bloc.dart';
-import '../../application/podcast_bloc/podcast_bloc.dart';
-import '../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
+import '../../application/episodes/episode_selection_cubit/episode_selection_cubit.dart';
+import '../../application/episodes/episodes_bloc/episodes_bloc.dart';
+import '../../application/podcast/podcast_bloc/podcast_bloc.dart';
+import '../../application/podcast/podcast_settings_cubit/podcast_settings_cubit.dart';
 import '../../domain/entities/podcast_filter_settings_entity.dart';
 import '../custom_widgets/effects/backdropfilter.dart';
 import '../custom_widgets/effects/opacity_body.dart';

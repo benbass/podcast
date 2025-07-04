@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:podcast/application/playlist_details_cubit/playlist_details_cubit.dart';
 import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/main.dart';
+import '../../application/user_playlist/user_playlist_cubit/user_playlist_cubit.dart';
 import '../../injection.dart';
 import '../../presentation/audioplayer_overlays/audioplayer_overlays.dart';
 import '../player/audiohandler.dart';
@@ -49,7 +49,7 @@ class PlayerStatesListener {
         await _updateEpisodePosition(
             episode: currentEpisode, position: 0, isCompleted: true);
         if (context!.mounted) {
-          context.read<PlaylistDetailsCubit>().loadPlaylist();
+          context.read<UserPlaylistCubit>().loadPlaylist();
         }
         if (autoplayStatus == true) {
           await getIt<MyAudioHandler>()

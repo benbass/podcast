@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../application/podcast_bloc/podcast_bloc.dart';
+import '../../../application/podcast/podcast_bloc/podcast_bloc.dart';
 import '../effects/backdropfilter.dart';
 
 class FailureDialog extends StatelessWidget {

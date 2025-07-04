@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../application/podcast_bloc/podcast_bloc.dart';
+import '../../../application/podcast/podcast_bloc/podcast_bloc.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../domain/usecases/episode_usecases.dart';
 import '../../../injection.dart';

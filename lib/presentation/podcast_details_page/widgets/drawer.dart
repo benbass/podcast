@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
+import '../../../application/podcast/podcast_settings_cubit/podcast_settings_cubit.dart';
 
 class PodcastSettingsDrawer extends StatefulWidget {
   const PodcastSettingsDrawer({

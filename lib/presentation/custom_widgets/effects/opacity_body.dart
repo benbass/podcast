@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '../../../application/podcast_bloc/podcast_bloc.dart';
+import '../../../application/podcast/podcast_bloc/podcast_bloc.dart';
 
 class OpacityBody extends StatelessWidget {
   const OpacityBody({

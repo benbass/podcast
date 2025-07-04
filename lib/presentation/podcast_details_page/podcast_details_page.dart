@@ -7,8 +7,8 @@ import 'package:podcast/presentation/podcast_details_page/widgets/drawer.dart';
 
 import 'package:podcast/presentation/podcast_details_page/widgets/podcast_category.dart';
 import 'package:podcast/presentation/podcast_details_page/widgets/row_icon_buttons_podcasts.dart';
-import '../../application/podcast_bloc/podcast_bloc.dart';
-import '../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
+import '../../application/podcast/podcast_bloc/podcast_bloc.dart';
+import '../../application/podcast/podcast_settings_cubit/podcast_settings_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../custom_widgets/decoration/box_decoration.dart';
 import '../custom_widgets/dialogs/failure_dialog.dart';
@@ -37,11 +37,12 @@ class PodcastDetailsPage extends StatelessWidget {
               Navigator.pop(context);
             }
           });
-        }
-        else if (state.status == PodcastStatus.loading) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        } else if (state.status == PodcastStatus.loading) {
+          return const Scaffold(
+              body: Center(child: CircularProgressIndicator()));
         } else if (state.status == PodcastStatus.success) {
-          BlocProvider.of<PodcastSettingsCubit>(context).loadSettings(state.currentPodcast.id);
+          BlocProvider.of<PodcastSettingsCubit>(context)
+              .loadSettings(state.currentPodcast.id);
         }
         return Scaffold(
           appBar: AppBar(
@@ -53,22 +54,22 @@ class PodcastDetailsPage extends StatelessWidget {
             actionsPadding: const EdgeInsets.symmetric(horizontal: 20),
           ),
           drawer: SafeArea(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
-                  child: Drawer(
-                    backgroundColor: Colors.white12,
-                    surfaceTintColor: themeDate.colorScheme.secondary,
-                    width: MediaQuery.of(context).size.width * 0.85,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        bottomRight: Radius.circular(20),
-                      ),
-                    ),
-                    child: const PodcastSettingsDrawer(),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
+              child: Drawer(
+                backgroundColor: Colors.white12,
+                surfaceTintColor: themeDate.colorScheme.secondary,
+                width: MediaQuery.of(context).size.width * 0.85,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
                   ),
                 ),
+                child: const PodcastSettingsDrawer(),
               ),
+            ),
+          ),
           body: Stack(
             fit: StackFit.expand,
             children: [
@@ -76,7 +77,9 @@ class PodcastDetailsPage extends StatelessWidget {
                 OpacityBody(
                   state: state,
                 ),
-              const BackdropFilterWidget(sigma: 25.0,),
+              const BackdropFilterWidget(
+                sigma: 25.0,
+              ),
               CustomScrollView(
                 physics: const BouncingScrollPhysics(),
                 slivers: [
@@ -130,13 +133,13 @@ class PodcastDetailsPage extends StatelessWidget {
                                   int maxItemsPerColumn = 3;
 
                                   for (int i = 0;
-                                  i < categories.length;
-                                  i += maxItemsPerColumn) {
+                                      i < categories.length;
+                                      i += maxItemsPerColumn) {
                                     List<Widget> currentColumnItems = [];
                                     for (int j = 0;
-                                    j < maxItemsPerColumn &&
-                                        (i + j) < categories.length;
-                                    j++) {
+                                        j < maxItemsPerColumn &&
+                                            (i + j) < categories.length;
+                                        j++) {
                                       currentColumnItems.add(
                                         PodcastCategory(
                                           value: categories[i + j],
@@ -147,7 +150,7 @@ class PodcastDetailsPage extends StatelessWidget {
                                       Column(
                                         mainAxisSize: MainAxisSize.min,
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: currentColumnItems,
                                       ),
                                     );
@@ -180,7 +183,7 @@ class PodcastDetailsPage extends StatelessWidget {
                               ),
                               Padding(
                                 padding:
-                                const EdgeInsets.symmetric(vertical: 20.0),
+                                    const EdgeInsets.symmetric(vertical: 20.0),
                                 child: Row(
                                   children: [
                                     Icon(
@@ -191,7 +194,8 @@ class PodcastDetailsPage extends StatelessWidget {
                                       width: 10,
                                     ),
                                     Text(
-                                      state.currentPodcast.language.toUpperCase(),
+                                      state.currentPodcast.language
+                                          .toUpperCase(),
                                       style: const TextStyle(
                                         fontSize: 16,
                                       ),

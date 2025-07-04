@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:podcast/application/episodes_bloc/episodes_bloc.dart';
-
-import '../../../application/episode_selection_cubit/episode_selection_cubit.dart';
+import '../../../application/episodes/episode_selection_cubit/episode_selection_cubit.dart';
+import '../../../application/episodes/episodes_bloc/episodes_bloc.dart';
 import '../../audioplayer_overlays/audioplayer_overlays.dart';
 import '../../custom_widgets/dialogs/episode_actions_dialog.dart';
 
@@ -30,9 +29,11 @@ class ConditionalFloatingActionButtons extends StatelessWidget {
               FloatingActionButton(
                 heroTag: 'fab_action_select_all',
                 onPressed: () async {
-                  final allEpisodes = context.read<EpisodesBloc>().state.episodes;
-                  if(context.mounted) {
-                    BlocProvider.of<EpisodeSelectionCubit>(context).selectAllEpisodes(allEpisodes);
+                  final allEpisodes =
+                      context.read<EpisodesBloc>().state.episodes;
+                  if (context.mounted) {
+                    BlocProvider.of<EpisodeSelectionCubit>(context)
+                        .selectAllEpisodes(allEpisodes);
                   }
                 },
                 tooltip: 'Select all',
@@ -41,7 +42,8 @@ class ConditionalFloatingActionButtons extends StatelessWidget {
               FloatingActionButton(
                 heroTag: 'fab_action_unselect_all',
                 onPressed: () {
-                  BlocProvider.of<EpisodeSelectionCubit>(context).deselectAllEpisodes();
+                  BlocProvider.of<EpisodeSelectionCubit>(context)
+                      .deselectAllEpisodes();
                 },
                 tooltip: 'Unselect all',
                 child: const Icon(Icons.deselect_rounded),

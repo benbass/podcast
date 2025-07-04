@@ -5,7 +5,7 @@ import 'package:podcast/core/globals.dart';
 import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/effects/backdropfilter.dart';
 import 'package:podcast/presentation/custom_widgets/page_transition.dart';
-import '../../application/podcast_bloc/podcast_bloc.dart';
+import '../../application/podcast/podcast_bloc/podcast_bloc.dart';
 import '../../domain/usecases/episode_usecases.dart';
 import '../../helpers/core/connectivity_manager.dart';
 import '../../injection.dart';

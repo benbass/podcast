@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:podcast/application/episodes_bloc/episodes_bloc.dart';
 import 'package:podcast/application/playback_cubit/playback_cubit.dart';
-
-import '../../../application/episode_selection_cubit/episode_selection_cubit.dart';
-import '../../../application/podcast_bloc/podcast_bloc.dart';
-import '../../../application/podcast_settings_cubit/podcast_settings_cubit.dart';
+import '../../../application/episodes/episode_selection_cubit/episode_selection_cubit.dart';
+import '../../../application/episodes/episodes_bloc/episodes_bloc.dart';
+import '../../../application/podcast/podcast_bloc/podcast_bloc.dart';
+import '../../../application/podcast/podcast_settings_cubit/podcast_settings_cubit.dart';
 import 'iconbutton_with_popup_text.dart';
 
 class EpisodesListPageAppBarActions extends StatelessWidget {
@@ -123,7 +122,8 @@ class EpisodesListPageAppBarActions extends StatelessWidget {
                       // Update the autoplay setting in the playback cubit if the current playlist is this podcast's episodes list
                       final String? origin =
                           context.read<PlaybackCubit>().state.origin;
-                      if (origin == podcastState.currentPodcast.feedId.toString()) {
+                      if (origin ==
+                          podcastState.currentPodcast.feedId.toString()) {
                         context
                             .read<PlaybackCubit>()
                             .updateAutoPlay(autoplayEnabled: value);
