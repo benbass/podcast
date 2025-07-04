@@ -16,8 +16,8 @@ import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'domain/entities/episode_entity.dart';
 import 'domain/entities/persistent_podcast_settings_entity.dart';
-import 'domain/entities/playlist_entity.dart';
 import 'domain/entities/podcast_entity.dart';
+import 'domain/entities/user_playlist_entity.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -376,25 +376,25 @@ final _entities = <obx_int.ModelEntity>[
     backlinks: <obx_int.ModelBacklink>[],
   ),
   obx_int.ModelEntity(
-    id: const obx_int.IdUid(5, 4281661072562383720),
-    name: 'AppPlaylist',
-    lastPropertyId: const obx_int.IdUid(4, 7342938097302703364),
+    id: const obx_int.IdUid(6, 1205279550352517390),
+    name: 'UserPlaylistEntity',
+    lastPropertyId: const obx_int.IdUid(3, 3393198647378540398),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 6993534284241746247),
+        id: const obx_int.IdUid(1, 6474584657920330663),
         name: 'id',
         type: 6,
         flags: 129,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 1648994079516446541),
+        id: const obx_int.IdUid(2, 1017179261880346229),
         name: 'episodeIds',
         type: 27,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 7342938097302703364),
+        id: const obx_int.IdUid(3, 3393198647378540398),
         name: 'autoPlayEnabled',
         type: 1,
         flags: 0,
@@ -443,11 +443,11 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(5, 4281661072562383720),
+    lastEntityId: const obx_int.IdUid(6, 1205279550352517390),
     lastIndexId: const obx_int.IdUid(4, 4003899417538329055),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
-    retiredEntityUids: const [3290180938186603765],
+    retiredEntityUids: const [3290180938186603765, 4281661072562383720],
     retiredIndexUids: const [4721092752090803034],
     retiredPropertyUids: const [
       945864541081495901,
@@ -466,6 +466,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
       783881693732996932,
       5813533059101897652,
       4325799128129907292,
+      6993534284241746247,
+      1648994079516446541,
+      7342938097302703364,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -910,20 +913,20 @@ obx_int.ModelDefinition getObjectBoxModel() {
             return object;
           },
         ),
-    AppPlaylist: obx_int.EntityDefinition<AppPlaylist>(
+    UserPlaylistEntity: obx_int.EntityDefinition<UserPlaylistEntity>(
       model: _entities[3],
-      toOneRelations: (AppPlaylist object) => [],
-      toManyRelations: (AppPlaylist object) => {},
-      getId: (AppPlaylist object) => object.id,
-      setId: (AppPlaylist object, int id) {
+      toOneRelations: (UserPlaylistEntity object) => [],
+      toManyRelations: (UserPlaylistEntity object) => {},
+      getId: (UserPlaylistEntity object) => object.id,
+      setId: (UserPlaylistEntity object, int id) {
         object.id = id;
       },
-      objectToFB: (AppPlaylist object, fb.Builder fbb) {
+      objectToFB: (UserPlaylistEntity object, fb.Builder fbb) {
         final episodeIdsOffset = fbb.writeListInt64(object.episodeIds);
-        fbb.startTable(5);
+        fbb.startTable(4);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, episodeIdsOffset);
-        fbb.addBool(3, object.autoPlayEnabled);
+        fbb.addBool(2, object.autoPlayEnabled);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -943,10 +946,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final autoPlayEnabledParam = const fb.BoolReader().vTableGet(
           buffer,
           rootOffset,
-          10,
+          8,
           false,
         );
-        final object = AppPlaylist(
+        final object = UserPlaylistEntity(
           id: idParam,
           episodeIds: episodeIdsParam,
           autoPlayEnabled: autoPlayEnabledParam,
@@ -1241,20 +1244,20 @@ class PersistentPodcastSettingsEntity_ {
       );
 }
 
-/// [AppPlaylist] entity fields to define ObjectBox queries.
-class AppPlaylist_ {
-  /// See [AppPlaylist.id].
-  static final id = obx.QueryIntegerProperty<AppPlaylist>(
+/// [UserPlaylistEntity] entity fields to define ObjectBox queries.
+class UserPlaylistEntity_ {
+  /// See [UserPlaylistEntity.id].
+  static final id = obx.QueryIntegerProperty<UserPlaylistEntity>(
     _entities[3].properties[0],
   );
 
-  /// See [AppPlaylist.episodeIds].
-  static final episodeIds = obx.QueryIntegerVectorProperty<AppPlaylist>(
+  /// See [UserPlaylistEntity.episodeIds].
+  static final episodeIds = obx.QueryIntegerVectorProperty<UserPlaylistEntity>(
     _entities[3].properties[1],
   );
 
-  /// See [AppPlaylist.autoPlayEnabled].
-  static final autoPlayEnabled = obx.QueryBooleanProperty<AppPlaylist>(
+  /// See [UserPlaylistEntity.autoPlayEnabled].
+  static final autoPlayEnabled = obx.QueryBooleanProperty<UserPlaylistEntity>(
     _entities[3].properties[2],
   );
 }
