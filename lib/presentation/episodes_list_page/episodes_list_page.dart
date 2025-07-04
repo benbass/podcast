@@ -20,7 +20,7 @@ import '../custom_widgets/effects/opacity_body.dart';
 import '../custom_widgets/failure_widget.dart';
 import '../custom_widgets/page_transition.dart';
 import '../podcast_details_page/podcast_details_page.dart';
-import 'widgets/row_icon_buttons_episodes.dart';
+import 'widgets/episodes_list_page_appbar_actions.dart';
 
 class EpisodesListPageWrapper extends StatefulWidget {
   const EpisodesListPageWrapper({super.key});
@@ -116,7 +116,7 @@ class EpisodesListPage extends StatelessWidget {
         appBar: AppBar(
           actions: [
             if (podcastState.currentPodcast.subscribed)
-              const RowIconButtonsEpisodes(),
+              const EpisodesListPageAppBarActions(),
           ],
         ),
         body: Stack(
