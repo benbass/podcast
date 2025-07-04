@@ -1,24 +1,24 @@
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
-class AppPlaylist {
+class UserPlaylistEntity {
   @Id(assignable: true) // we have only 1 playlist to which we manually assign id = 1 (globalPlaylistId)
   int id;
 
   List<int> episodeIds;
   bool autoPlayEnabled;
 
-  AppPlaylist({
+  UserPlaylistEntity({
     required this.id,
     required this.episodeIds,
     this.autoPlayEnabled = false,
   });
 
-  AppPlaylist copyWith({
+  UserPlaylistEntity copyWith({
     List<int>? episodeIds,
     bool? autoPlayEnabled,
   }) {
-    return AppPlaylist(
+    return UserPlaylistEntity(
       id: id,
       episodeIds: episodeIds ?? this.episodeIds,
       autoPlayEnabled: autoPlayEnabled ?? this.autoPlayEnabled,
