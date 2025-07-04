@@ -3,6 +3,7 @@ part of 'playback_cubit.dart';
 enum PlaybackStatus { playing, paused, stopped, loading, error }
 
 class PlaybackState extends Equatable {
+  final String? origin;
   final EpisodeEntity? episode;
   final List<EpisodeEntity> currentPlaylist;
   final int? currentIndex;
@@ -11,6 +12,7 @@ class PlaybackState extends Equatable {
   final PlaybackStatus playbackStatus;
 
   const PlaybackState({
+    this.origin,
     this.episode,
     this.currentPlaylist = const <EpisodeEntity>[],
     this.currentIndex,
@@ -20,6 +22,7 @@ class PlaybackState extends Equatable {
   });
 
   PlaybackState copyWith({
+    String? origin,
     EpisodeEntity? episode,
     List<EpisodeEntity>? currentPlaylist,
     int? currentIndex,
@@ -28,6 +31,7 @@ class PlaybackState extends Equatable {
     PlaybackStatus? playbackStatus,
   }) {
     return PlaybackState(
+      origin: origin ?? this.origin,
       episode: episode ?? this.episode,
       currentPlaylist: currentPlaylist ?? this.currentPlaylist,
       currentIndex: currentIndex ?? this.currentIndex,
@@ -37,8 +41,9 @@ class PlaybackState extends Equatable {
     );
   }
 
-  PlaybackState clearEpisode(){
+  PlaybackState clearEpisode() {
     return PlaybackState(
+      origin: null,
       episode: null,
       currentPlaylist: [],
       currentIndex: null,
@@ -48,6 +53,7 @@ class PlaybackState extends Equatable {
 
   @override
   List<Object?> get props => [
+        origin,
         episode,
         currentPlaylist,
         currentIndex,
