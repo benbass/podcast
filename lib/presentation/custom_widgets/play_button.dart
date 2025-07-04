@@ -83,6 +83,7 @@ class PlayButtonActive extends StatelessWidget {
         }
         final bool? autoplayEnabled = podcast.persistentSettings.target?.autoplayEnabled; // Null when podcast is not subscribed
         BlocProvider.of<PlaybackCubit>(context).onPlay(
+          origin: podcast.feedId.toString(),
           episode: episode,
           playlist: playlist,
           isAutoplayEnabled: autoplayEnabled ?? false,
