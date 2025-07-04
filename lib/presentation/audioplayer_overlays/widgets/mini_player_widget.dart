@@ -4,7 +4,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:marquee/marquee.dart';
 import 'package:podcast/core/navigation/app_navigator.dart';
 
-import '../../../application/playback_cubit/playback_cubit.dart';
+import '../../../application/playback/playback_cubit/playback_cubit.dart';
 import '../../../helpers/core/utilities/image_provider.dart';
 import '../../../helpers/player/audiohandler.dart';
 import '../../../injection.dart';

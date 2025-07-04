@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
-
-import '../../application/playback_cubit/playback_cubit.dart';
+import '../../application/playback/playback_cubit/playback_cubit.dart';
 import '../../core/globals.dart';
 import '../../injection.dart';
 import '../../main.dart';

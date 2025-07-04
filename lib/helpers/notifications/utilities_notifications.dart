@@ -2,9 +2,9 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../application/playback/playback_cubit/playback_cubit.dart';
 import 'notifications_controller.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
-import '../../application/playback_cubit/playback_cubit.dart';
 import '../../domain/entities/podcast_entity.dart';
 
 class UtilitiesNotifications {

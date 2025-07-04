@@ -4,7 +4,7 @@ import 'package:podcast/domain/entities/podcast_entity.dart';
 import 'package:podcast/presentation/custom_widgets/playback_linear_progress_indicator.dart';
 
 import '../../../application/episodes/episode_selection_cubit/episode_selection_cubit.dart';
-import '../../../application/playback_cubit/playback_cubit.dart';
+import '../../../application/playback/playback_cubit/playback_cubit.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/utilities/format_utilities.dart';
 import '../../../helpers/core/utilities/image_provider.dart';

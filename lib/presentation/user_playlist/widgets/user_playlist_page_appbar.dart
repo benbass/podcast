@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../application/playback_cubit/playback_cubit.dart';
+import '../../../application/playback/playback_cubit/playback_cubit.dart';
 import '../../../application/user_playlist/user_playlist_cubit/user_playlist_cubit.dart';
 import '../../../core/globals.dart';
 import '../../custom_widgets/effects/backdropfilter.dart';

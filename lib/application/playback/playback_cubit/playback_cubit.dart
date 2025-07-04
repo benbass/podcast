@@ -6,7 +6,7 @@ import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/helpers/player/audiohandler.dart';
 import 'package:podcast/injection.dart';
 
-import '../../core/globals.dart';
+import '../../../core/globals.dart';
 
 part 'playback_state.dart';
 

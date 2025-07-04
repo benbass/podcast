@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/presentation/homepage/widgets/scaling_carousel_sliver.dart';
-
-import '../../application/playback_cubit/playback_cubit.dart';
+import '../../application/playback/playback_cubit/playback_cubit.dart';
 import '../../application/podcast/podcast_bloc/podcast_bloc.dart';
 import '../../domain/queued_audio_download/queued_audio_download.dart';
 import '../../helpers/audio_download/audio_download_queue_manager.dart';

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:podcast/presentation/episode_details_page/widgets/playback_position_slider.dart';
 
-import '../../../application/playback_cubit/playback_cubit.dart';
+import '../../../application/playback/playback_cubit/playback_cubit.dart';
 import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/notifications/utilities_notifications.dart';
 import '../../../helpers/player/audiohandler.dart';

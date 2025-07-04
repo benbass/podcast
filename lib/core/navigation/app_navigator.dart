@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../application/episodes/episodes_bloc/episodes_bloc.dart';
-import '../../application/playback_cubit/playback_cubit.dart';
+import '../../application/playback/playback_cubit/playback_cubit.dart';
 import '../../application/podcast/podcast_bloc/podcast_bloc.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/entities/podcast_entity.dart';

@@ -9,7 +9,7 @@ import 'package:podcast/infrastructure/repositories/podcast_repository_impl.dart
 import 'application/episodes/episode_selection_cubit/episode_selection_cubit.dart';
 import 'application/episodes/episodes_bloc/episodes_bloc.dart';
 import 'application/episodes/textfield_cubit/text_field_cubit.dart';
-import 'application/playback_cubit/playback_cubit.dart';
+import 'application/playback/playback_cubit/playback_cubit.dart';
 import 'application/podcast/podcast_bloc/podcast_bloc.dart';
 import 'application/podcast/podcast_settings_cubit/podcast_settings_cubit.dart';
 import 'application/user_playlist/user_playlist_cubit/user_playlist_cubit.dart';

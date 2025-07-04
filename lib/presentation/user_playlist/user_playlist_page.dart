@@ -4,7 +4,7 @@ import 'package:podcast/presentation/audioplayer_overlays/audioplayer_overlays.d
 import 'package:podcast/presentation/user_playlist/widgets/user_playlist_list_item.dart';
 import 'package:podcast/presentation/user_playlist/widgets/user_playlist_page_appbar.dart';
 
-import '../../application/playback_cubit/playback_cubit.dart';
+import '../../application/playback/playback_cubit/playback_cubit.dart';
 import '../../application/podcast/podcast_bloc/podcast_bloc.dart';
 import '../../application/user_playlist/user_playlist_cubit/user_playlist_cubit.dart';
 import '../../core/globals.dart';

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:podcast/helpers/audio_download/audio_download_queue_manager.dart';
 import 'package:podcast/presentation/custom_widgets/effects/backdropfilter.dart';
-
-import '../../application/playback_cubit/playback_cubit.dart';
+import '../../application/playback/playback_cubit/playback_cubit.dart';
 import '../../injection.dart';
 import '../../main.dart';
 import '../database/episode_cleanup.dart';
