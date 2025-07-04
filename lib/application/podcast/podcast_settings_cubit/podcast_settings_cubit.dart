@@ -2,10 +2,10 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import '../../core/globals.dart';
-import '../../domain/entities/persistent_podcast_settings_entity.dart';
-import '../../domain/entities/podcast_entity.dart';
-import '../../domain/entities/podcast_filter_settings_entity.dart';
+import '../../../core/globals.dart';
+import '../../../domain/entities/persistent_podcast_settings_entity.dart';
+import '../../../domain/entities/podcast_entity.dart';
+import '../../../domain/entities/podcast_filter_settings_entity.dart';
 
 part 'podcast_settings_state.dart';
 

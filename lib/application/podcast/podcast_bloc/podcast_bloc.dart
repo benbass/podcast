@@ -5,9 +5,9 @@ import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:podcast/core/globals.dart';
 
-import '../../domain/entities/podcast_entity.dart';
-import '../../domain/usecases/episode_usecases.dart';
-import '../../domain/usecases/podcast_usecases.dart';
+import '../../../domain/entities/podcast_entity.dart';
+import '../../../domain/usecases/episode_usecases.dart';
+import '../../../domain/usecases/podcast_usecases.dart';
 
 part 'podcast_event.dart';
 part 'podcast_state.dart';

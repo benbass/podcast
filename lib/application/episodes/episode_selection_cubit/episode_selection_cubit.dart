@@ -1,8 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../domain/entities/episode_entity.dart';
-
+import '../../../domain/entities/episode_entity.dart';
 part 'episode_selection_state.dart';
 
 class EpisodeSelectionCubit extends Cubit<EpisodeSelectionState> {

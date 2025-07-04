@@ -5,9 +5,9 @@ import 'package:equatable/equatable.dart';
 import 'package:podcast/domain/entities/episode_entity.dart';
 import 'package:podcast/domain/entities/podcast_filter_settings_entity.dart';
 
-import '../../core/error/failure.dart';
-import '../../domain/usecases/episode_usecases.dart';
-import '../podcast_settings_cubit/podcast_settings_cubit.dart';
+import '../../../core/error/failure.dart';
+import '../../../domain/usecases/episode_usecases.dart';
+import '../../podcast/podcast_settings_cubit/podcast_settings_cubit.dart';
 
 part 'episodes_event.dart';
 part 'episodes_state.dart';

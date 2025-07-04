@@ -7,7 +7,7 @@ import '../../../domain/entities/podcast_entity.dart';
 import '../../../helpers/core/utilities/image_provider.dart';
 import '../../custom_widgets/playback_linear_progress_indicator.dart';
 
-class PlaylistListItem extends StatelessWidget {
+class UserPlaylistListItem extends StatelessWidget {
   final ThemeData themeData;
   final int index;
   final EpisodeEntity episode;
@@ -16,7 +16,7 @@ class PlaylistListItem extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onRemoveTap;
 
-  const PlaylistListItem({
+  const UserPlaylistListItem({
     required Key key,
     required this.themeData,
     required this.index,

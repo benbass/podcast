@@ -1,34 +1,34 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 
-import '../../core/globals.dart';
-import '../../domain/entities/episode_entity.dart';
-import '../../domain/entities/playlist_entity.dart';
+import '../../../core/globals.dart';
+import '../../../domain/entities/episode_entity.dart';
+import '../../../domain/entities/user_playlist_entity.dart';
 
-part 'playlist_details_state.dart';
+part 'user_playlist_state.dart';
 
-class PlaylistDetailsCubit extends Cubit<PlaylistDetailsState> {
-  PlaylistDetailsCubit() : super(PlaylistDetailsInitial());
+class UserPlaylistCubit extends Cubit<UserPlaylistState> {
+  UserPlaylistCubit() : super(UserPlaylistInitial());
 
-  static List<AppPlaylist> playlists = playlistBox.getAll();
+  static List<UserPlaylistEntity> userPlaylists = userPlaylistBox.getAll();
 
   Future<void> loadPlaylist() async {
-    emit(PlaylistDetailsLoading());
+    emit(UserPlaylistLoading());
     try {
-      AppPlaylist? playlist = playlistBox.get(globalPlaylistId);
+      UserPlaylistEntity? playlist = userPlaylistBox.get(globalPlaylistId);
 
       if (playlist == null) {
-        playlist = AppPlaylist(
+        playlist = UserPlaylistEntity(
           id: globalPlaylistId,
           episodeIds: [],
         );
 
-        playlistBox.put(playlist);
+        userPlaylistBox.put(playlist);
       }
 
       if (playlist.episodeIds.isEmpty) {
-        emit(PlaylistDetailsLoaded(
-          playlist: const [],
+        emit(UserPlaylistLoaded(
+          userPlaylist: const [],
           autoPlayEnabled: playlist.autoPlayEnabled,
         ));
         return;
@@ -42,21 +42,21 @@ class PlaylistDetailsCubit extends Cubit<PlaylistDetailsState> {
       // Sort? May be necessary if objectBox getMany() does not keep the order of the episodes in the playlist.
       // In that case order the episodes as in playlist.episodeIds!
 
-      emit(PlaylistDetailsLoaded(
-        playlist: List<EpisodeEntity>.from(episodeEntities),
+      emit(UserPlaylistLoaded(
+        userPlaylist: List<EpisodeEntity>.from(episodeEntities),
         autoPlayEnabled: playlist.autoPlayEnabled,
       ));
     } catch (e) {
-      emit(PlaylistDetailsError("Error loading the playlist."));
+      emit(UserPlaylistError("Error loading the playlist."));
     }
   }
 
   Future<void> addEpisodeToPlaylist(List<int> episodeIdsToAdd) async {
-    emit(PlaylistDetailsLoading());
+    emit(UserPlaylistLoading());
 
     try {
-      final AppPlaylist playlist = playlistBox.get(globalPlaylistId) ??
-          AppPlaylist(id: globalPlaylistId, episodeIds: []);
+      final UserPlaylistEntity playlist = userPlaylistBox.get(globalPlaylistId) ??
+          UserPlaylistEntity(id: globalPlaylistId, episodeIds: []);
 
       // Prevent duplicates
       final newEpisodeIds = episodeIdsToAdd
@@ -65,65 +65,65 @@ class PlaylistDetailsCubit extends Cubit<PlaylistDetailsState> {
 
       if (newEpisodeIds.isEmpty) {
         // Episodes already in playlist
-        emit(PlaylistDetailsInfo("Episode(s) already in playlist."));
+        emit(UserPlaylistMessage("Episode(s) already in playlist."));
         return;
       }
 
       playlist.episodeIds.addAll(newEpisodeIds);
-      playlistBox.put(playlist);
+      userPlaylistBox.put(playlist);
 
       final List<EpisodeEntity?> allPlaylistEpisodes =
           episodeBox.getMany(playlist.episodeIds);
       final List<EpisodeEntity> allEpisodeEntities =
           allPlaylistEpisodes.whereType<EpisodeEntity>().toList();
 
-      emit(PlaylistDetailsLoaded(
-        playlist: List<EpisodeEntity>.from(allEpisodeEntities),
+      emit(UserPlaylistLoaded(
+        userPlaylist: List<EpisodeEntity>.from(allEpisodeEntities),
         autoPlayEnabled: playlist.autoPlayEnabled,
       ));
     } catch (e) {
-      emit(PlaylistDetailsError("Error adding episode(s) to playlist."));
+      emit(UserPlaylistError("Error adding episode(s) to playlist."));
     }
   }
 
   Future<void> removeEpisodeFromPlaylist(int episodeId) async {
-    emit(PlaylistDetailsLoading());
+    emit(UserPlaylistLoading());
     try {
-      final AppPlaylist? playlist = playlistBox.get(globalPlaylistId);
+      final UserPlaylistEntity? playlist = userPlaylistBox.get(globalPlaylistId);
 
       if (playlist == null) {
         emit(
-            PlaylistDetailsError("Playlist not found. Cannot remove episode."));
+            UserPlaylistError("Playlist not found. Cannot remove episode."));
         return;
       }
 
       final bool wasRemoved = playlist.episodeIds.remove(episodeId);
 
       if (!wasRemoved) {
-        emit(PlaylistDetailsInfo("Episode not found in playlist."));
+        emit(UserPlaylistMessage("Episode not found in playlist."));
         await loadPlaylist();
         return;
       }
 
-      playlistBox.put(playlist);
+      userPlaylistBox.put(playlist);
 
       final List<EpisodeEntity?> allPlaylistEpisodes =
           episodeBox.getMany(playlist.episodeIds);
       final List<EpisodeEntity> allEpisodeEntities =
           allPlaylistEpisodes.whereType<EpisodeEntity>().toList();
 
-      emit(PlaylistDetailsLoaded(
-        playlist: allEpisodeEntities,
+      emit(UserPlaylistLoaded(
+        userPlaylist: allEpisodeEntities,
         autoPlayEnabled: playlist.autoPlayEnabled,
       ));
     } catch (e) {
-      emit(PlaylistDetailsError("Error removing episode from playlist."));
+      emit(UserPlaylistError("Error removing episode from playlist."));
     }
   }
 
   Future<void> reorderPlaylist(int oldIndex, int newIndex) async {
     try {
-      AppPlaylist? playlist = playlistBox.get(globalPlaylistId);
+      UserPlaylistEntity? playlist = userPlaylistBox.get(globalPlaylistId);
 
       if (playlist == null) {
         return;
@@ -147,59 +147,59 @@ class PlaylistDetailsCubit extends Cubit<PlaylistDetailsState> {
       final int episodeIdToMove = playlist.episodeIds.removeAt(oldIndex);
       playlist.episodeIds.insert(adjustedNewIndex, episodeIdToMove);
 
-      playlistBox.put(playlist);
+      userPlaylistBox.put(playlist);
       final List<EpisodeEntity?> allPlaylistEpisodes =
           episodeBox.getMany(playlist.episodeIds);
 
-      emit(PlaylistDetailsLoaded(
-        playlist: List<EpisodeEntity>.from(allPlaylistEpisodes),
+      emit(UserPlaylistLoaded(
+        userPlaylist: List<EpisodeEntity>.from(allPlaylistEpisodes),
         autoPlayEnabled: playlist.autoPlayEnabled,
       ));
     } catch (e) {
-      emit(PlaylistDetailsError("Error reordering playlist."));
+      emit(UserPlaylistError("Error reordering playlist."));
       loadPlaylist();
     }
   }
 
   Future<void> clearPlaylist() async {
-    emit(PlaylistDetailsLoading());
+    emit(UserPlaylistLoading());
     try {
-      final AppPlaylist? playlist = playlistBox.get(globalPlaylistId);
+      final UserPlaylistEntity? playlist = userPlaylistBox.get(globalPlaylistId);
 
       if (playlist == null) {
         return;
       }
 
       playlist.episodeIds.clear();
-      playlistBox.put(playlist);
+      userPlaylistBox.put(playlist);
 
-      emit(PlaylistDetailsLoaded(
-        playlist: const [],
+      emit(UserPlaylistLoaded(
+        userPlaylist: const [],
         autoPlayEnabled: playlist.autoPlayEnabled,
       ));
     } catch (e) {
-      emit(PlaylistDetailsError("Error clearing playlist."));
+      emit(UserPlaylistError("Error clearing playlist."));
     }
   }
 
   Future<void> updatePersistentSettings(bool enabled) async {
     try {
-      final AppPlaylist? playlist = playlistBox.get(globalPlaylistId);
+      final UserPlaylistEntity? playlist = userPlaylistBox.get(globalPlaylistId);
       if (playlist == null) {
         return;
       }
       playlist.autoPlayEnabled = enabled;
-      playlistBox.put(playlist);
+      userPlaylistBox.put(playlist);
 
       final List<EpisodeEntity?> allPlaylistEpisodes =
           episodeBox.getMany(playlist.episodeIds);
 
-      emit(PlaylistDetailsLoaded(
-        playlist: List<EpisodeEntity>.from(allPlaylistEpisodes),
+      emit(UserPlaylistLoaded(
+        userPlaylist: List<EpisodeEntity>.from(allPlaylistEpisodes),
         autoPlayEnabled: enabled,
       ));
     } catch (e) {
-      emit(PlaylistDetailsError("Error updating autoplay setting."));
+      emit(UserPlaylistError("Error updating autoplay setting."));
     }
   }
 }

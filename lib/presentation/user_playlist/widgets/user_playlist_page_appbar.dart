@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/playback_cubit/playback_cubit.dart';
-import '../../../application/playlist_details_cubit/playlist_details_cubit.dart';
+import '../../../application/user_playlist/user_playlist_cubit/user_playlist_cubit.dart';
 import '../../../core/globals.dart';
 import '../../custom_widgets/effects/backdropfilter.dart';
 
-class PlaylistPageAppBar {
+class UserPlaylistPageAppBar {
   static AppBar buildPlaylistPageAppBar(BuildContext context, ThemeData themeData) {
     final themeData = Theme.of(context);
     return AppBar(
       title: const Text('Playlist'),
       actions: [
         // Autoplay Toggle Button
-        BlocBuilder<PlaylistDetailsCubit, PlaylistDetailsState>(
+        BlocBuilder<UserPlaylistCubit, UserPlaylistState>(
           builder: (context, state) {
-            if (state is PlaylistDetailsLoaded) {
+            if (state is UserPlaylistLoaded) {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.min,
@@ -34,7 +34,7 @@ class PlaylistPageAppBar {
                     onChanged: (value) {
                       // Update the persistent autoplay setting in the cubit
                       context
-                          .read<PlaylistDetailsCubit>()
+                          .read<UserPlaylistCubit>()
                           .updatePersistentSettings(value);
                       // Update the autoplay setting in the playback cubit if the current playlist is the user's playlist
                       final String? origin = context.read<PlaybackCubit>().state.origin;
@@ -96,7 +96,7 @@ class PlaylistPageAppBar {
                 TextButton(
                   child: const Text('Clear'),
                   onPressed: () {
-                    context.read<PlaylistDetailsCubit>().clearPlaylist();
+                    context.read<UserPlaylistCubit>().clearPlaylist();
                     Navigator.of(dialogContext).pop();
                   },
                 ),
