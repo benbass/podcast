@@ -14,6 +14,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   PlaybackCubit() : super(const PlaybackState());
 
   Future<void> onPlay({
+    required String origin,
     required EpisodeEntity episode,
     required List<EpisodeEntity> playlist,
     required bool isAutoplayEnabled,
@@ -31,6 +32,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     }
 
     emit(state.copyWith(
+      origin: origin,
       episode: episode,
       currentPlaylist: playlist,
       currentIndex: index,
