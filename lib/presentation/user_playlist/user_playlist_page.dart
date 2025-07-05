@@ -165,7 +165,7 @@ class UserPlaylistPage extends StatelessWidget {
                             if (context.mounted) {
                               await context
                                   .read<UserPlaylistCubit>()
-                                  .removeEpisodeFromPlaylist(episode.id);
+                                  .removeEpisodeIdFromPlaylist(episode.id);
                             }
                           },
                         );
