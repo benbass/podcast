@@ -186,7 +186,7 @@ class EpisodeActionsDialog {
       {
         "title": "Add to playlist",
         "onPressed": () {
-          context.read<UserPlaylistCubit>().addEpisodeToPlaylist([episode.id]);
+          context.read<UserPlaylistCubit>().addEpisodeIdsToPlaylist([episode.id]);
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
