@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../core/globals.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../domain/entities/user_playlist_entity.dart';
+import '../../../objectbox.g.dart';
 
 part 'user_playlist_state.dart';
 
@@ -51,12 +52,13 @@ class UserPlaylistCubit extends Cubit<UserPlaylistState> {
     }
   }
 
-  Future<void> addEpisodeToPlaylist(List<int> episodeIdsToAdd) async {
+  Future<void> addEpisodeIdsToPlaylist(List<int> episodeIdsToAdd) async {
     emit(UserPlaylistLoading());
 
     try {
-      final UserPlaylistEntity playlist = userPlaylistBox.get(globalPlaylistId) ??
-          UserPlaylistEntity(id: globalPlaylistId, episodeIds: []);
+      final UserPlaylistEntity playlist =
+          userPlaylistBox.get(globalPlaylistId) ??
+              UserPlaylistEntity(id: globalPlaylistId, episodeIds: []);
 
       // Prevent duplicates
       final newEpisodeIds = episodeIdsToAdd
@@ -86,14 +88,14 @@ class UserPlaylistCubit extends Cubit<UserPlaylistState> {
     }
   }
 
-  Future<void> removeEpisodeFromPlaylist(int episodeId) async {
+  Future<void> removeEpisodeIdFromPlaylist(int episodeId) async {
     emit(UserPlaylistLoading());
     try {
-      final UserPlaylistEntity? playlist = userPlaylistBox.get(globalPlaylistId);
+      final UserPlaylistEntity? playlist =
+          userPlaylistBox.get(globalPlaylistId);
 
       if (playlist == null) {
-        emit(
-            UserPlaylistError("Playlist not found. Cannot remove episode."));
+        emit(UserPlaylistError("Playlist not found. Cannot remove episode."));
         return;
       }
 
@@ -164,7 +166,8 @@ class UserPlaylistCubit extends Cubit<UserPlaylistState> {
   Future<void> clearPlaylist() async {
     emit(UserPlaylistLoading());
     try {
-      final UserPlaylistEntity? playlist = userPlaylistBox.get(globalPlaylistId);
+      final UserPlaylistEntity? playlist =
+          userPlaylistBox.get(globalPlaylistId);
 
       if (playlist == null) {
         return;
@@ -184,7 +187,8 @@ class UserPlaylistCubit extends Cubit<UserPlaylistState> {
 
   Future<void> updatePersistentSettings(bool enabled) async {
     try {
-      final UserPlaylistEntity? playlist = userPlaylistBox.get(globalPlaylistId);
+      final UserPlaylistEntity? playlist =
+          userPlaylistBox.get(globalPlaylistId);
       if (playlist == null) {
         return;
       }
@@ -200,6 +204,23 @@ class UserPlaylistCubit extends Cubit<UserPlaylistState> {
       ));
     } catch (e) {
       emit(UserPlaylistError("Error updating autoplay setting."));
+    }
+  }
+
+  Future<void> removeEpisodeIdsByFeed({required int feedId}) async {
+    // Get the playlist
+    UserPlaylistEntity? playlist = userPlaylistBox.get(globalPlaylistId);
+
+    if (playlist != null && playlist.episodeIds.isNotEmpty) {
+      // Get all episode objects from db by feedID and build a set from their ids
+      final idsQueryBuilder =
+          episodeBox.query(EpisodeEntity_.feedId.equals(feedId)).build();
+      final episodeIds = idsQueryBuilder.findIds().toSet();
+
+      // Remove all ids from the playlist that are in the set
+      playlist.episodeIds.removeWhere((id) => episodeIds.contains(id));
+      // Save the playlist
+      userPlaylistBox.put(playlist);
     }
   }
 }
