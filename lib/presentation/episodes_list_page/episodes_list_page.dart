@@ -243,6 +243,7 @@ class EpisodesListPage extends StatelessWidget {
                                 episodes: episodesState.episodes,
                                 episode: item,
                                 podcast: currentPodcast,
+                                index: index,
                               );
                             },
                           ),
