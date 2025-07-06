@@ -31,12 +31,8 @@ class UserPlaylistListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<PlaybackCubit, PlaybackState>(
       builder: (context, state) {
-        final EpisodeEntity? currentlyPlayingEpisode = state.episode;
-
         final bool isCurrentlyPlayingThisEpisode =
-        currentlyPlayingEpisode != null
-            ? currentlyPlayingEpisode.id == episode.id
-            : false;
+            state.episode?.eId == episode.eId;
 
         final bool isAudioPlaying = isCurrentlyPlayingThisEpisode &&
             state.playbackStatus == PlaybackStatus.playing;
@@ -76,18 +72,12 @@ class UserPlaylistListItem extends StatelessWidget {
                 return BlocBuilder<PlaybackCubit, PlaybackState>(
                   builder: (context, currentlyPlayingEpisodeState) {
                     return Card(
-                      color: isAudioPlaying
-                          ? themeData.colorScheme.secondary
+                      color: isCurrentlyPlayingThisEpisode
+                          ? themeData.colorScheme.onPrimary
                           .withValues(alpha: 0.4)
                           : Colors.black12,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          side: isAudioPlaying
-                              ? BorderSide(
-                            color: themeData.colorScheme.secondary,
-                            width: 2.0,
-                          )
-                              : BorderSide.none),
+                          borderRadius: BorderRadius.circular(10.0),),
                       elevation: 4.0,
                       shadowColor: Colors.black12,
                       //margin: const EdgeInsets.all(8.0),
@@ -198,8 +188,8 @@ class UserPlaylistListItem extends StatelessWidget {
                                                 ),
                                                 color: Theme.of(context)
                                                     .colorScheme
-                                                    .primary,
-                                                iconSize: 30,
+                                                    .onPrimary,
+                                                iconSize: 40,
                                                 onPressed: onPlayTap,
                                               ),
                                             ],
