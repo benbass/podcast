@@ -8,6 +8,8 @@ import '../../../application/playback/playback_cubit/playback_cubit.dart';
 import '../../../domain/entities/episode_entity.dart';
 import '../../../helpers/core/utilities/format_utilities.dart';
 import '../../../helpers/core/utilities/image_provider.dart';
+import '../../../helpers/player/audiohandler.dart';
+import '../../../injection.dart';
 import '../../custom_widgets/dialogs/episode_actions_dialog.dart';
 import '../../custom_widgets/episode_actions_row.dart';
 import '../../custom_widgets/page_transition.dart';
@@ -19,11 +21,13 @@ class EpisodeCard extends StatelessWidget {
     required this.episodes,
     required this.episode,
     required this.podcast,
+    required this.index,
   });
 
   final List<EpisodeEntity> episodes;
   final EpisodeEntity episode;
   final PodcastEntity podcast;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -45,27 +49,25 @@ class EpisodeCard extends StatelessWidget {
             builder: (context, selectedEpisodesState) {
               bool isSelected = BlocProvider.of<EpisodeSelectionCubit>(context)
                   .isEpisodeSelected(episode);
-              Color cardColor = isSelected
-                  ? themeData.colorScheme.secondary.withValues(alpha: 0.4)
-                  : Colors.black12;
+
               return BlocBuilder<PlaybackCubit, PlaybackState>(
                 builder: (context, currentlyPlayingEpisodeState) {
                   final isCurrentlyPlaying =
                       currentlyPlayingEpisodeState.episode?.eId == episode.eId;
+                  Color cardColor = isSelected
+                      ? themeData.colorScheme.secondary.withValues(alpha: 0.4)
+                      : isCurrentlyPlaying
+                          ? themeData.colorScheme.onPrimary
+                              .withValues(alpha: 0.4)
+                          : Colors.black12;
                   return Card(
                     key: ValueKey(episode.eId),
                     color: cardColor,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        side: isCurrentlyPlaying
-                            ? BorderSide(
-                                color: themeData.colorScheme.secondary,
-                                width: 2.0,
-                              )
-                            : BorderSide.none),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                     elevation: 4.0,
                     shadowColor: Colors.black12,
-                    //margin: const EdgeInsets.all(8.0),
                     clipBehavior: Clip.antiAlias,
                     child: SizedBox(
                       height: dimension,
@@ -147,8 +149,17 @@ class EpisodeCard extends StatelessWidget {
                                               ),
                                           ],
                                         ),
-                                        if (episode.isSubscribed)
-                                          _buildEpisodeIconsRow(context),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            if (episode.isSubscribed)
+                                              _buildEpisodeIconsRow(context),
+                                            SizedBox(width: 30.0),
+                                            _buildPlayPauseButton(),
+                                            SizedBox(width: 5.0),
+                                          ],
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -165,6 +176,45 @@ class EpisodeCard extends StatelessWidget {
             },
           );
         });
+  }
+
+  BlocBuilder<PlaybackCubit, PlaybackState> _buildPlayPauseButton() {
+    return BlocBuilder<PlaybackCubit, PlaybackState>(
+      builder: (context, state) {
+        final EpisodeEntity? currentlyPlayingEpisode = state.episode;
+
+        final bool isCurrentlyPlayingThisEpisode =
+            currentlyPlayingEpisode != null
+                ? currentlyPlayingEpisode.id == episode.id
+                : false;
+
+        final bool isAudioPlaying = isCurrentlyPlayingThisEpisode &&
+            state.playbackStatus == PlaybackStatus.playing;
+        return SizedBox(
+          height: 40.0,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            icon: Icon(
+              isAudioPlaying
+                  ? Icons.pause_circle_filled
+                  : Icons.play_circle_fill,
+            ),
+            color: Theme.of(context).colorScheme.onPrimary,
+            iconSize: 40,
+            onPressed: () => isCurrentlyPlayingThisEpisode
+                ? getIt<MyAudioHandler>().handlePlayPauseFromCard(context)
+                : getIt<MyAudioHandler>().playEpisodeFromCard(
+                    context,
+                    index,
+                    episode,
+                    episodes,
+                    episode.podcast.target!.persistentSettings.target!
+                        .autoplayEnabled),
+          ),
+        );
+      },
+    );
   }
 
   void _navigateToEpisodeDetails(BuildContext context) {
