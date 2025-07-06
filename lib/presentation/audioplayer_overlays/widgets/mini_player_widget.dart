@@ -145,7 +145,7 @@ class MiniPlayerWidget extends StatelessWidget {
                   final isPlaying = stream.data?.playing;
                   return IconButton(
                     onPressed: () {
-                      getIt<MyAudioHandler>().handlePlayPause();
+                      getIt<MyAudioHandler>().handlePlayPauseFromCard(context);
                     },
                     icon: Icon(
                       isPlaying == true
