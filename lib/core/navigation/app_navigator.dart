@@ -20,9 +20,7 @@ class AppNavigator {
     if (context == null) return;
 
     EpisodeEntity episode =
-        BlocProvider.of<PlaybackCubit>(context, listen: false)
-            .state
-            .episode!;
+        BlocProvider.of<PlaybackCubit>(context, listen: false).state.episode!;
     List<EpisodeEntity> episodes =
         BlocProvider.of<PlaybackCubit>(context, listen: false)
             .state
@@ -40,7 +38,8 @@ class AppNavigator {
     final podcastBloc = BlocProvider.of<PodcastBloc>(context);
     podcastBloc.add(PodcastSelectedEvent(podcast: podcast));
 
-    Navigator.of(context).push(
+    Navigator.pop(
+      context,
       MaterialPageRoute<void>(
         builder: (BuildContext context) => EpisodeDetailsPage(
           initialEpisode: episode,
