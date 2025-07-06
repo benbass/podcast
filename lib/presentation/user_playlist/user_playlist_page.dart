@@ -7,7 +7,6 @@ import 'package:podcast/presentation/user_playlist/widgets/user_playlist_page_ap
 import '../../application/playback/playback_cubit/playback_cubit.dart';
 import '../../application/podcast/podcast_bloc/podcast_bloc.dart';
 import '../../application/user_playlist/user_playlist_cubit/user_playlist_cubit.dart';
-import '../../core/globals.dart';
 import '../../domain/entities/episode_entity.dart';
 import '../../domain/entities/podcast_entity.dart';
 import '../../helpers/player/audiohandler.dart';
@@ -47,7 +46,8 @@ class UserPlaylistPage extends StatelessWidget {
     final themeData = Theme.of(context);
     context.read<UserPlaylistCubit>().loadPlaylist();
     return Scaffold(
-      appBar: UserPlaylistPageAppBar.buildPlaylistPageAppBar(context, themeData),
+      appBar:
+          UserPlaylistPageAppBar.buildPlaylistPageAppBar(context, themeData),
       body: SafeArea(
         child: Stack(
           fit: StackFit.expand,
@@ -84,9 +84,8 @@ class UserPlaylistPage extends StatelessWidget {
                       children: [
                         Text(state.message),
                         ElevatedButton(
-                          onPressed: () => context
-                              .read<UserPlaylistCubit>()
-                              .loadPlaylist(),
+                          onPressed: () =>
+                              context.read<UserPlaylistCubit>().loadPlaylist(),
                           child: const Text('Try again'),
                         )
                       ],
@@ -133,8 +132,13 @@ class UserPlaylistPage extends StatelessWidget {
                           episode: episode,
                           podcast: podcast,
                           onPlayTap: () => isPlayingThisEpisode
-                              ? _handlePlayPause(context)
-                              : _playEpisode(context, index, episode, episodes,
+                              ? getIt<MyAudioHandler>()
+                                  .handlePlayPauseFromCard(context)
+                              : getIt<MyAudioHandler>().playEpisodeFromCard(
+                                  context,
+                                  index,
+                                  episode,
+                                  episodes,
                                   autoplayEnabled),
                           onTap: () {
                             final podcast = episode.podcast.target!;
@@ -197,38 +201,5 @@ class UserPlaylistPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _playEpisode(
-    BuildContext context,
-    int index,
-    EpisodeEntity episode,
-    List<EpisodeEntity> episodes,
-    bool autoplayEnabled,
-  ) async {
-    if (context.read<PlaybackCubit>().state.episode != null) {
-      final previousEpisode = context.read<PlaybackCubit>().state.episode;
-      previousEpisode!.position =
-          getIt<MyAudioHandler>().player.position.inSeconds;
-      episodeBox.put(previousEpisode);
-    }
-    await context.read<PlaybackCubit>().onPlay(
-          origin: globalPlaylistId.toString(),
-          episode: episode,
-          playlist: episodes,
-          isAutoplayEnabled: autoplayEnabled,
-          currentIndex: index,
-          isUserPlaylist: true,
-        );
-
-    await getIt<MyAudioHandler>().play();
-    if (context.mounted && overlayEntry == null) {
-      showOverlayPlayerMin(context);
-    }
-  }
-
-  void _handlePlayPause(BuildContext context) {
-    getIt<MyAudioHandler>().handlePlayPause();
-    context.read<PlaybackCubit>().onPlayPause();
   }
 }
