@@ -235,9 +235,11 @@ class _EpisodeDetailsPageState extends State<EpisodeDetailsPage> {
                                                         if (episodeToDisplay
                                                             .isSubscribed)
                                                           Expanded(
-                                                            child: EpisodeActionsRow(
-                                                                episode:
-                                                                    episodeToDisplay),
+                                                            child:
+                                                                EpisodeActionsRow(
+                                                              episode:
+                                                                  episodeToDisplay,
+                                                            ),
                                                           ),
                                                         if (episodeToDisplay
                                                             .isSubscribed)
