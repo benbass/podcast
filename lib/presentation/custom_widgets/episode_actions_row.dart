@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:podcast/domain/usecases/episode_usecases.dart';
 import 'package:podcast/presentation/custom_widgets/effects/backdropfilter.dart';
@@ -13,7 +12,10 @@ import 'action_feedback/action_feedback.dart';
 
 class EpisodeActionsRow extends StatefulWidget {
   final EpisodeEntity episode;
-  const EpisodeActionsRow({super.key, required this.episode});
+  const EpisodeActionsRow({
+    super.key,
+    required this.episode,
+  });
 
   @override
   State<EpisodeActionsRow> createState() => _EpisodeActionsRowState();
@@ -85,7 +87,7 @@ class _EpisodeActionsRowState extends State<EpisodeActionsRow> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Spacer(flex: 5),
+                const Spacer(flex: 3),
                 Icon(
                   isRead ? Icons.check_rounded : null,
                   size: 30.0,
