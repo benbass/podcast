@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import '../../application/playback/playback_cubit/playback_cubit.dart';
 import '../../core/globals.dart';
+import '../../domain/entities/episode_entity.dart';
 import '../../injection.dart';
 import '../../main.dart';
 import '../../presentation/audioplayer_overlays/audioplayer_overlays.dart';
@@ -73,8 +74,6 @@ class MyAudioHandler {
     context.read<PlaybackCubit>().resetPlayback();
 
     await player.stop();
-
-
   }
 
   Future<void> stopOnCompleted() async {
@@ -135,9 +134,8 @@ class MyAudioHandler {
     bool playbackCubitIsReady = false;
     final context = MyApp.navigatorKey.currentContext;
     if (context!.mounted) {
-      playbackCubitIsReady =
-          await BlocProvider.of<PlaybackCubit>(context)
-              .onPlayNext(autoplayEnabled);
+      playbackCubitIsReady = await BlocProvider.of<PlaybackCubit>(context)
+          .onPlayNext(autoplayEnabled);
     }
     if (playbackCubitIsReady) {
       await play();
@@ -151,8 +149,7 @@ class MyAudioHandler {
 
     if (context!.mounted) {
       playbackCubitIsReady =
-          await BlocProvider.of<PlaybackCubit>(context)
-              .onPlayPrevious();
+          await BlocProvider.of<PlaybackCubit>(context).onPlayPrevious();
     }
     if (playbackCubitIsReady) {
       await play();
@@ -160,6 +157,42 @@ class MyAudioHandler {
     return playbackCubitIsReady;
   }
 
+  // Actions from cards
+  // play
+  void playEpisodeFromCard(
+    BuildContext context,
+    int index,
+    EpisodeEntity episode,
+    List<EpisodeEntity> episodes,
+    bool autoplayEnabled,
+  ) async {
+    if (context.read<PlaybackCubit>().state.episode != null) {
+      final previousEpisode = context.read<PlaybackCubit>().state.episode;
+      previousEpisode!.position = player.position.inSeconds;
+      episodeBox.put(previousEpisode);
+    }
+    await context.read<PlaybackCubit>().onPlay(
+          origin: globalPlaylistId.toString(),
+          episode: episode,
+          playlist: episodes,
+          isAutoplayEnabled: autoplayEnabled,
+          currentIndex: index,
+          isUserPlaylist: true,
+        );
+
+    await play();
+    if (context.mounted && overlayEntry == null) {
+      showOverlayPlayerMin(context);
+    }
+  }
+
+  // Play/Pause
+  void handlePlayPauseFromCard(BuildContext context) {
+    handlePlayPause();
+    context.read<PlaybackCubit>().onPlayPause();
+  }
+
+  //
   void dispose() {
     player.dispose();
   }
